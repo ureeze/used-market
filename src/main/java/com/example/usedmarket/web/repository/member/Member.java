@@ -1,17 +1,19 @@
 package com.example.usedmarket.web.repository.member;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MEMBER")
 @Getter
+@ToString
 @NoArgsConstructor
 public class Member {
 
@@ -33,8 +35,16 @@ public class Member {
     private Role role;
 
     @CreatedDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "CREATE_AT", nullable = false)
-    private LocalDate createAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "CREATE_AT", nullable = true)
+    private LocalDateTime createAt;
+
+    @Builder
+    public Member(String name, String email, Role role, LocalDateTime createAt) {
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.createAt = createAt;
+    }
 
 }
