@@ -31,7 +31,6 @@ public class MemberServiceImpl implements MemberService {
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .role(Role.GUEST)
-                .createAt(LocalDateTime.now())
                 .build();
         //member를 DB에 저장.
         Member savedMember = memberRepository.save(member);
@@ -52,12 +51,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Long update(Long id, MemberRequestDto requestDto) {
-        return null;
+    public MemberResponseDto update(Long id, MemberRequestDto requestDto) {
+        Member member = memberRepository.getById(id);
+        member.update(requestDto.getName(), requestDto.getEmail());
+        return MemberResponseDto.toDto(memberRepository.save(member));
     }
 
     @Override
     public void delete(Long id) {
-
+        memberRepository.deleteById(id);
     }
 }

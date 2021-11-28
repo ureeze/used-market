@@ -17,7 +17,7 @@ public interface MemberService {
     List<MemberResponseDto> findAll();
 
     //회원 업데이트
-    Long update(Long id, MemberRequestDto requestDto);
+    MemberResponseDto update(Long id, MemberRequestDto requestDto);
 
     //회원 삭제
     void delete(Long id);

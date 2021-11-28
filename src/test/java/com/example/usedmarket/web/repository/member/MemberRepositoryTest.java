@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -35,7 +34,6 @@ class MemberRepositoryTest {
                 .name(name)
                 .email(email)
                 .role(Role.GUEST)
-                .createAt(LocalDateTime.now())
                 .build();
 
         //when
@@ -58,7 +56,6 @@ class MemberRepositoryTest {
         memberRepository.save(Member.builder()
                 .name(name)
                 .email(email)
-                .createAt(LocalDateTime.now())
                 .role(Role.GUEST)
                 .build());
 

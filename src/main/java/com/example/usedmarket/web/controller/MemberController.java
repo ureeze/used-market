@@ -32,4 +32,15 @@ public class MemberController {
     public ResponseEntity<List<MemberResponseDto>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.findAll());
     }
+
+    @PutMapping("/members/{id}")
+    public ResponseEntity<MemberResponseDto> updateOne(@PathVariable Long id, @RequestBody MemberRequestDto memberRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(memberService.update(id, memberRequestDto));
+    }
+
+    @DeleteMapping("/members/{id}")
+    public ResponseEntity<MemberResponseDto> updateOne(@PathVariable Long id) {
+        memberService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).body(MemberResponseDto.builder().id(id).build());
+    }
 }
