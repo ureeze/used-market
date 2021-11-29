@@ -30,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
         //member를 DB에 저장.
         Member savedMember = memberRepository.save(member);
@@ -38,18 +38,20 @@ public class MemberServiceImpl implements MemberService {
         return MemberResponseDto.toDto(savedMember);
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public MemberResponseDto findById(Long id) {
         Member updatedMember = memberRepository.findById(id).get();
         return MemberResponseDto.toDto(updatedMember);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<MemberResponseDto> findAll() {
         return memberRepository.findAll().stream().map(member -> MemberResponseDto.toDto(member)).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public MemberResponseDto update(Long id, MemberRequestDto requestDto) {
         Member member = memberRepository.getById(id);
@@ -57,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
         return MemberResponseDto.toDto(memberRepository.save(member));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         memberRepository.deleteById(id);

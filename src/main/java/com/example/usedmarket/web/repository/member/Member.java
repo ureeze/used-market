@@ -42,14 +42,21 @@ public class Member {
     private LocalDateTime createAt;
 
     @Builder
-    public Member(String name, String email, Role role) {
+    public Member(String name, String email, Role role, String picture) {
         this.name = name;
         this.email = email;
+        this.picture = picture;
         this.role = role;
     }
 
-    public void update(String name, String email) {
+
+    public Member update(String name, String picture) {
         this.name = name;
-        this.email = email;
+        this.picture = picture;
+        return this;
+    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
     }
 }

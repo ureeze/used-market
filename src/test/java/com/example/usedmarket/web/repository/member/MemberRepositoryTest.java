@@ -33,7 +33,7 @@ class MemberRepositoryTest {
         Member member = Member.builder()
                 .name(name)
                 .email(email)
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
 
         //when
@@ -56,7 +56,7 @@ class MemberRepositoryTest {
         memberRepository.save(Member.builder()
                 .name(name)
                 .email(email)
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build());
 
         //then
