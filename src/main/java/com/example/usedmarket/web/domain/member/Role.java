@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.repository.member;
+package com.example.usedmarket.web.domain.member;
 
 import lombok.Getter;
 

@@ -1,14 +1,15 @@
 package com.example.usedmarket.web.service.post;
 
-import com.example.usedmarket.web.dto.PostRequestDto;
+import com.example.usedmarket.web.config.auth.dto.SessionMember;
 import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.PostSaveRequestDto;
 
 import java.util.List;
 
 public interface PostService {
 
     //포스트 등록
-    PostResponseDto save(PostRequestDto requestDTO);
+    PostResponseDto save(SessionMember member, PostSaveRequestDto requestDTO);
 
     //포스트 조회
     PostResponseDto findById(Long id);
@@ -17,7 +18,7 @@ public interface PostService {
     List<PostResponseDto> findAll();
 
     //포스트 수정
-    PostResponseDto update(Long id, PostRequestDto requestDTO);
+    PostResponseDto update(Long id, PostSaveRequestDto requestDTO);
 
     //포스트 삭제
     void delete(Long id);

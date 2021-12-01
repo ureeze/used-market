@@ -1,8 +1,8 @@
-package com.example.usedmarket.web.repository.post;
+package com.example.usedmarket.web.domain.post;
 
-import com.example.usedmarket.web.repository.member.Member;
-import com.example.usedmarket.web.repository.member.MemberRepository;
-import com.example.usedmarket.web.repository.member.Role;
+import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.domain.member.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

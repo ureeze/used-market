@@ -2,14 +2,13 @@ package com.example.usedmarket.web.service.member;
 
 import com.example.usedmarket.web.dto.MemberResponseDto;
 import com.example.usedmarket.web.dto.MemberRequestDto;
-import com.example.usedmarket.web.repository.member.Member;
-import com.example.usedmarket.web.repository.member.MemberRepository;
-import com.example.usedmarket.web.repository.member.Role;
+import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.domain.member.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

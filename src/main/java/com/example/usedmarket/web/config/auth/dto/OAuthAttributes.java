@@ -1,7 +1,7 @@
 package com.example.usedmarket.web.config.auth.dto;
 
-import com.example.usedmarket.web.repository.member.Member;
-import com.example.usedmarket.web.repository.member.Role;
+import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.member.Role;
 import lombok.Builder;
 import lombok.Getter;
 

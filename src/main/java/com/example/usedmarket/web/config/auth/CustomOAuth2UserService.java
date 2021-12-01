@@ -2,8 +2,8 @@ package com.example.usedmarket.web.config.auth;
 
 import com.example.usedmarket.web.config.auth.dto.OAuthAttributes;
 import com.example.usedmarket.web.config.auth.dto.SessionMember;
-import com.example.usedmarket.web.repository.member.Member;
-import com.example.usedmarket.web.repository.member.MemberRepository;
+import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

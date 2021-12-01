@@ -1,6 +1,6 @@
 package com.example.usedmarket.web.config.auth;
 
-import com.example.usedmarket.web.repository.member.Role;
+import com.example.usedmarket.web.domain.member.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

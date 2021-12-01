@@ -1,7 +1,7 @@
-package com.example.usedmarket.web.repository.post;
+package com.example.usedmarket.web.domain.post;
 
-import com.example.usedmarket.web.repository.member.Member;
-import com.example.usedmarket.web.repository.member.Role;
+import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,5 +55,14 @@ public class Post {
         this.content = content;
         this.status = status;
         this.member = member;
+    }
+
+    public static Post toEntity(Member member, PostSaveRequestDto postRequest){
+        return Post.builder()
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
+                .status(Status.SELL)
+                .member(member)
+                .build();
     }
 }
