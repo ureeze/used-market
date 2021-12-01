@@ -1,11 +1,13 @@
 package com.example.usedmarket.web.dto;
 
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.Status;
 import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class PostResponseDto implements Serializable {
     private Status status;
     private LocalDateTime createdAt;
     private Long memberId;
+    private List<Book> bookList;
 
     public static PostResponseDto toDto(Post post) {
         return PostResponseDto.builder()
@@ -27,8 +30,8 @@ public class PostResponseDto implements Serializable {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .status(post.getStatus())
-                .createdAt(post.getCreateAt())
                 .memberId(post.getMember().getId())
+                .bookList(post.getBookList())
                 .build();
     }
 }

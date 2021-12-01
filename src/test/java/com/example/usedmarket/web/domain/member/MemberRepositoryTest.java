@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,7 @@ class MemberRepositoryTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("멤버 저장 테스트")
     public void createMemberTest() {
         //given
@@ -51,6 +53,7 @@ class MemberRepositoryTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("멤버조회 테스트")
     public void findMemberTest() {
         //given

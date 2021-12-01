@@ -1,24 +1,20 @@
 package com.example.usedmarket.web.domain.post;
 
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "POST")
 @Getter
-@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
     @Id
@@ -35,19 +31,13 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @CreatedDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "CREATE_AT", nullable = false)
-    private LocalDateTime createAt;
-
-    @LastModifiedDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "UPDATE_AT", nullable = false)
-    private LocalDateTime updateAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
+    private List<Book> bookList = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, Status status, Member member) {
@@ -57,12 +47,17 @@ public class Post {
         this.member = member;
     }
 
-    public static Post toEntity(Member member, PostSaveRequestDto postRequest){
+    public static Post toPost(Member member, PostSaveRequestDto postRequest) {
         return Post.builder()
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
                 .status(Status.SELL)
                 .member(member)
                 .build();
+    }
+
+    public void update(PostSaveRequestDto postSaveRequestDto) {
+        this.title = postSaveRequestDto.getTitle();
+        this.content = postSaveRequestDto.getContent();
     }
 }

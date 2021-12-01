@@ -1,9 +1,6 @@
 package com.example.usedmarket.web.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -16,20 +13,22 @@ public class PostSaveRequestDto {
 
     private String bookName;
 
-    private int inventoryQuantity;
+    private int stock;
 
     private int unitPrice;
 
     private String category;
 
+    private String imgUrl;
 
     @Builder
-    public PostSaveRequestDto(String title, String content, String bookName, int inventoryQuantity, int unitPrice, String category) {
+    public PostSaveRequestDto(String title, String content, String bookName, int stock, int unitPrice,String imgUrl, String category) {
         this.title = title;
         this.content = content;
         this.bookName = bookName;
-        this.inventoryQuantity = inventoryQuantity;
+        this.stock = stock;
         this.unitPrice = unitPrice;
+        this.imgUrl = imgUrl;
         this.category = category;
     }
 }

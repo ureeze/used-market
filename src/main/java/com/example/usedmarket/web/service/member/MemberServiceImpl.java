@@ -20,7 +20,7 @@ public class MemberServiceImpl implements MemberService {
 
     /*
     SignUpRequestDto 를 통한 member 생성.
-    @return member를 memberResponseDto로 변환 후 반환
+    @return member 를 memberResponseDto 로 변환 후 반환
      */
     @Transactional
     @Override
@@ -31,25 +31,39 @@ public class MemberServiceImpl implements MemberService {
                 .email(dto.getEmail())
                 .role(Role.USER)
                 .build();
-        //member를 DB에 저장.
+        //member 를 DB에 저장.
         Member savedMember = memberRepository.save(member);
-        //savedMember를 memberResponseDto에 넣어 반환
+        //savedMember 를 memberResponseDto 에 넣어 반환
         return MemberResponseDto.toDto(savedMember);
     }
 
+    /*
+    MemberRepository 에서 Member 조회
+    @return findMember 를 MemberResponseDto 로 변환 후 반환
+     */
     @Transactional(readOnly = true)
     @Override
     public MemberResponseDto findById(Long id) {
-        Member updatedMember = memberRepository.findById(id).get();
-        return MemberResponseDto.toDto(updatedMember);
+        // id 값을 이용해 MemberRepository 에서 Member 조회
+        Member findMember = memberRepository.findById(id).get();
+        // findMember 를 MemberResponseDto 로 변환 후 반환
+        return MemberResponseDto.toDto(findMember);
     }
 
+    /*
+    Repository 에서 member 리스트 조회
+    @return member 를 memberResponseDto 로 stream 을 이용해 변환 후 리스트로 반환
+     */
     @Transactional(readOnly = true)
     @Override
     public List<MemberResponseDto> findAll() {
         return memberRepository.findAll().stream().map(member -> MemberResponseDto.toDto(member)).collect(Collectors.toList());
     }
 
+    /*
+    Member 의 id 값과 수정하고자 하는 MemberRequestDto 를 input 으로 받음
+    @return 수정된 member 를 memberResponseDto 로 변환 후 반환
+     */
     @Transactional
     @Override
     public MemberResponseDto update(Long id, MemberRequestDto requestDto) {
@@ -58,6 +72,9 @@ public class MemberServiceImpl implements MemberService {
         return MemberResponseDto.toDto(memberRepository.save(member));
     }
 
+    /*
+    input 으로 들어온 id 값에 해당하는 Member 제거
+     */
     @Transactional
     @Override
     public void delete(Long id) {
