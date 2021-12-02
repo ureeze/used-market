@@ -39,7 +39,6 @@ class MemberServiceTest {
         return requestDto;
     }
 
-    @BeforeEach
     @AfterEach
     public void clean() {
         memberRepository.deleteAll();

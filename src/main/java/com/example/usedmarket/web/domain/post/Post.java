@@ -1,5 +1,6 @@
 package com.example.usedmarket.web.domain.post;
 
+import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
@@ -16,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Post {
+public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

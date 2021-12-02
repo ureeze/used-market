@@ -31,6 +31,7 @@ public class PostServiceImpl implements PostService {
         // requestDto 를 이용해 Book 생성
         Post post = Post.toPost(Member.toMember(sessionMember), requestDTO);
         Book book = Book.toBook(requestDTO);
+        // post 에 book 추가
         post.getBookList().add(book);
 
         // PostRepository 에 post 저장
