@@ -33,15 +33,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @Builder
-//    public Member(String name, String email, Role role, String picture) {
-//        this.name = name;
-//        this.email = email;
-//        this.picture = picture;
-//        this.role = role;
-//    }
-
-
     public Member update(String name, String picture) {
         this.name = name;
         this.picture = picture;

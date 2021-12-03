@@ -116,4 +116,6 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.[0].id").isNumber());
 
     }
+
+
 }

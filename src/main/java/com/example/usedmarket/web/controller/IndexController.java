@@ -3,6 +3,8 @@ package com.example.usedmarket.web.controller;
 import com.example.usedmarket.web.config.auth.LoginUser;
 import com.example.usedmarket.web.config.auth.dto.SessionMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +18,9 @@ public class IndexController {
         if (member != null) {
             model.addAttribute("memberName", member.getName());
             System.out.println("member is not null");
+
         }
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "index";
     }
 }

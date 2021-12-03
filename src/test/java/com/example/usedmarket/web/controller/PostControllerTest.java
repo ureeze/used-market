@@ -1,7 +1,9 @@
 package com.example.usedmarket.web.controller;
 
+import com.example.usedmarket.web.config.auth.dto.SessionMember;
 import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.dto.MemberRequestDto;
+import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,16 +14,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,6 +35,8 @@ class PostControllerTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     WebApplicationContext context;
@@ -51,10 +52,18 @@ class PostControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "pbj", roles = "USER")
     @DisplayName("Post 등록 테스트")
     void save() throws Exception {
         //given
+
+        Member mem = Member.builder()
+                .name("test")
+                .email("test@google.com")
+                .picture("pic")
+                .role(Role.USER)
+                .build();
+        SessionMember sessionMember = new SessionMember(memberRepository.save(mem));
+
         PostSaveRequestDto requestDto = PostSaveRequestDto.builder()
                 .title("title")
                 .content("content")
@@ -68,12 +77,14 @@ class PostControllerTest {
         String url = "http://localhost:" + port + "/posts";
 
         //when
-        mvc.perform(post(url)
+        //then
+        mvc.perform(post(url).with(user(sessionMember))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andDo(print());
 
-        //then
+
     }
+
 }
