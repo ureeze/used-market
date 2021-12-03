@@ -2,7 +2,7 @@ package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.config.auth.LoginUser;
 import com.example.usedmarket.web.config.auth.dto.SessionMember;
-import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.service.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -20,37 +20,37 @@ public class PostController {
 
     //포스트 저장
     @PostMapping("/posts")
-    public ResponseEntity<PostResponseDto> save(@LoginUser SessionMember member, @RequestBody PostSaveRequestDto requestDto) {
-        PostResponseDto responseDto = postService.save(member, requestDto);
+    public ResponseEntity<PostSaveResponseDto> save(@LoginUser SessionMember member, @RequestBody PostSaveRequestDto requestDto) {
+        PostSaveResponseDto responseDto = postService.save(member, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     //포스트 조회
     @GetMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> findById(@PathVariable Long id) {
-        PostResponseDto responseDto = postService.findById(id);
+    public ResponseEntity<PostSaveResponseDto> findById(@PathVariable Long id) {
+        PostSaveResponseDto responseDto = postService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //포스트 전체조회
     @GetMapping("/posts")
-    public ResponseEntity<List<PostResponseDto>> findAll() {
-        List<PostResponseDto> responseDtoList = postService.findAll();
+    public ResponseEntity<List<PostSaveResponseDto>> findAll() {
+        List<PostSaveResponseDto> responseDtoList = postService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     //포스트 수정
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> update(@PathVariable Long id, @RequestBody PostSaveRequestDto requestDto) {
-        PostResponseDto responseDto = postService.update(id, requestDto);
+    public ResponseEntity<PostSaveResponseDto> update(@PathVariable Long id, @RequestBody PostSaveRequestDto requestDto) {
+        PostSaveResponseDto responseDto = postService.update(id, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //포스트 삭제
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> delete(@PathVariable Long id) {
+    public ResponseEntity<PostSaveResponseDto> delete(@PathVariable Long id) {
         postService.delete(id);
-        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.builder().postId(id).build());
+        return ResponseEntity.status(HttpStatus.OK).body(PostSaveResponseDto.builder().postId(id).build());
     }
 
 }

@@ -8,7 +8,7 @@ import com.example.usedmarket.web.domain.member.MemberRepository;
 import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +76,7 @@ class PostServiceTest {
         PostSaveRequestDto requestDto = retrieveRequestDto();
 
         //when
-        PostResponseDto responseDto = postService.save(sessionMember, requestDto);
+        PostSaveResponseDto responseDto = postService.save(sessionMember, requestDto);
 
         //then
         assertEquals(requestDto.getContent(), responseDto.getContent());
@@ -96,7 +96,7 @@ class PostServiceTest {
 
         //when
         postRepository.save(post);
-        PostResponseDto responseDto = postService.findById(post.getId());
+        PostSaveResponseDto responseDto = postService.findById(post.getId());
 
         //then
         assertEquals(post.getId(), responseDto.getPostId());
@@ -120,7 +120,7 @@ class PostServiceTest {
         //when
         postRepository.save(post0);
         postRepository.save(post1);
-        List<PostResponseDto> postList = postService.findAll();
+        List<PostSaveResponseDto> postList = postService.findAll();
 
         //then
         assertEquals(post0.getId(), postList.get(0).getPostId());

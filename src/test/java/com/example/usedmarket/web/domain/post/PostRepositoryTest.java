@@ -52,7 +52,7 @@ class PostRepositoryTest {
         Post post = Post.builder()
                 .title("스프링부트")
                 .content("스프링부트2.0은 스프링프레임워크의 ....")
-                .status(Status.SELL)
+                .status(PostStatus.SELL)
                 .member(member)
                 .build();
         Book book = Book.builder()

@@ -30,18 +30,17 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private PostStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
     private List<Book> bookList = new ArrayList<>();
 
     @Builder
-    public Post(String title, String content, Status status, Member member) {
+    public Post(String title, String content, PostStatus status, Member member) {
         this.title = title;
         this.content = content;
         this.status = status;
@@ -52,7 +51,7 @@ public class Post extends BaseTimeEntity {
         return Post.builder()
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
-                .status(Status.SELL)
+                .status(PostStatus.SELL)
                 .member(member)
                 .build();
     }

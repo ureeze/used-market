@@ -2,7 +2,7 @@ package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.Post;
-import com.example.usedmarket.web.domain.post.Status;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import lombok.*;
 
 import java.io.Serializable;
@@ -14,18 +14,18 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostResponseDto implements Serializable {
+public class PostSaveResponseDto implements Serializable {
 
     private Long postId;
     private String title;
     private String content;
-    private Status status;
+    private PostStatus status;
     private LocalDateTime createdAt;
     private Long memberId;
     private List<Book> bookList;
 
-    public static PostResponseDto toDto(Post post) {
-        return PostResponseDto.builder()
+    public static PostSaveResponseDto toDto(Post post) {
+        return PostSaveResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
