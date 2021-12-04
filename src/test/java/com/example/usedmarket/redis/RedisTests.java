@@ -1,13 +1,12 @@
 package com.example.usedmarket.redis;
 
-import com.example.usedmarket.web.config.auth.RedisSessionConfig;
+import com.example.usedmarket.web.config.RedisSessionConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,6 +1,6 @@
 package com.example.usedmarket.web.domain.member;
 
-import com.example.usedmarket.web.config.auth.dto.SessionMember;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

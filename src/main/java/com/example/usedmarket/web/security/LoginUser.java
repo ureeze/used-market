@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.config.auth;
+package com.example.usedmarket.web.security;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

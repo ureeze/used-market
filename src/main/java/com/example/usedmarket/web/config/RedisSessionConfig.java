@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.config.auth;
+package com.example.usedmarket.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

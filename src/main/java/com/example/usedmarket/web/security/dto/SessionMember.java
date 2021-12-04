@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.config.auth.dto;
+package com.example.usedmarket.web.security.dto;
 
 import com.example.usedmarket.web.domain.member.Member;
 import lombok.Getter;

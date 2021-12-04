@@ -1,6 +1,6 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.config.auth.dto.SessionMember;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.member.MemberRepository;

@@ -1,7 +1,7 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.config.auth.LoginUser;
-import com.example.usedmarket.web.config.auth.dto.SessionMember;
+import com.example.usedmarket.web.security.LoginUser;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +20,7 @@ public class IndexController {
             System.out.println("member is not null");
 
         }
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "index";
     }
 }
