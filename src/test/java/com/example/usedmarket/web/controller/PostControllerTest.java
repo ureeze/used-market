@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.member.MemberRepository;
@@ -8,6 +7,7 @@ import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -124,10 +124,10 @@ class PostControllerTest {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
         PostSaveRequestDto requestDto1 = createPostSaveRequestDto(1);
-        Post post0 = Post.toPost(member, requestDto0);
-        Post post1 = Post.toPost(member, requestDto1);
-        Book book0 = Book.toBook(requestDto0);
-        Book book1 = Book.toBook(requestDto1);
+        Post post0 = requestDto0.toPost(sessionMember);
+        Post post1 = requestDto1.toPost(sessionMember);
+        Book book0 = requestDto0.toBook();
+        Book book1 = requestDto1.toBook();
         post0.getBookList().add(book0);
         post0.getBookList().add(book1);
         post1.getBookList().add(book0);
@@ -156,8 +156,8 @@ class PostControllerTest {
     void findById() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = Post.toPost(member, requestDto0);
-        Book book0 = Book.toBook(requestDto0);
+        Post post0 = requestDto0.toPost(sessionMember);
+        Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);
 
@@ -182,14 +182,14 @@ class PostControllerTest {
     void update() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = Post.toPost(member, requestDto0);
-        Book book0 = Book.toBook(requestDto0);
+        Post post0 = requestDto0.toPost(sessionMember);
+        Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);
 
         PostSaveRequestDto requestDto1 = createPostSaveRequestDto(1);
-        Post post1 = Post.toPost(member, requestDto1);
-        Book book1 = Book.toBook(requestDto1);
+        Post post1 = requestDto1.toPost(sessionMember);
+        Book book1 = requestDto1.toBook();
         post1.getBookList().add(book1);
 
         String url = "http://localhost:" + port + "/posts/" + post0.getId();
@@ -214,8 +214,8 @@ class PostControllerTest {
     void deleteById() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = Post.toPost(member, requestDto0);
-        Book book0 = Book.toBook(requestDto0);
+        Post post0 = requestDto0.toPost(sessionMember);
+        Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);
 

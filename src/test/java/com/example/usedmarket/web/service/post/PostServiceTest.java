@@ -8,7 +8,7 @@ import com.example.usedmarket.web.domain.member.MemberRepository;
 import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +76,7 @@ class PostServiceTest {
         PostSaveRequestDto requestDto = retrieveRequestDto();
 
         //when
-        PostSaveResponseDto responseDto = postService.save(sessionMember, requestDto);
+        PostResponseDto responseDto = postService.save(sessionMember, requestDto);
 
         //then
         assertEquals(requestDto.getContent(), responseDto.getContent());
@@ -90,13 +90,13 @@ class PostServiceTest {
     public void findPost() {
         //given
         SessionMember sessionMember = retrieveSessionMember();
-        Post post = Post.toPost(Member.toMember(sessionMember), retrieveRequestDto());
-        Book book = Book.toBook(retrieveRequestDto());
+        Post post = retrieveRequestDto().toPost(sessionMember);
+        Book book = retrieveRequestDto().toBook();
         post.getBookList().add(book);
+        postRepository.save(post);
 
         //when
-        postRepository.save(post);
-        PostSaveResponseDto responseDto = postService.findById(post.getId());
+        PostResponseDto responseDto = postService.findById(post.getId());
 
         //then
         assertEquals(post.getId(), responseDto.getPostId());
@@ -111,16 +111,16 @@ class PostServiceTest {
     public void findAllPost() {
         //given
         SessionMember sessionMember = retrieveSessionMember();
-        Post post0 = Post.toPost(Member.toMember(sessionMember), retrieveRequestDto());
-        Post post1 = Post.toPost(Member.toMember(sessionMember), retrieveRequestDto());
-        Book book = Book.toBook(retrieveRequestDto());
+        Post post0 = retrieveRequestDto().toPost(sessionMember);
+        Post post1 = retrieveRequestDto().toPost(sessionMember);
+        Book book = retrieveRequestDto().toBook();
         post0.getBookList().add(book);
         post1.getBookList().add(book);
-
-        //when
         postRepository.save(post0);
         postRepository.save(post1);
-        List<PostSaveResponseDto> postList = postService.findAll();
+
+        //when
+        List<PostResponseDto> postList = postService.findAll();
 
         //then
         assertEquals(post0.getId(), postList.get(0).getPostId());
@@ -132,8 +132,8 @@ class PostServiceTest {
     public void updatePost() {
         //given
         SessionMember sessionMember = retrieveSessionMember();
-        Post post = Post.toPost(Member.toMember(sessionMember), retrieveRequestDto());
-        Book book = Book.toBook(retrieveRequestDto());
+        Post post = retrieveRequestDto().toPost(sessionMember);
+        Book book = retrieveRequestDto().toBook();
         post.getBookList().add(book);
         postRepository.save(post);
 
@@ -159,12 +159,13 @@ class PostServiceTest {
     @DisplayName("service - 포스트 삭제 테스트")
     public void deletePost() {
         //given
-        Post post = Post.toPost(Member.toMember(retrieveSessionMember()), retrieveRequestDto());
-        Book book = Book.toBook(retrieveRequestDto());
+        SessionMember sessionMember = retrieveSessionMember();
+        Post post = retrieveRequestDto().toPost(sessionMember);
+        Book book = retrieveRequestDto().toBook();
         post.getBookList().add(book);
+        postRepository.save(post);
 
         //when
-        postRepository.save(post);
         postService.delete(post.getId());
 
         //then

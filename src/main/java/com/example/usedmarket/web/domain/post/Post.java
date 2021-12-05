@@ -3,8 +3,13 @@ package com.example.usedmarket.web.domain.post;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import lombok.*;
+import com.example.usedmarket.web.security.dto.SessionMember;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -47,17 +52,9 @@ public class Post extends BaseTimeEntity {
         this.member = member;
     }
 
-    public static Post toPost(Member member, PostSaveRequestDto postRequest) {
-        return Post.builder()
-                .title(postRequest.getTitle())
-                .content(postRequest.getContent())
-                .status(PostStatus.SELL)
-                .member(member)
-                .build();
-    }
-
-    public void update(PostSaveRequestDto postSaveRequestDto) {
-        this.title = postSaveRequestDto.getTitle();
-        this.content = postSaveRequestDto.getContent();
+    public void update(PostSaveRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.bookList.get(0).update(requestDto);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.usedmarket.web.security.dto;
 
 import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.member.Role;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +33,16 @@ public class SessionMember implements OAuth2User, UserDetails, Serializable {
     public void updateRoleUser() {
         this.authorities = Collections.
                 singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    public Member toMember() {
+        return Member.builder()
+                .id(this.id)
+                .name(this.name)
+                .email(this.email)
+                .picture(this.picture)
+                .role(Role.USER)
+                .build();
     }
 
     @Override

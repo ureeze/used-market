@@ -19,18 +19,14 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     /*
-    SignUpRequestDto 를 통한 member 생성.
+    MemberRequestDto 를 통한 member 생성.
     @return member 를 memberResponseDto 로 변환 후 반환
      */
     @Transactional
     @Override
-    public MemberResponseDto createMember(MemberRequestDto dto) {
-        //SignUpRequestDto -> member 생성.
-        Member member = Member.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .role(Role.USER)
-                .build();
+    public MemberResponseDto createMember(MemberRequestDto requestDto) {
+        //MemberRequestDto -> member 생성.
+        Member member =  requestDto.toMember();
         //member 를 DB에 저장.
         Member savedMember = memberRepository.save(member);
         //savedMember 를 memberResponseDto 에 넣어 반환
@@ -67,9 +63,12 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public MemberResponseDto update(Long id, MemberRequestDto requestDto) {
+        // id 값을 이용해 MemberRepository 에서 Member 조회
         Member member = memberRepository.getById(id);
-        member.update(requestDto.getName(), requestDto.getEmail());
-        return MemberResponseDto.toDto(memberRepository.save(member));
+        // RequestDto 를 이용해 Member 수정
+        member.update(requestDto);
+        // member 가 영속성 컨텍스트에 존재하기 때문에 바로 MemberResponseDto 로 반환
+        return MemberResponseDto.toDto(member);
     }
 
     /*

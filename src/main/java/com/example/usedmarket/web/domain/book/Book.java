@@ -39,6 +39,7 @@ public class Book extends BaseTimeEntity {
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "POST_ID")
     private Post post;
 
     @Builder
@@ -50,15 +51,6 @@ public class Book extends BaseTimeEntity {
         this.imgUrl = imgUrl;
     }
 
-    public static Book toBook(PostSaveRequestDto requestDto) {
-        return Book.builder()
-                .bookName(requestDto.getBookName())
-                .stock(requestDto.getStock())
-                .unitPrice(requestDto.getUnitPrice())
-                .category(requestDto.getCategory())
-                .imgUrl(requestDto.getImgUrl())
-                .build();
-    }
 
     public void update(PostSaveRequestDto requestDto) {
         this.bookName = requestDto.getBookName();

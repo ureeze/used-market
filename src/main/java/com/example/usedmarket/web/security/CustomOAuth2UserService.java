@@ -1,9 +1,9 @@
 package com.example.usedmarket.web.security;
 
-import com.example.usedmarket.web.security.dto.OAuthAttributes;
-import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.security.dto.OAuthAttributes;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -30,7 +30,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
 
-
         OAuthAttributes attributes = OAuthAttributes.of(registationId, userNameAttributeName, oAuth2User.getAttributes());
 
         Member member = saveOrUpdate(attributes);
@@ -47,7 +46,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private Member saveOrUpdate(OAuthAttributes attributes) {
         Member member = memberRepository.findByEmail(attributes.getEmail())
-                .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
+                .map(entity -> entity.update(attributes))
                 .orElse(attributes.toEntity());
         return memberRepository.save(member);
     }

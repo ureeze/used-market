@@ -1,7 +1,8 @@
 package com.example.usedmarket.web.domain.member;
 
-import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
+import com.example.usedmarket.web.dto.MemberRequestDto;
+import com.example.usedmarket.web.security.dto.OAuthAttributes;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -35,24 +36,23 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public Member update(String name, String picture) {
-        this.name = name;
-        this.picture = picture;
+    public Member update(MemberRequestDto requestDto) {
+        update(requestDto.getName(), requestDto.getEmail());
         return this;
     }
 
-    public static Member toMember(SessionMember sessionMember) {
-        //return new Member(sessionMember.getId(), sessionMember.getName(), sessionMember.getEmail(), sessionMember.getPicture(), Role.USER);
-        return Member.builder()
-                .id(sessionMember.getId())
-                .name(sessionMember.getName())
-                .email(sessionMember.getEmail())
-                .picture(sessionMember.getPicture())
-                .role(Role.USER)
-                .build();
+    public Member update(OAuthAttributes attributes) {
+        update(attributes.getName(), attributes.getEmail());
+        return this;
     }
 
+    public void update(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+
     public String getRoleKey() {
-        return this.role.getKey();
+        return role.getKey();
     }
 }
