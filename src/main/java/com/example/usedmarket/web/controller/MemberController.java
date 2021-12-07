@@ -6,6 +6,8 @@ import com.example.usedmarket.web.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +19,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/members")
-    public ResponseEntity<MemberResponseDto> save(@RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<MemberResponseDto> save(@Validated @RequestBody MemberRequestDto memberRequestDto) {
         MemberResponseDto createMember = memberService.createMember(memberRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMember);
     }
@@ -34,7 +36,7 @@ public class MemberController {
     }
 
     @PutMapping("/members/{id}")
-    public ResponseEntity<MemberResponseDto> updateOne(@PathVariable Long id, @RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<MemberResponseDto> updateOne(@PathVariable Long id, @Validated @RequestBody MemberRequestDto memberRequestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.update(id, memberRequestDto));
     }
 

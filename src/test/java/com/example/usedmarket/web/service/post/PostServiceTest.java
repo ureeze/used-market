@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.service.post;
 
-import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
 import com.example.usedmarket.web.domain.member.Member;
@@ -10,6 +9,7 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.security.dto.SessionMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
@@ -41,39 +40,46 @@ class PostServiceTest {
     BookRepository bookRepository;
 
     @AfterEach
-    public void clean() {
+    void clean() {
         postRepository.deleteAll();
+        bookRepository.deleteAll();
+        memberRepository.deleteAll();
     }
 
-    public SessionMember retrieveSessionMember() {
+    SessionMember createSessionMember() {
+        int num = (int) (Math.random() * 10000) + 1;
+        String name = "pbj" + num;
         Member member = Member.builder()
-                .name("pbj")
-                .email("pbj@naver.com")
-                .picture("pic")
+                .name(name)
+                .email(name + "@google.com")
+                .picture("pic" + num)
                 .role(Role.USER)
                 .build();
+        memberRepository.save(member);
         SessionMember sessionMember = new SessionMember(memberRepository.save(member));
         return sessionMember;
-
     }
 
-    public PostSaveRequestDto retrieveRequestDto() {
+    PostSaveRequestDto createRequestDto() {
+        int num = (int) (Math.random() * 10000) + 1;
+
         return PostSaveRequestDto.builder()
-                .title("스프링부트 책 팝니다.")
-                .content("스프링부트2.6")
-                .bookName("스프링부트로 앱 만들기")
+                .title("스프링부트 책 팝니다." + num)
+                .content("스프링부트는 스프링 프레임워크의 복잡한 환경설정을 간편하게 해놓은 ..." + num)
+                .bookName("스프링부트로 앱 만들기" + num)
                 .stock(1)
-                .unitPrice(10000)
-                .category("it")
+                .unitPrice(num)
+                .category("it" + num)
+                .bookStatus("S")
                 .build();
     }
 
     @Test
     @DisplayName("service - 포스트 생성 테스트")
-    public void createPost() {
+    void createPost() {
         //given
-        SessionMember sessionMember = retrieveSessionMember();
-        PostSaveRequestDto requestDto = retrieveRequestDto();
+        SessionMember sessionMember = createSessionMember();
+        PostSaveRequestDto requestDto = createRequestDto();
 
         //when
         PostResponseDto responseDto = postService.save(sessionMember, requestDto);
@@ -82,17 +88,21 @@ class PostServiceTest {
         assertEquals(requestDto.getContent(), responseDto.getContent());
         assertEquals(requestDto.getTitle(), responseDto.getTitle());
         assertEquals(requestDto.getBookName(), responseDto.getBookList().get(0).getBookName());
-        assertEquals(bookRepository.findAll().get(0).getId(), responseDto.getBookList().get(0).getId());
     }
 
     @Test
-    @DisplayName("service - 포스트 조회 테스트")
-    public void findPost() {
+    @DisplayName("service - 포스트 개별 조회 테스트")
+    void findPost() {
         //given
-        SessionMember sessionMember = retrieveSessionMember();
-        Post post = retrieveRequestDto().toPost(sessionMember);
-        Book book = retrieveRequestDto().toBook();
-        post.getBookList().add(book);
+        SessionMember sessionMember = createSessionMember();
+
+        PostSaveRequestDto requestDto = createRequestDto();
+
+        Post post = requestDto.toPost(sessionMember);
+
+        Book book = requestDto.toBook();
+        post.addBook(book);
+
         postRepository.save(post);
 
         //when
@@ -103,70 +113,78 @@ class PostServiceTest {
         assertEquals(post.getTitle(), responseDto.getTitle());
         assertEquals(post.getMember().getId(), responseDto.getMemberId());
         assertEquals(post.getBookList().get(0).getBookName(), responseDto.getBookList().get(0).getBookName());
-        assertEquals(bookRepository.findAll().get(0).getId(), responseDto.getBookList().get(0).getId());
+        assertEquals(post.getBookList().get(0).getId(), bookRepository.findAll().get(0).getId());
     }
 
     @Test
     @DisplayName("service - 전체 포스트 조회 테스트")
-    public void findAllPost() {
+    void findAllPost() {
         //given
-        SessionMember sessionMember = retrieveSessionMember();
-        Post post0 = retrieveRequestDto().toPost(sessionMember);
-        Post post1 = retrieveRequestDto().toPost(sessionMember);
-        Book book = retrieveRequestDto().toBook();
-        post0.getBookList().add(book);
-        post1.getBookList().add(book);
+        SessionMember sessionMember = createSessionMember();
+
+        PostSaveRequestDto requestDto = createRequestDto();
+
+        Post post0 = requestDto.toPost(sessionMember);
+        Post post1 = createRequestDto().toPost(sessionMember);
+
+        Book book = requestDto.toBook();
+        post0.addBook(book);
+        post1.addBook(book);
+
         postRepository.save(post0);
         postRepository.save(post1);
 
         //when
-        List<PostResponseDto> postList = postService.findAll();
+        List<PostResponseDto> findAll = postService.findAll();
 
         //then
-        assertEquals(post0.getId(), postList.get(0).getPostId());
-        assertEquals(post1.getId(), postList.get(1).getPostId());
+        assertEquals(post0.getId(), findAll.get(0).getPostId());
+        assertEquals(post1.getId(), findAll.get(1).getPostId());
+        assertEquals(post1.getBookList().get(0).getBookName(), findAll.get(1).getBookList().get(0).getBookName());
     }
 
     @Test
     @DisplayName("service - 포스트 수정 테스트")
-    public void updatePost() {
+    void updatePost() {
         //given
-        SessionMember sessionMember = retrieveSessionMember();
-        Post post = retrieveRequestDto().toPost(sessionMember);
-        Book book = retrieveRequestDto().toBook();
-        post.getBookList().add(book);
+        SessionMember sessionMember = createSessionMember();
+
+        PostSaveRequestDto requestDto = createRequestDto();
+
+        Post post = requestDto.toPost(sessionMember);
+
+        Book book = requestDto.toBook();
+        post.addBook(book);
+
         postRepository.save(post);
 
-        PostSaveRequestDto newRequestDto = PostSaveRequestDto.builder()
-                .title("자바 책 팝니다.")
-                .content("스프링부트2.6")
-                .bookName("자바 만들기")
-                .stock(1)
-                .unitPrice(10000)
-                .category("it")
-                .build();
+        PostSaveRequestDto newRequestDto = createRequestDto();
 
         //when
-        postService.update(post.getId(), newRequestDto);
+        PostResponseDto postResponseDto = postService.update(post.getId(), newRequestDto);
 
         //then
-        postRepository.findById(post.getId());
-        assertEquals(newRequestDto.getTitle(), post.getTitle());
-        assertEquals(newRequestDto.getBookName(), post.getBookList().get(0).getBookName());
+        assertEquals(newRequestDto.getTitle(), postResponseDto.getTitle());
+        assertEquals(newRequestDto.getBookName(), postResponseDto.getBookList().get(0).getBookName());
     }
 
     @Test
     @DisplayName("service - 포스트 삭제 테스트")
-    public void deletePost() {
+    void deletePost() {
         //given
-        SessionMember sessionMember = retrieveSessionMember();
-        Post post = retrieveRequestDto().toPost(sessionMember);
-        Book book = retrieveRequestDto().toBook();
-        post.getBookList().add(book);
-        postRepository.save(post);
+        SessionMember sessionMember = createSessionMember();
+
+        PostSaveRequestDto requestDto = createRequestDto();
+
+        Post post = requestDto.toPost(sessionMember);
+
+        Book book = requestDto.toBook();
+        post.addBook(book);
+
+        Post savedPost = postRepository.save(post);
 
         //when
-        postService.delete(post.getId());
+        postService.delete(savedPost.getId());
 
         //then
         System.out.println("service - 포스트 삭제 성공");

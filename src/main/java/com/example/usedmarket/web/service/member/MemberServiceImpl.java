@@ -1,10 +1,10 @@
 package com.example.usedmarket.web.service.member;
 
-import com.example.usedmarket.web.dto.MemberResponseDto;
-import com.example.usedmarket.web.dto.MemberRequestDto;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.dto.MemberRequestDto;
+import com.example.usedmarket.web.dto.MemberResponseDto;
+import com.example.usedmarket.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberResponseDto createMember(MemberRequestDto requestDto) {
         //MemberRequestDto -> member 생성.
-        Member member =  requestDto.toMember();
+        Member member = requestDto.toMember();
         //member 를 DB에 저장.
         Member savedMember = memberRepository.save(member);
         //savedMember 를 memberResponseDto 에 넣어 반환
@@ -41,7 +41,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberResponseDto findById(Long id) {
         // id 값을 이용해 MemberRepository 에서 Member 조회
-        Member findMember = memberRepository.findById(id).get();
+        Member findMember = memberRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Member 가 존재하지 않습니다."));
+
         // findMember 를 MemberResponseDto 로 변환 후 반환
         return MemberResponseDto.toDto(findMember);
     }
@@ -53,7 +54,11 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     @Override
     public List<MemberResponseDto> findAll() {
-        return memberRepository.findAll().stream().map(member -> MemberResponseDto.toDto(member)).collect(Collectors.toList());
+        // MemberRepository 에서 Member 전체 조회
+        List<Member> memberList = memberRepository.findAll();
+
+        // Stream 을 이용해 MemberResponseDto 타입으로 변환하여 반환
+        return memberList.stream().map(member -> MemberResponseDto.toDto(member)).collect(Collectors.toList());
     }
 
     /*
@@ -72,11 +77,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /*
-    input 으로 들어온 id 값에 해당하는 Member 제거
+     * input 으로 들어온 id 값에 해당하는 Member 제거
+     * @param id - 삭제하고자 하는 Member 의 ID
      */
     @Transactional
     @Override
     public void delete(Long id) {
+        // MemberRepository 에서 ID 에 맞는 Member 삭제
         memberRepository.deleteById(id);
     }
 }

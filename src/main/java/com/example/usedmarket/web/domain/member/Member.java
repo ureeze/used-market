@@ -36,6 +36,22 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Override
+    public int hashCode() {
+        return id.intValue();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Member) {
+            Member member = (Member) obj;
+            if (id.equals(member.id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Member update(MemberRequestDto requestDto) {
         update(requestDto.getName(), requestDto.getEmail());
         return this;

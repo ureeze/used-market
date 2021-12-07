@@ -1,11 +1,13 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.dto.MemberRequestDto;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.dto.MemberRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,9 +25,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -48,8 +51,20 @@ class MemberControllerTest {
 
     MockMvc mvc;
 
+    MemberRequestDto createRequestDto() {
+        int num = (int) (Math.random() * 10000) + 1;
+
+        String name = "PBJ" + num;
+        String email = name + "@google.com";
+        MemberRequestDto requestDto = MemberRequestDto.builder()
+                .name(name)
+                .email(email)
+                .build();
+        return requestDto;
+    }
+
     @BeforeEach
-    public void setup() {
+    void setup() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -58,22 +73,16 @@ class MemberControllerTest {
     }
 
     @AfterEach
-    public void clean() {
+    void clean() {
         memberRepository.deleteAll();
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    @DisplayName("Member 등록 테스트")
-    public void memberCreate() throws Exception {
+    @DisplayName("CONTROLLER - Member 등록 테스트")
+    void memberCreate() throws Exception {
         //given
-        String expectedName = "pbj";
-        String expectedEmail = "pbj@google.com";
-        MemberRequestDto requestDto = MemberRequestDto.builder()
-                .name(expectedName)
-                .email(expectedEmail)
-                .build();
-
+        MemberRequestDto requestDto = createRequestDto();
 
         String url = "http://localhost:" + port + "/members";
 
@@ -86,25 +95,19 @@ class MemberControllerTest {
 
         //then
         List<Member> all = memberRepository.findAll();
-        assertEquals(expectedName, all.get(0).getName());
-        assertEquals(expectedEmail, all.get(0).getEmail());
+        assertEquals(requestDto.getName(), all.get(0).getName());
+        assertEquals(requestDto.getEmail(), all.get(0).getEmail());
 
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    @DisplayName("Member 전체조회")
-    public void memberRetrieve() throws Exception {
+    @DisplayName("CONTROLLER - Member 전체조회")
+    void memberRetrieve() throws Exception {
         //given
-        String expectedName = "pbj1";
-        String expectedEmail = "pbj1@google.com";
+        MemberRequestDto requestDto = createRequestDto();
 
-        memberRepository.save(Member.builder()
-                .name(expectedName)
-                .email(expectedEmail)
-                .picture("pic")
-                .role(Role.USER)
-                .build());
+        memberRepository.save(requestDto.toMember());
 
         String url = "http://localhost:" + port + "/members";
 
@@ -112,10 +115,65 @@ class MemberControllerTest {
         //then
         mvc.perform(get(url))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value(expectedName))
-                .andExpect(jsonPath("$.[0].id").isNumber());
-
+                .andExpect(jsonPath("$.[0].name").value(requestDto.getName()))
+                .andExpect(jsonPath("$.[0].id").isNumber())
+                .andDo(print());
     }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("CONTROLLER - Request 유효성 검증 테스트 (이름 Null)")
+    void validationRequestDto() throws Exception {
+        //given
+        MemberRequestDto requestDto = new MemberRequestDto();
+        requestDto.setEmail("pbj@naver.com");
+
+        String url = "http://localhost:" + port + "/members";
+
+        //when
+        //then
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("CONTROLLER - Request 유효성 검증 테스트 (이메일 @ 누락)")
+    void validationRequestDto2() throws Exception {
+        //given
+        MemberRequestDto requestDto = MemberRequestDto.builder()
+                .name("pbj")
+                .email("pppbbbjjj")
+                .build();
+
+        String url = "http://localhost:" + port + "/members";
+
+        //when
+        //then
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("CONTROLLER - Member 개별조회 UserNotFoundException 예외 테스트")
+    void memberFindById_userNotFoundExceptionTest() throws Exception {
+        //given
+        String url = "http://localhost:" + port + "/members/" + 1;
+
+        //when
+        //then
+        mvc.perform(get(url))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
 
 
 }

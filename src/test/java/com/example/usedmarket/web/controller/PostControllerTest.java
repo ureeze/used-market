@@ -55,7 +55,7 @@ class PostControllerTest {
     SessionMember sessionMember;
     Member member;
 
-    public PostSaveRequestDto createPostSaveRequestDto(int num) {
+    PostSaveRequestDto createPostSaveRequestDto(int num) {
         return PostSaveRequestDto.builder()
                 .title("TEST 제목" + num)
                 .content("내용" + num)
@@ -63,6 +63,7 @@ class PostControllerTest {
                 .stock(1)
                 .unitPrice(10000)
                 .category("경제" + num)
+                .bookStatus("S")
                 .imgUrl("img" + num)
                 .build();
 
@@ -70,7 +71,7 @@ class PostControllerTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
@@ -88,7 +89,7 @@ class PostControllerTest {
     }
 
     @AfterEach
-    public void clean() {
+    void clean() {
         postRepository.deleteAll();
     }
 

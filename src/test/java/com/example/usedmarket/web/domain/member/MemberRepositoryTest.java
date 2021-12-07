@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@Transactional
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MemberRepositoryTest {
 
@@ -22,52 +23,52 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
 
     @AfterEach
-    public void clean() {
+    void clean() {
         memberRepository.deleteAll();
     }
 
-    @Test
-    @Transactional
-    @DisplayName("controller - 멤버 저장 테스트")
-    public void createMemberTest() {
-        //given
-        String name = "PBJ";
-        String email = "PBJ@goole.com";
+    Member createMember() {
+        int num = (int) (Math.random() * 10000) + 1;
+        String name = "PBJ" + num;
+        String email = name + "@google.com";
 
         Member member = Member.builder()
                 .name(name)
                 .email(email)
                 .role(Role.USER)
                 .build();
+        return member;
+
+    }
+
+
+    @Test
+    @DisplayName("controller - 멤버 저장 테스트")
+    public void createMemberTest() {
+        //given
+        Member member = createMember();
 
         //when
         Member savedMember = memberRepository.save(member);
 
         //then
-        assertEquals(name, savedMember.getName());
-        assertEquals(email, savedMember.getEmail());
-        System.out.println(member.toString());
+        assertEquals(member.getName(), savedMember.getName());
+        assertEquals(member.getEmail(), savedMember.getEmail());
     }
 
     @Test
-    @Transactional
     @DisplayName("멤버조회 테스트")
     public void findMemberTest() {
         //given
-        String name = "PBJ";
-        String email = "PBJ@goole.com";
+        Member member = createMember();
 
         //when
-        memberRepository.save(Member.builder()
-                .name(name)
-                .email(email)
-                .role(Role.USER)
-                .build());
+        Member savedMember = memberRepository.save(member);
 
         //then
         List<Member> list = memberRepository.findAll();
-        assertEquals(name, list.get(0).getName());
-        assertEquals(email, list.get(0).getEmail());
+        assertEquals(savedMember.getName(), list.get(0).getName());
+        assertEquals(savedMember.getEmail(), list.get(0).getEmail());
     }
 
     @Test
@@ -76,12 +77,7 @@ class MemberRepositoryTest {
         //given
         LocalDateTime now = LocalDateTime.now();
         now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        memberRepository.save(Member.builder()
-                .name("pbj")
-                .email("pbj@google.com")
-                .picture("pic")
-                .role(Role.USER)
-                .build());
+        memberRepository.save(createMember());
 
         //when
         List<Member> membersList = memberRepository.findAll();

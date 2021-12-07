@@ -41,6 +41,7 @@ public class PostServiceImpl implements PostService {
      * POST 조회
      * @return POST 를 PostResponseDto 로 변환 후 반환
      */
+    @Transactional(readOnly = true)
     @Override
     public PostResponseDto findById(Long id) {
         // POST id로 PostRepository 에서  POST 조회
@@ -53,6 +54,7 @@ public class PostServiceImpl implements PostService {
     전체 POST 조회
     @return POST 를 stream 을 이용해 PostResponseDto 로 변환 후 리스트로 반환
      */
+    @Transactional(readOnly = true)
     @Override
     public List<PostResponseDto> findAll() {
         return postRepository.findAll().stream().map(post ->  PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
@@ -62,6 +64,7 @@ public class PostServiceImpl implements PostService {
     POST 의 id 값과 수정하고자 하는 PostSaveRequestDto 값을 이용해 POST 수정
     @return POST 를 PostResponseDto 로 변환 후 반환
      */
+    @Transactional
     @Override
     public PostResponseDto update(Long id, PostSaveRequestDto requestDTO) {
         // POST id로 POST 조회
@@ -75,6 +78,7 @@ public class PostServiceImpl implements PostService {
     /*
     POST 의 id 을 이용해 POST 삭제
      */
+    @Transactional
     @Override
     public void delete(Long id) {
         postRepository.deleteById(id);

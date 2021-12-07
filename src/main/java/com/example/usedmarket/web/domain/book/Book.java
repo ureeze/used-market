@@ -15,6 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "BOOK")
 @EntityListeners(AuditingEntityListener.class)
 public class Book extends BaseTimeEntity {
@@ -35,21 +36,19 @@ public class Book extends BaseTimeEntity {
     @Column(name = "CATEGORY", nullable = false, length = 20)
     private String category;
 
+    @Column(name = "DELETED", nullable = false)
+    private boolean deleted;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private BookStatus bookStatus;
+
     @Column(name = "IMG_URL", length = 500)
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_ID")
     private Post post;
-
-    @Builder
-    public Book(String bookName, int stock, int unitPrice, String category, String imgUrl) {
-        this.bookName = bookName;
-        this.stock = stock;
-        this.unitPrice = unitPrice;
-        this.category = category;
-        this.imgUrl = imgUrl;
-    }
 
 
     public void update(PostSaveRequestDto requestDto) {
@@ -58,5 +57,13 @@ public class Book extends BaseTimeEntity {
         this.unitPrice = requestDto.getUnitPrice();
         this.category = requestDto.getCategory();
         this.imgUrl = requestDto.getImgUrl();
+    }
+
+    public void stockUp(int count) {
+        this.stock += count;
+    }
+
+    public void deleted() {
+        this.deleted = true;
     }
 }

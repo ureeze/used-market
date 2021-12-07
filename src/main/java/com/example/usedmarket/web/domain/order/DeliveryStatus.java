@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum DeliveryStatus {
-    BEING_DELIVERED("BEING_DELIVERED", "배송중"), DELIVERY_COMPLETED("DELIVERY_COMPLETED", "배송완료");
+    PAYMENT_COMPLETED("PAYMENT_COMPLETED", "결제완료"),BEING_DELIVERED("BEING_DELIVERED", "배송중"), DELIVERY_COMPLETED("DELIVERY_COMPLETED", "배송완료");
 
     private String key;
     private String value;
