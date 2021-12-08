@@ -7,8 +7,9 @@ import com.example.usedmarket.web.domain.member.MemberRepository;
 import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.SessionMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +83,7 @@ class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
         //when
-        PostResponseDto responseDto = postService.save(sessionMember, requestDto);
+        PostSaveResponseDto responseDto = postService.save(sessionMember, requestDto);
 
         //then
         assertEquals(requestDto.getContent(), responseDto.getContent());
@@ -95,10 +96,10 @@ class PostServiceTest {
     void findPost() {
         //given
         SessionMember sessionMember = createSessionMember();
-
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post = requestDto.toPost(sessionMember);
+        Post post = requestDto.toPost(member);
 
         Book book = requestDto.toBook();
         post.addBook(book);
@@ -106,7 +107,7 @@ class PostServiceTest {
         postRepository.save(post);
 
         //when
-        PostResponseDto responseDto = postService.findById(post.getId());
+        PostSaveResponseDto responseDto = postService.findById(post.getId());
 
         //then
         assertEquals(post.getId(), responseDto.getPostId());
@@ -121,11 +122,12 @@ class PostServiceTest {
     void findAllPost() {
         //given
         SessionMember sessionMember = createSessionMember();
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post0 = requestDto.toPost(sessionMember);
-        Post post1 = createRequestDto().toPost(sessionMember);
+        Post post0 = requestDto.toPost(member);
+        Post post1 = createRequestDto().toPost(member);
 
         Book book = requestDto.toBook();
         post0.addBook(book);
@@ -135,7 +137,7 @@ class PostServiceTest {
         postRepository.save(post1);
 
         //when
-        List<PostResponseDto> findAll = postService.findAll();
+        List<PostSaveResponseDto> findAll = postService.findAll();
 
         //then
         assertEquals(post0.getId(), findAll.get(0).getPostId());
@@ -148,10 +150,12 @@ class PostServiceTest {
     void updatePost() {
         //given
         SessionMember sessionMember = createSessionMember();
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post = requestDto.toPost(sessionMember);
+
+        Post post = requestDto.toPost(member);
 
         Book book = requestDto.toBook();
         post.addBook(book);
@@ -161,7 +165,7 @@ class PostServiceTest {
         PostSaveRequestDto newRequestDto = createRequestDto();
 
         //when
-        PostResponseDto postResponseDto = postService.update(post.getId(), newRequestDto);
+        PostSaveResponseDto postResponseDto = postService.update(post.getId(), newRequestDto);
 
         //then
         assertEquals(newRequestDto.getTitle(), postResponseDto.getTitle());
@@ -173,10 +177,11 @@ class PostServiceTest {
     void deletePost() {
         //given
         SessionMember sessionMember = createSessionMember();
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post = requestDto.toPost(sessionMember);
+        Post post = requestDto.toPost(member);
 
         Book book = requestDto.toBook();
         post.addBook(book);

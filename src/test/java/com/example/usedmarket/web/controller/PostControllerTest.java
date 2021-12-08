@@ -7,6 +7,7 @@ import com.example.usedmarket.web.domain.member.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.SessionMember;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -84,6 +85,7 @@ class PostControllerTest {
                 .picture("pic")
                 .role(Role.USER)
                 .build();
+
         sessionMember = new SessionMember(memberRepository.save(member));
 
     }
@@ -125,8 +127,9 @@ class PostControllerTest {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
         PostSaveRequestDto requestDto1 = createPostSaveRequestDto(1);
-        Post post0 = requestDto0.toPost(sessionMember);
-        Post post1 = requestDto1.toPost(sessionMember);
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Post post0 = requestDto0.toPost(member);
+        Post post1 = requestDto1.toPost(member);
         Book book0 = requestDto0.toBook();
         Book book1 = requestDto1.toBook();
         post0.getBookList().add(book0);
@@ -157,7 +160,8 @@ class PostControllerTest {
     void findById() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = requestDto0.toPost(sessionMember);
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Post post0 = requestDto0.toPost(member);
         Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);
@@ -183,13 +187,14 @@ class PostControllerTest {
     void update() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = requestDto0.toPost(sessionMember);
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Post post0 = requestDto0.toPost(member);
         Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);
 
         PostSaveRequestDto requestDto1 = createPostSaveRequestDto(1);
-        Post post1 = requestDto1.toPost(sessionMember);
+        Post post1 = requestDto1.toPost(member);
         Book book1 = requestDto1.toBook();
         post1.getBookList().add(book1);
 
@@ -215,7 +220,9 @@ class PostControllerTest {
     void deleteById() throws Exception {
         //given
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-        Post post0 = requestDto0.toPost(sessionMember);
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+
+        Post post0 = requestDto0.toPost(member);
         Book book0 = requestDto0.toBook();
         post0.getBookList().add(book0);
         postRepository.save(post0);

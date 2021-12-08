@@ -14,7 +14,7 @@ public interface OrderService {
     //주문 조회
     OrderResponseDto findById(Long id);
 
-    //주문 전체조회
+    //세션에 의한 주문 전체조회
     List<OrderResponseDto> findAll(SessionMember sessionMember);
 
     //주문 취소

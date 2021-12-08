@@ -56,23 +56,4 @@ public class OrderedBook extends BaseTimeEntity {
         this.deleted = true;
     }
 
-
-    // 주문 취소 로직
-    public void cancel(Order order, Book book, Member member) {
-
-        // 책 재고 조정
-        if (book != null) {
-            book.stockUp(getCount());
-        }
-
-        // 주문된 책 삭제
-        if (isDeletable(order)) {
-            deleted();
-        }
-
-        // 주문 취소
-        if (order.isDeletable(member)) {
-            order.deleted();
-        }
-    }
 }

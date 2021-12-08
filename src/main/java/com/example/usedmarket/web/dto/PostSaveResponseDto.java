@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostResponseDto implements Serializable {
+public class PostSaveResponseDto implements Serializable {
 
     private Long postId;
     private String title;
@@ -25,8 +25,8 @@ public class PostResponseDto implements Serializable {
     private List<Book> bookList;
 
 
-    public static PostResponseDto toResponseDto(Post post) {
-        return PostResponseDto.builder()
+    public static PostSaveResponseDto toResponseDto(Post post) {
+        return PostSaveResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())

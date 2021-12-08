@@ -1,6 +1,7 @@
 package com.example.usedmarket.web.domain.order;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.post.Post;
@@ -96,5 +97,23 @@ public class Order extends BaseTimeEntity {
         this.deleted = true;
     }
 
+    // 주문 취소 로직
+    public void cancel(OrderedBook orderedBook, Book book, Member member) {
+
+        // 책 재고 조정
+        if (book != null) {
+            book.stockUp(orderedBook.getCount());
+        }
+
+        // 주문된 책 삭제
+        if (orderedBook != null && orderedBook.isDeletable(this)) {
+            orderedBook.deleted();
+        }
+
+        // 주문 취소
+        if (isDeletable(member)) {
+            deleted();
+        }
+    }
 
 }

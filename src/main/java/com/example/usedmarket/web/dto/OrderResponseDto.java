@@ -32,6 +32,9 @@ public class OrderResponseDto {
     //책 제목
     private String bookName;
 
+    //주문 상태
+    private String deliveryStatus;
+
     //주문 ID
     private Long orderId;
 
@@ -47,6 +50,7 @@ public class OrderResponseDto {
                 .count(orderedBook.getCount())
                 .orderPrice(orderedBook.getOrderPrice())
                 .bookStatus(orderedBook.getBook().getBookStatus().name())
+                .deliveryStatus(order.getDeliveryStatus().name())
                 .bookName(orderedBook.getBook().getBookName())
                 .orderId(order.getId())
                 .orderedBookId(orderedBook.getId())

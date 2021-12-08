@@ -93,7 +93,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /*
-     * 해당 세션의 전체 주문 조회
+     * 해당 세션의 주문 취소
+     * @param sessionMember - 현재 세션 유저
      * @param id - ORDER 의 ID 값
      * @return
      */
@@ -113,13 +114,12 @@ public class OrderServiceImpl implements OrderService {
         //재고 증가시킬 Book 탐색
         Book book = bookRepository.findById(orderedBook.getBook().getId()).orElse(null);
 
-
         //결제완료의 경우 취소가능
         if (order.getDeliveryStatus().equals(DeliveryStatus.PAYMENT_COMPLETED)) {
             //결제 취소
 
             //주문 취소
-            orderedBook.cancel(order, book, member);
+            order.cancel(orderedBook, book, member);
 
         } else {
             //배송중, 배송완료의 경우 취소불가, 예외처리

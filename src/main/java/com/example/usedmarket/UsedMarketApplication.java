@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-//@EnableConfigurationProperties(AppProperties.class)
 public class UsedMarketApplication {
 
     public static void main(String[] args) {

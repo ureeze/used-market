@@ -1,11 +1,12 @@
 package com.example.usedmarket.web.service.post;
 
+import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.SessionMember;
-import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
     /*
      * SessionMember 와 PostResponseDto 를 통한 POST 생성.
@@ -28,13 +30,18 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public PostResponseDto save(SessionMember sessionMember, PostSaveRequestDto requestDTO) {
-        // SessionMember 와 requestDto 를 이용해 POST 생성
-        Post post = requestDTO.toPost(sessionMember);
+    public PostSaveResponseDto save(SessionMember sessionMember, PostSaveRequestDto requestDTO) {
+        //Member 조회
+        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+
+        // Member 와 requestDto 를 이용해 POST 생성
+        Post post = requestDTO.toPost(member);
+
         // PostRepository 에 POST 저장
         Post savedPost = postRepository.save(post);
+
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(savedPost);
+        return PostSaveResponseDto.toResponseDto(savedPost);
     }
 
     /*
@@ -43,11 +50,12 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional(readOnly = true)
     @Override
-    public PostResponseDto findById(Long id) {
+    public PostSaveResponseDto findById(Long id) {
         // POST id로 PostRepository 에서  POST 조회
         Post findPost = postRepository.findById(id).get();
+
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(findPost);
+        return PostSaveResponseDto.toResponseDto(findPost);
     }
 
     /*
@@ -56,8 +64,8 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<PostResponseDto> findAll() {
-        return postRepository.findAll().stream().map(post ->  PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
+    public List<PostSaveResponseDto> findAll() {
+        return postRepository.findAll().stream().map(post -> PostSaveResponseDto.toResponseDto(post)).collect(Collectors.toList());
     }
 
     /*
@@ -66,13 +74,13 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public PostResponseDto update(Long id, PostSaveRequestDto requestDTO) {
+    public PostSaveResponseDto update(Long id, PostSaveRequestDto requestDTO) {
         // POST id로 POST 조회
         Post post = postRepository.findById(id).get();
         // POST 수정
         post.update(requestDTO);
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(post);
+        return PostSaveResponseDto.toResponseDto(post);
     }
 
     /*
