@@ -23,35 +23,44 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Order extends BaseTimeEntity {
 
+    // ORDER ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 받는 사람명
     @Column(name = "RECIPIENT", nullable = false, length = 10)
     private String recipient;
 
+    // 배송 주소
     @Column(name = "ADDRESS", nullable = false, length = 200)
     private String address;
 
+    // 연락처
     @Column(name = "PHONE", nullable = false, length = 30)
     private String phone;
 
+    // 배송 상태
     @Column(name = "DELIVERY_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
+    // 삭제 여부
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
+    // 주문과 연관된 사용자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    // 주문과 연관된 POST
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_ID")
     private Post post;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    // 주문과 연관된 ORDERED BOOK
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderedBook> orderedBookList = new ArrayList<>();
 
     @Builder
@@ -81,39 +90,27 @@ public class Order extends BaseTimeEntity {
         return false;
     }
 
+    //주문 삭제 가능 확인
     public boolean isDeletable(Member member) {
         if (this.member != member) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
-
         if (this.deleted) {
             throw new IllegalArgumentException("이미 삭제된 ORDER 입니다.");
         }
-
         return true;
     }
 
+    // 주문 삭제
     public void deleted() {
         this.deleted = true;
     }
 
     // 주문 취소 로직
-    public void cancel(OrderedBook orderedBook, Book book, Member member) {
-
-        // 책 재고 조정
-        if (book != null) {
-            book.stockUp(orderedBook.getCount());
-        }
-
-        // 주문된 책 삭제
-        if (orderedBook != null && orderedBook.isDeletable(this)) {
-            orderedBook.deleted();
-        }
-
+    public void cancel( Member member) {
         // 주문 취소
         if (isDeletable(member)) {
             deleted();
         }
     }
-
 }

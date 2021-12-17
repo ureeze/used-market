@@ -1,7 +1,7 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.security.LoginUser;
 import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.service.post.PostService;
@@ -32,6 +32,7 @@ public class PostController {
         PostSaveResponseDto responseDto = postService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
 
     //포스트 전체조회
     @GetMapping("/posts")

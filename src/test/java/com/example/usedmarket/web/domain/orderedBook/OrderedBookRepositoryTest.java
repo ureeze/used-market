@@ -17,14 +17,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
+@SpringBootTest
 class OrderedBookRepositoryTest {
     @Autowired
     OrderRepository orderRepository;
@@ -65,7 +66,7 @@ class OrderedBookRepositoryTest {
                 .build();
     }
 
-    Post createPost(Member member, Book book) {
+    Post createPost(Member member) {
         int num = (int) (Math.random() * 10000) + 1;
         Post post = Post.builder()
                 .title("PostTitle" + num)
@@ -73,8 +74,7 @@ class OrderedBookRepositoryTest {
                 .status(PostStatus.SELL)
                 .member(member)
                 .build();
-        post.addBook(book);
-        return postRepository.save(post);
+        return post;
     }
 
     Order createOrder(Member member, Post post) {
@@ -87,7 +87,7 @@ class OrderedBookRepositoryTest {
                 .member(member)
                 .post(post)
                 .build();
-        return orderRepository.save(order);
+        return order;
     }
 
     OrderedBook createOrderedBook(Order order, Book book) {
@@ -105,9 +105,7 @@ class OrderedBookRepositoryTest {
     void clean() {
         memberRepository.deleteAll();
         postRepository.deleteAll();
-        bookRepository.deleteAll();
         orderRepository.deleteAll();
-        orderedBookRepository.deleteAll();
     }
 
 
@@ -117,9 +115,14 @@ class OrderedBookRepositoryTest {
         //given
         Member member = createMember();
         Book book = createBook();
-        Post post = createPost(member, book);
-        Order order = createOrder(member, post);
+        Post post = createPost(member);
+        book.addPost(post);
+        post.addBook(book);
+        Post savedPost = postRepository.save(post);
+
+        Order order = createOrder(member, savedPost);
         OrderedBook orderedBook = createOrderedBook(order, book);
+        orderRepository.save(order);
 
         //when
         OrderedBook savedOrderedBook = orderedBookRepository.save(orderedBook);

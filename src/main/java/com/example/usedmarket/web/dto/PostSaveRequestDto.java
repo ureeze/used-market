@@ -68,20 +68,21 @@ public class PostSaveRequestDto {
                 .unitPrice(this.unitPrice)
                 .category(this.category)
                 .bookStatus(BookStatus.valueOf(this.bookStatus))
+                .deleted(false)
                 .imgUrl(this.imgUrl)
                 .build();
     }
 
-    public Post toPost(Member member) {
+    public Post toPost(Member member,Book book) {
         // requestDto 로 POST 생성
         Post post = Post.builder()
                 .title(this.title)
                 .content(this.content)
                 .status(PostStatus.SELL)
+                .deleted(false)
                 .member(member)
                 .build();
-        // requestDto 를 이용해 Book 생성 후 POST 에 Book 추가
-        post.addBook(toBook());
+        post.addBook(book);
         return post;
     }
 }

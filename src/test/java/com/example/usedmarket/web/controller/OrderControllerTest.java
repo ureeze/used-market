@@ -23,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,9 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
@@ -134,7 +135,7 @@ class OrderControllerTest {
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
-                .port(8080)
+                .port(port)
                 .path("/orders")
                 .build()
                 .encode()
@@ -206,7 +207,7 @@ class OrderControllerTest {
         Order savedOrder = orderRepository.save(order);
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
-                .port(8080)
+                .port(port)
                 .path("/orders")
                 .build()
                 .encode()

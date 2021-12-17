@@ -1,6 +1,8 @@
 package com.example.usedmarket.web.service.post;
 
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.member.MemberRepository;
+import com.example.usedmarket.web.exception.PostNotFoundException;
 import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.SessionMember;
 import com.example.usedmarket.web.domain.member.Member;
@@ -34,8 +36,9 @@ public class PostServiceImpl implements PostService {
         //Member 조회
         Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
-        // Member 와 requestDto 를 이용해 POST 생성
-        Post post = requestDTO.toPost(member);
+        // Member 와 requestDto 를 이용해 POST 와 Book 생성
+        Book book = requestDTO.toBook();
+        Post post = requestDTO.toPost(member, book);
 
         // PostRepository 에 POST 저장
         Post savedPost = postRepository.save(post);
@@ -46,21 +49,22 @@ public class PostServiceImpl implements PostService {
 
     /*
      * POST 조회
-     * @return POST 를 PostResponseDto 로 변환 후 반환
+     * @param id - 찾고자 하는 POST ID 값
+     * @return findPOST 를 PostResponseDto 로 변환 후 반환
      */
     @Transactional(readOnly = true)
     @Override
     public PostSaveResponseDto findById(Long id) {
         // POST id로 PostRepository 에서  POST 조회
-        Post findPost = postRepository.findById(id).get();
+        Post findPost = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // POST 를 PostResponseDto 로 반환
         return PostSaveResponseDto.toResponseDto(findPost);
     }
 
     /*
-    전체 POST 조회
-    @return POST 를 stream 을 이용해 PostResponseDto 로 변환 후 리스트로 반환
+     * 전체 POST 조회
+     * @return findPOST 를 stream 을 이용해 PostResponseDto 로 변환 후 리스트로 반환
      */
     @Transactional(readOnly = true)
     @Override
@@ -69,22 +73,30 @@ public class PostServiceImpl implements PostService {
     }
 
     /*
-    POST 의 id 값과 수정하고자 하는 PostSaveRequestDto 값을 이용해 POST 수정
-    @return POST 를 PostResponseDto 로 변환 후 반환
+     * POST 의 id 값과 수정하고자 하는 PostSaveRequestDto 값을 이용해 POST 수정
+     * @param id - 수정하고자 하는 POST 의 ID 값
+     * @param requestDto - 수정하고자 하는 요청 정보
+     * @return POST 를 PostResponseDto 로 변환 후 반환
      */
     @Transactional
     @Override
     public PostSaveResponseDto update(Long id, PostSaveRequestDto requestDTO) {
         // POST id로 POST 조회
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
+
         // POST 수정
         post.update(requestDTO);
+
+        // POST 와 연관된 책 수정
+        post.getBookList().get(0).update(requestDTO);
+
         // POST 를 PostResponseDto 로 반환
         return PostSaveResponseDto.toResponseDto(post);
     }
 
     /*
-    POST 의 id 을 이용해 POST 삭제
+     * POST 의 id 을 이용해 POST 삭제
+     * @param id - 삭제하고자 하는 POST 의 ID 값
      */
     @Transactional
     @Override

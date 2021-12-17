@@ -18,28 +18,44 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    /*
     @PostMapping("/members")
     public ResponseEntity<MemberResponseDto> save(@Validated @RequestBody MemberRequestDto memberRequestDto) {
         MemberResponseDto createMember = memberService.createMember(memberRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMember);
     }
+    */
 
+    /*
+    회원정보 조회
+    * */
     @GetMapping("/members/{id}")
     public ResponseEntity<MemberResponseDto> findById(@PathVariable Long id) {
         MemberResponseDto findMember = memberService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(findMember);
     }
 
+
+    /*
+    * 회원 전체 조회
+    * */
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponseDto>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.findAll());
     }
 
+
+    /*
+    *  회원정보 수정
+    * */
     @PutMapping("/members/{id}")
     public ResponseEntity<MemberResponseDto> updateOne(@PathVariable Long id, @Validated @RequestBody MemberRequestDto memberRequestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.update(id, memberRequestDto));
     }
 
+    /*
+    *  회원 탈퇴
+    * */
     @DeleteMapping("/members/{id}")
     public ResponseEntity<MemberResponseDto> delete(@PathVariable Long id) {
         memberService.delete(id);

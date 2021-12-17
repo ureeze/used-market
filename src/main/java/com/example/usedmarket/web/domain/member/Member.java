@@ -18,23 +18,29 @@ import javax.persistence.*;
 @EntityListeners(AuditingEntityListener.class)
 public class Member extends BaseTimeEntity {
 
+    //Member ID
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //사용자 이름
     @Column(name = "NAME", nullable = false, length = 20)
     private String name;
 
+    //사용자 이메일
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
+    //사용자 프로필사진
     @Column(name = "PICTURE", length = 2000)
     private String picture;
 
+    //사용자 권한
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
 
     @Override
     public int hashCode() {
@@ -52,22 +58,24 @@ public class Member extends BaseTimeEntity {
         return false;
     }
 
+    // 회원정보 수정
     public Member update(MemberRequestDto requestDto) {
-        update(requestDto.getName(), requestDto.getEmail());
+        update(requestDto.getName());
         return this;
     }
 
-    public Member update(OAuthAttributes attributes) {
-        update(attributes.getName(), attributes.getEmail());
-        return this;
+    // 회원정보 수정
+    public void update(OAuthAttributes attributes) {
+        this.name = attributes.getName();
+        this.email = attributes.getEmail();
     }
 
-    public void update(String name, String email) {
+    // 회원정보 수정
+    public void update(String name) {
         this.name = name;
-        this.email = email;
     }
 
-
+    // 사용자의 권한 반환
     public String getRoleKey() {
         return role.getKey();
     }

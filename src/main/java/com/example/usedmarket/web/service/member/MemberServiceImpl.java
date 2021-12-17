@@ -19,8 +19,9 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     /*
-    MemberRequestDto 를 통한 member 생성.
-    @return member 를 memberResponseDto 로 변환 후 반환
+    MemberRequestDto 를 통한 Member 생성.
+    @param requestDto - 가입 요청 정보
+    @return Member 를 memberResponseDto 로 변환 후 반환
      */
     @Transactional
     @Override
@@ -35,6 +36,7 @@ public class MemberServiceImpl implements MemberService {
 
     /*
     MemberRepository 에서 Member 조회
+    @param 찾고자 하는 Member ID 값
     @return findMember 를 MemberResponseDto 로 변환 후 반환
      */
     @Transactional(readOnly = true)
@@ -48,8 +50,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /*
-    Repository 에서 member 리스트 조회
-    @return member 를 memberResponseDto 로 stream 을 이용해 변환 후 리스트로 반환
+    Repository 에서 Member 리스트 조회
+    @return Member 를 MemberResponseDto 로 stream 을 이용해 변환 후 리스트로 반환
      */
     @Transactional(readOnly = true)
     @Override
@@ -63,7 +65,9 @@ public class MemberServiceImpl implements MemberService {
 
     /*
     Member 의 id 값과 수정하고자 하는 MemberRequestDto 를 input 으로 받음
-    @return 수정된 member 를 memberResponseDto 로 변환 후 반환
+    @param id - 찾고자 하는 Member ID 값
+    @param requestDto - 업데이트 하고자 하는 요청 정보
+    @return 수정된 Member 를 MemberResponseDto 로 변환 후 반환
      */
     @Transactional
     @Override

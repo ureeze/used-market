@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class OrderResponseDto {
+public class OrderConfirmResponseDto {
     //받는 사람
     private String recipient;
 
@@ -41,8 +41,8 @@ public class OrderResponseDto {
     //주문된 책 ID
     private Long orderedBookId;
 
-    public static OrderResponseDto toDto(Order order, OrderedBook orderedBook) {
-        return OrderResponseDto.builder()
+    public static OrderConfirmResponseDto toDto(Order order, OrderedBook orderedBook) {
+        return OrderConfirmResponseDto.builder()
                 .recipient(order.getRecipient())
                 .address(order.getAddress())
                 .phone(order.getPhone())

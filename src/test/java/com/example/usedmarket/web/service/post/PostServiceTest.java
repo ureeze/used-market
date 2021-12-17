@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +24,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
+@SpringBootTest
 class PostServiceTest {
 
     @Autowired
@@ -99,10 +100,9 @@ class PostServiceTest {
         Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post = requestDto.toPost(member);
-
         Book book = requestDto.toBook();
-        post.addBook(book);
+        Post post = requestDto.toPost(member, book);
+
 
         postRepository.save(post);
 
@@ -126,12 +126,10 @@ class PostServiceTest {
 
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post0 = requestDto.toPost(member);
-        Post post1 = createRequestDto().toPost(member);
-
         Book book = requestDto.toBook();
-        post0.addBook(book);
-        post1.addBook(book);
+        Post post0 = requestDto.toPost(member, book);
+        Post post1 = createRequestDto().toPost(member, book);
+
 
         postRepository.save(post0);
         postRepository.save(post1);
@@ -155,10 +153,9 @@ class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
 
-        Post post = requestDto.toPost(member);
-
         Book book = requestDto.toBook();
-        post.addBook(book);
+        Post post = requestDto.toPost(member, book);
+
 
         postRepository.save(post);
 
@@ -181,10 +178,9 @@ class PostServiceTest {
 
         PostSaveRequestDto requestDto = createRequestDto();
 
-        Post post = requestDto.toPost(member);
-
         Book book = requestDto.toBook();
-        post.addBook(book);
+        Post post = requestDto.toPost(member, book);
+
 
         Post savedPost = postRepository.save(post);
 

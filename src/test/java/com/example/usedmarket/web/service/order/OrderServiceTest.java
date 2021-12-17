@@ -13,13 +13,14 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.dto.OrderRequestDto;
-import com.example.usedmarket.web.dto.OrderResponseDto;
+import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
 import com.example.usedmarket.web.security.dto.SessionMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +28,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
+@SpringBootTest
 class OrderServiceTest {
 
     @Autowired
@@ -132,7 +133,7 @@ class OrderServiceTest {
         OrderRequestDto requestDto = createOrderRequestDto(post, book);
 
         //when
-        OrderResponseDto responseDto = orderService.save(sessionMember, requestDto);
+        OrderConfirmResponseDto responseDto = orderService.save(sessionMember, requestDto);
 
         //then
         assertEquals(requestDto.getAddress(), responseDto.getAddress());
@@ -155,7 +156,7 @@ class OrderServiceTest {
         Order savedOrder = orderRepository.save(order);
 
         //when
-        OrderResponseDto responseDto = orderService.findById(savedOrder.getId());
+        OrderConfirmResponseDto responseDto = orderService.findById(savedOrder.getId());
 
         //then
         assertEquals(requestDto.getAddress(), responseDto.getAddress());
@@ -178,7 +179,7 @@ class OrderServiceTest {
         orderRepository.save(order);
 
         //when
-        List<OrderResponseDto> orderResponseDtoList = orderService.findAll(sessionMember);
+        List<OrderConfirmResponseDto> orderResponseDtoList = orderService.findAll(sessionMember);
 
         //then
         assertEquals(requestDto.getAddress(), orderResponseDtoList.get(0).getAddress());

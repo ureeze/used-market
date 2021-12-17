@@ -21,28 +21,35 @@ import java.util.List;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Post extends BaseTimeEntity {
+    //POST ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //POST 제목
     @Column(name = "TITLE", nullable = false, length = 30)
     private String title;
 
+    //POST 내용
     @Column(name = "CONTENT", length = 200, nullable = false)
     private String content;
 
+    //POST 상태
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
+    //POST 삭제 여부
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
+    //POST 와 관련된 MEMBER
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
+    //POST 와 관련된 BOOK
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Book> bookList = new ArrayList<>();
 
     @Builder
@@ -70,17 +77,22 @@ public class Post extends BaseTimeEntity {
         return false;
     }
 
+    // POST 책 추가
     public Post addBook(Book book) {
         getBookList().add(book);
         return this;
     }
 
+    // 포스트 수정
     public void update(PostSaveRequestDto requestDto) {
+        // POST 제목 수정
         this.title = requestDto.getTitle();
+
+        // POST 내용 수정
         this.content = requestDto.getContent();
-        this.bookList.get(0).update(requestDto);
     }
 
+    //POST 삭제 여부 확인
     public boolean isDeletable(Member member) {
         if (this.member != member) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
@@ -93,6 +105,7 @@ public class Post extends BaseTimeEntity {
         return true;
     }
 
+    //POST 삭제
     public void deleted() {
         this.bookList.get(0).deleted();
         this.deleted = true;
