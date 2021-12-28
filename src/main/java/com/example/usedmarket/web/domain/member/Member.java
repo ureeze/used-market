@@ -65,9 +65,10 @@ public class Member extends BaseTimeEntity {
     }
 
     // 회원정보 수정
-    public void update(OAuthAttributes attributes) {
+    public Member update(OAuthAttributes attributes) {
         this.name = attributes.getName();
         this.email = attributes.getEmail();
+        return this;
     }
 
     // 회원정보 수정
