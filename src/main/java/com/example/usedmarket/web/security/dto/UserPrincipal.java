@@ -1,8 +1,11 @@
 package com.example.usedmarket.web.security.dto;
 
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.Role;
+
+import com.example.usedmarket.web.domain.user.UserEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,40 +17,43 @@ import java.util.Collections;
 import java.util.Map;
 
 @Getter
-public class SessionMember implements OAuth2User, UserDetails, Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class UserPrincipal implements UserDetails, OAuth2User, Serializable {
 
     private Long id;
     private String name;
     private String email;
     private String picture;
     private Collection<? extends GrantedAuthority> authorities;
+    private Map<String, Object> attributes;
 
-    public SessionMember(Member member) {
-        this.id = member.getId();
-        this.name = member.getName();
-        this.email = member.getEmail();
-        this.picture = member.getPicture();
-        updateRoleUser();
-    }
 
-    public void updateRoleUser() {
-        this.authorities = Collections.
-                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    public Member toMember() {
-        return Member.builder()
-                .id(this.id)
-                .name(this.name)
-                .email(this.email)
-                .picture(this.picture)
-                .role(Role.USER)
+    public static UserPrincipal createUserPrincipal(UserEntity user){
+        return UserPrincipal.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .picture(user.getPicture())
+                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
+                .attributes(null)
                 .build();
     }
 
     @Override
     public Map<String, Object> getAttributes() {
-        return null;
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
     @Override
@@ -57,26 +63,26 @@ public class SessionMember implements OAuth2User, UserDetails, Serializable {
 
     @Override
     public String getUsername() {
-        return this.name;
+        return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return false;
     }
 }

@@ -1,11 +1,11 @@
 package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.post.Post;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -42,13 +42,13 @@ public class OrderRequestDto {
     @NotNull
     private Long bookId;
 
-    public Order createOrder(Member member, Post post) {
+    public Order createOrder(UserEntity user, Post post) {
         Order order = Order.builder()
                 .recipient(this.recipient)
                 .address(this.address)
                 .phone(this.phone)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
-                .member(member)
+                .user(user)
                 .post(post)
                 .build();
         return order;

@@ -1,35 +1,36 @@
 package com.example.usedmarket.web.domain.order;
 
+import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@Transactional
-@SpringBootTest
-class OrderRepositoryTest {
+public class OrderRepositoryTest {
 
     @Autowired
     OrderRepository orderRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -37,17 +38,19 @@ class OrderRepositoryTest {
     @Autowired
     BookRepository bookRepository;
 
+    @Autowired
+    TestEntityManager testEntityManager;
 
-    Member createMember() {
+    UserEntity createUserEntity() {
         int num = (int) (Math.random() * 10000) + 1;
         String name = "pbj" + num;
-        Member member = Member.builder()
+        UserEntity userEntity = UserEntity.builder()
                 .name(name)
                 .email(name + "@google.com")
                 .picture("pic" + num)
                 .role(Role.USER)
                 .build();
-        return memberRepository.save(member);
+        return userRepository.save(userEntity);
     }
 
     Book createBook() {
@@ -62,41 +65,41 @@ class OrderRepositoryTest {
                 .build();
     }
 
-    Post createPost(Member member, Book book) {
+    Post createPost(UserEntity userEntity, Book book) {
         int num = (int) (Math.random() * 10000) + 1;
         Post post = Post.builder()
                 .title("PostTitle" + num)
                 .content("contentInPost" + num)
                 .status(PostStatus.SELL)
-                .member(member)
+                .userEntity(userEntity)
                 .build();
         post.addBook(book);
         return postRepository.save(post);
     }
 
 
-    Order createOrder(Member member, Post post) {
+    Order createOrder(UserEntity userEntity, Post post) {
         int num = (int) (Math.random() * 10000) + 1;
         return Order.builder()
                 .recipient("pbj" + num)
                 .address("seoul " + num)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
                 .phone(num + "")
-                .member(member)
+                .user(userEntity)
                 .post(post)
                 .build();
     }
 
     Order createOrder() {
-        Member member = createMember();
+        UserEntity userEntity = createUserEntity();
         Book book = createBook();
-        Post post = createPost(member, book);
-        return createOrder(member, post);
+        Post post = createPost(userEntity, book);
+        return createOrder(userEntity, post);
     }
 
     @AfterEach
     void clean() {
-        memberRepository.deleteAll();
+        userRepository.deleteAll();
         postRepository.deleteAll();
         orderRepository.deleteAll();
     }
@@ -108,19 +111,10 @@ class OrderRepositoryTest {
         Order order = createOrder();
 
         //when
-        Order savedOrder = orderRepository.save(order);
-        Order findOrder = orderRepository.findById(savedOrder.getId()).get();
+        testEntityManager.persist(order);
 
         //then
-        assertEquals(savedOrder.getId(), order.getId());
-        assertEquals(savedOrder.getAddress(), order.getAddress());
-        assertEquals(savedOrder.getDeliveryStatus(), order.getDeliveryStatus());
-        assertEquals(savedOrder.getPhone(), order.getPhone());
-
-        assertEquals(findOrder.getId(), savedOrder.getId());
-        assertEquals(findOrder.getAddress(), savedOrder.getAddress());
-        assertEquals(findOrder.getDeliveryStatus(), savedOrder.getDeliveryStatus());
-        assertEquals(findOrder.getPhone(), savedOrder.getPhone());
+        assertThat(orderRepository.findById(order.getId()).get().getAddress()).isEqualTo(order.getAddress());
     }
 
 

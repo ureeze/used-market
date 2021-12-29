@@ -5,9 +5,11 @@ import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
 @Builder
-public class OrderConfirmResponseDto {
+public class OrderConfirmResponseDto implements Serializable {
     //받는 사람
     private String recipient;
 
@@ -40,6 +42,8 @@ public class OrderConfirmResponseDto {
 
     //주문된 책 ID
     private Long orderedBookId;
+
+
 
     public static OrderConfirmResponseDto toDto(Order order, OrderedBook orderedBook) {
         return OrderConfirmResponseDto.builder()

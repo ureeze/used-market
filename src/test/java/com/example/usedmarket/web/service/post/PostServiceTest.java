@@ -2,38 +2,37 @@ package com.example.usedmarket.web.service.post;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.UserNotFoundException;
-import com.example.usedmarket.web.security.dto.SessionMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @ActiveProfiles("test")
 @Transactional
 @SpringBootTest
-class PostServiceTest {
+public class PostServiceTest {
+    @Autowired
+    PostServiceImpl postService;
 
     @Autowired
-    PostService postService;
-
-    @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -45,21 +44,20 @@ class PostServiceTest {
     void clean() {
         postRepository.deleteAll();
         bookRepository.deleteAll();
-        memberRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
-    SessionMember createSessionMember() {
+    UserPrincipal createUserPrincipal() {
         int num = (int) (Math.random() * 10000) + 1;
         String name = "pbj" + num;
-        Member member = Member.builder()
+        UserEntity user = UserEntity.builder()
                 .name(name)
                 .email(name + "@google.com")
                 .picture("pic" + num)
                 .role(Role.USER)
                 .build();
-        memberRepository.save(member);
-        SessionMember sessionMember = new SessionMember(memberRepository.save(member));
-        return sessionMember;
+        userRepository.save(user);
+        return UserPrincipal.createUserPrincipal(user);
     }
 
     PostSaveRequestDto createRequestDto() {
@@ -80,29 +78,27 @@ class PostServiceTest {
     @DisplayName("service - 포스트 생성 테스트")
     void createPost() {
         //given
-        SessionMember sessionMember = createSessionMember();
+        UserPrincipal userPrincipal = createUserPrincipal();
         PostSaveRequestDto requestDto = createRequestDto();
 
         //when
-        PostSaveResponseDto responseDto = postService.save(sessionMember, requestDto);
+        PostSaveResponseDto responseDto = postService.save(userPrincipal, requestDto);
 
         //then
-        assertEquals(requestDto.getContent(), responseDto.getContent());
-        assertEquals(requestDto.getTitle(), responseDto.getTitle());
-        assertEquals(requestDto.getBookName(), responseDto.getBookList().get(0).getBookName());
+        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
+        assertThat(responseDto.getBooksList().get(0).getBookName()).isEqualTo(requestDto.getBookName());
     }
 
     @Test
     @DisplayName("service - 포스트 개별 조회 테스트")
     void findPost() {
         //given
-        SessionMember sessionMember = createSessionMember();
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserPrincipal userPrincipal = createUserPrincipal();
+        UserEntity user = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(member, book);
-
+        Post post = requestDto.toPost(user, book);
 
         postRepository.save(post);
 
@@ -110,26 +106,21 @@ class PostServiceTest {
         PostSaveResponseDto responseDto = postService.findById(post.getId());
 
         //then
-        assertEquals(post.getId(), responseDto.getPostId());
-        assertEquals(post.getTitle(), responseDto.getTitle());
-        assertEquals(post.getMember().getId(), responseDto.getMemberId());
-        assertEquals(post.getBookList().get(0).getBookName(), responseDto.getBookList().get(0).getBookName());
-        assertEquals(post.getBookList().get(0).getId(), bookRepository.findAll().get(0).getId());
+        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
     }
 
     @Test
     @DisplayName("service - 전체 포스트 조회 테스트")
     void findAllPost() {
         //given
-        SessionMember sessionMember = createSessionMember();
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserPrincipal userPrincipal = createUserPrincipal();
+        UserEntity user = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post0 = requestDto.toPost(member, book);
-        Post post1 = createRequestDto().toPost(member, book);
-
+        Post post0 = requestDto.toPost(user, book);
+        Post post1 = createRequestDto().toPost(user, book);
 
         postRepository.save(post0);
         postRepository.save(post1);
@@ -138,23 +129,22 @@ class PostServiceTest {
         List<PostSaveResponseDto> findAll = postService.findAll();
 
         //then
-        assertEquals(post0.getId(), findAll.get(0).getPostId());
-        assertEquals(post1.getId(), findAll.get(1).getPostId());
-        assertEquals(post1.getBookList().get(0).getBookName(), findAll.get(1).getBookList().get(0).getBookName());
+        assertThat(findAll.get(0).getContent()).isEqualTo(post0.getContent());
+        assertThat(findAll.get(1).getContent()).isEqualTo(post1.getContent());
     }
 
     @Test
     @DisplayName("service - 포스트 수정 테스트")
     void updatePost() {
         //given
-        SessionMember sessionMember = createSessionMember();
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserPrincipal userPrincipal = createUserPrincipal();
+        UserEntity user = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(member, book);
+        Post post = requestDto.toPost(user, book);
 
 
         postRepository.save(post);
@@ -165,29 +155,26 @@ class PostServiceTest {
         PostSaveResponseDto postResponseDto = postService.update(post.getId(), newRequestDto);
 
         //then
-        assertEquals(newRequestDto.getTitle(), postResponseDto.getTitle());
-        assertEquals(newRequestDto.getBookName(), postResponseDto.getBookList().get(0).getBookName());
+        assertThat(postResponseDto.getContent()).isEqualTo(newRequestDto.getContent());
     }
 
     @Test
     @DisplayName("service - 포스트 삭제 테스트")
     void deletePost() {
         //given
-        SessionMember sessionMember = createSessionMember();
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserPrincipal userPrincipal = createUserPrincipal();
+        UserEntity user = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(member, book);
-
-
-        Post savedPost = postRepository.save(post);
+        Post post = requestDto.toPost(user, book);
+        postRepository.save(post);
 
         //when
-        postService.delete(savedPost.getId());
+        postService.delete(post.getId());
 
         //then
-        System.out.println("service - 포스트 삭제 성공");
+        System.out.println("삭제 완료");
     }
 }

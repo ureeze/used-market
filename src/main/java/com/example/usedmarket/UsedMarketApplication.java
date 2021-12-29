@@ -1,14 +1,14 @@
 package com.example.usedmarket;
 
+import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,11 +29,11 @@ public class UsedMarketApplication {
 
     @Bean
     @Profile("dev")
-    public CommandLineRunner dataLoader(MemberRepository memberRepository, PostRepository postRepository, BookRepository bookRepository) {
+    public CommandLineRunner dataLoader(UserRepository userRepository, PostRepository postRepository, BookRepository bookRepository) {
 
         return (args) -> {
             System.out.println("dataLoader 시작");
-            Member member = memberRepository.save(Member.builder()
+            UserEntity userEntity = userRepository.save(UserEntity.builder()
                     .name("default 이름")
                     .role(Role.USER)
                     .email("default@gmail.com")
@@ -48,7 +48,7 @@ public class UsedMarketApplication {
                                 .content("콘텐츠" + index)
                                 .status(PostStatus.SELL)
                                 .deleted(false)
-                                .member(member)
+                                .userEntity(userEntity)
                                 .build();
                         Book book = Book.builder()
                                 .bookName("name" + index)

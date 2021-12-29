@@ -2,15 +2,15 @@ package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.UserNotFoundException;
-import com.example.usedmarket.web.security.dto.SessionMember;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,20 +33,19 @@ import java.net.URI;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @ActiveProfiles("test")
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class PostControllerTest {
+public class PostControllerTest {
 
     @LocalServerPort
     int port;
@@ -56,7 +54,7 @@ class PostControllerTest {
     BookRepository bookRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -81,9 +79,9 @@ class PostControllerTest {
 
     }
 
-    Member createMember() {
+    UserEntity createUserEntity() {
         int num = (int) (Math.random() * 10000) + 1;
-        return memberRepository.save(Member.builder()
+        return userRepository.save(UserEntity.builder()
                 .name("test" + num)
                 .email("test" + num + "@google.com")
                 .picture("pic" + num)
@@ -111,13 +109,19 @@ class PostControllerTest {
     @DisplayName("controller - POST 등록 테스트")
     void save() throws Exception {
         //given
-        SessionMember sessionMember = new SessionMember(createMember());
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
         PostSaveRequestDto requestDto = createPostSaveRequestDto();
 
-        String url = "http://localhost:" + port + "/posts";
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts")
+                .build()
+                .encode()
+                .toUri();
 
         //when
-        mvc.perform(post(url).with(user(sessionMember))
+        mvc.perform(post(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
@@ -135,11 +139,11 @@ class PostControllerTest {
     @DisplayName("controller - POST 전체조회 테스트")
     void findAll() throws Exception {
         //given
-        SessionMember sessionMember = new SessionMember(createMember());
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
         PostSaveRequestDto requestDto = createPostSaveRequestDto();
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(member, book);
+        Post post = requestDto.toPost(userEntity, book);
 
         postRepository.save(post);
 
@@ -153,7 +157,7 @@ class PostControllerTest {
 
         //when
         //then
-        mvc.perform(get(uri).with(user(sessionMember))
+        mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -167,18 +171,18 @@ class PostControllerTest {
     @DisplayName("controller - POST 조회 테스트")
     void findById() throws Exception {
         //given
-        SessionMember sessionMember = new SessionMember(createMember());
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
         Book book = requestDto0.toBook();
-        Post post = requestDto0.toPost(member, book);
+        Post post = requestDto0.toPost(userEntity, book);
         postRepository.save(post);
 
         String url = "http://localhost:" + port + "/posts/" + post.getId();
 
         //when
         //then
-        mvc.perform(get(url).with(user(sessionMember))
+        mvc.perform(get(url).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("title").value(post.getTitle()))
@@ -186,61 +190,4 @@ class PostControllerTest {
                 .andExpect(jsonPath("status").value(PostStatus.SELL.name()))
                 .andDo(print());
     }
-
-    @Test
-    @DisplayName("controller - POST 수정 테스트")
-    void update() throws Exception {
-        //given
-        SessionMember sessionMember = new SessionMember(createMember());
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-        PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
-        Book book = requestDto0.toBook();
-        Post post = requestDto0.toPost(member, book);
-        postRepository.save(post);
-
-        PostSaveRequestDto updateRequestDto = createPostSaveRequestDto();
-        Book updateBook = updateRequestDto.toBook();
-        Post updatePost = updateRequestDto.toPost(member, book);
-
-        String url = "http://localhost:" + port + "/posts/" + post.getId();
-
-//        //when
-//        //then
-//        mvc.perform(put(url).with(user(sessionMember))
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(new ObjectMapper().writeValueAsString(requestDto1)))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("title").value(post1.getTitle()))
-//                .andExpect(jsonPath("content").value(post1.getContent()))
-//                .andExpect(jsonPath("status").value("SELL"))
-//                .andExpect(jsonPath("$.bookList").exists())
-//                .andExpect(jsonPath("$.bookList[0].bookName").value(post1.getBookList().get(0).getBookName()))
-//                .andExpect(jsonPath("$.bookList[0].stock").value(1))
-//                .andDo(print());
-    }
-
-//    @Test
-//    @DisplayName("controller - POST 삭제 테스트")
-//    void deleteById() throws Exception {
-//        //given
-//        PostSaveRequestDto requestDto0 = createPostSaveRequestDto(0);
-//        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-//
-//        Post post0 = requestDto0.toPost(member);
-////        Book book0 = requestDto0.toBook();
-////        post0.getBookList().add(book0);
-//        postRepository.save(post0);
-//
-//        String url = "http://localhost:" + port + "/posts/" + post0.getId();
-//
-//        //when
-//        //then
-//        mvc.perform(delete(url).with(user(sessionMember))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.postId").value(post0.getId()))
-//                .andDo(print());
-//    }
-
-
 }

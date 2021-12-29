@@ -1,11 +1,10 @@
 package com.example.usedmarket.web.dto;
 
-import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.post.Post;
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.PostStatus;
-import com.example.usedmarket.web.security.dto.SessionMember;
+import com.example.usedmarket.web.domain.post.Post;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,6 +60,7 @@ public class PostSaveRequestDto {
         this.bookStatus = bookStatus;
     }
 
+
     public Book toBook() {
         return Book.builder()
                 .bookName(this.bookName)
@@ -73,14 +73,14 @@ public class PostSaveRequestDto {
                 .build();
     }
 
-    public Post toPost(Member member,Book book) {
+    public Post toPost(UserEntity user, Book book) {
         // requestDto 로 POST 생성
         Post post = Post.builder()
                 .title(this.title)
                 .content(this.content)
                 .status(PostStatus.SELL)
                 .deleted(false)
-                .member(member)
+                .userEntity(user)
                 .build();
         post.addBook(book);
         return post;

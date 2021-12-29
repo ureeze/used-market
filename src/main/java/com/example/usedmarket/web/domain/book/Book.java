@@ -1,5 +1,6 @@
 package com.example.usedmarket.web.domain.book;
 
+
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
@@ -10,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor

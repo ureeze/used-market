@@ -2,7 +2,7 @@ package com.example.usedmarket.web.domain.post;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.member.Member;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,21 +43,21 @@ public class Post extends BaseTimeEntity {
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    //POST 와 관련된 MEMBER
+    //POST 와 관련된 USER
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_ID")
-    private Member member;
+    @JoinColumn(name = "USER_ID")
+    private UserEntity user;
 
     //POST 와 관련된 BOOK
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Book> bookList = new ArrayList<>();
 
     @Builder
-    public Post(String title, String content, PostStatus status, Member member, boolean deleted) {
+    public Post(String title, String content, PostStatus status, UserEntity userEntity, boolean deleted) {
         this.title = title;
         this.content = content;
         this.status = status;
-        this.member = member;
+        this.user = userEntity;
         this.deleted = deleted;
     }
 
@@ -77,12 +77,11 @@ public class Post extends BaseTimeEntity {
         return false;
     }
 
-    // POST 책 추가
-    public Post addBook(Book book) {
-        getBookList().add(book);
-        return this;
-    }
 
+    // POST 책 추가
+    public void addBook(Book book) {
+        this.bookList.add(book);
+    }
     // 포스트 수정
     public void update(PostSaveRequestDto requestDto) {
         // POST 제목 수정
@@ -93,8 +92,8 @@ public class Post extends BaseTimeEntity {
     }
 
     //POST 삭제 여부 확인
-    public boolean isDeletable(Member member) {
-        if (this.member != member) {
+    public boolean isDeletable(UserEntity user) {
+        if (this.user != user) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
 

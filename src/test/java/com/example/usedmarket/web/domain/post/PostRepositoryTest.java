@@ -1,55 +1,52 @@
 package com.example.usedmarket.web.domain.post;
 
+import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
-import org.junit.jupiter.api.AfterEach;
+import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@Transactional
-@SpringBootTest
-class PostRepositoryTest {
+public class PostRepositoryTest {
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
-    PostRepository postRepository;
+    PostRepository postsRepository;
 
     @Autowired
-    BookRepository bookRepository;
+    BookRepository booksRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    TestEntityManager testEntityManager;
 
-    @AfterEach
-    void clean() {
-        postRepository.deleteAll();
-        bookRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
-    Member createMember() {
+    /*
+    FormLogin 용 UserEntity 생성
+     */
+    UserEntity createUserEntity() {
         int num = (int) (Math.random() * 10000) + 1;
-        String name = "pbj" + num;
+        String name = "PBJ" + num;
         String email = name + "@google.com";
-        String picture = "pbjPicture" + num;
-        Member member = Member.builder()
-                .name(name)
-                .email(email)
+        String password = num + "";
+
+        UserEntity userEntity = UserEntity.builder()
+                .name(name).password(password)
+                .email(email).picture(null).registrationId(null)
                 .role(Role.USER)
-                .picture(picture)
                 .build();
-        return memberRepository.save(member);
+        return userEntity;
     }
 
     Book createBook() {
@@ -62,41 +59,34 @@ class PostRepositoryTest {
                 .bookStatus(BookStatus.S)
                 .stock(1)
                 .build();
-        return bookRepository.save(book);
+        return booksRepository.save(book);
     }
 
-    Post createPost(Member member, Book book) {
+    Post createPost(UserEntity user, Book book) {
         int num = (int) (Math.random() * 10000) + 1;
         Post post = Post.builder()
                 .title("PostTitle" + num)
                 .content("contentInPost" + num)
                 .status(PostStatus.SELL)
-                .member(member)
+                .userEntity(user)
                 .build();
-        return post.addBook(book);
-
+        post.addBook(book);
+        return post;
     }
+
 
     @Test
     @DisplayName("repository - 포스트 저장")
     void CreatePostAndBook() {
         //given
-        Member member = createMember();
+        UserEntity userEntity = createUserEntity();
         Book book = createBook();
-        Post post = createPost(member, book);
+        Post post = createPost(userEntity, book);
 
         //when
-        postRepository.saveAndFlush(post);
+        testEntityManager.persist(post);
 
         //then
-        Post savedPost = postRepository.findById(post.getId()).get();
-        assertEquals(post.getTitle(), savedPost.getTitle());
-        assertEquals(post.getContent(), savedPost.getContent());
-        assertEquals(post.getStatus(), savedPost.getStatus());
-        assertEquals(book.getBookName(), savedPost.getBookList().get(0).getBookName());
-        assertEquals(book.getCategory(), savedPost.getBookList().get(0).getCategory());
-        assertEquals(post.getMember().getEmail(), savedPost.getMember().getEmail());
-        assertEquals(false, savedPost.isDeleted());
-
+        assertThat(postsRepository.findById(post.getId()).get()).isEqualTo(post);
     }
 }

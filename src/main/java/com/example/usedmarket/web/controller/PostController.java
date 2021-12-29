@@ -2,9 +2,9 @@ package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.dto.PostSaveResponseDto;
-import com.example.usedmarket.web.security.LoginUser;
-import com.example.usedmarket.web.security.dto.SessionMember;
-import com.example.usedmarket.web.service.post.PostService;
+import com.example.usedmarket.web.security.dto.LoginUser;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
+import com.example.usedmarket.web.service.post.PostServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceImpl postService;
 
     //포스트 저장
     @PostMapping("/posts")
-    public ResponseEntity<PostSaveResponseDto> save(@LoginUser SessionMember sessionMember, @Validated @RequestBody PostSaveRequestDto requestDto) {
-        PostSaveResponseDto responseDto = postService.save(sessionMember, requestDto);
+    public ResponseEntity<PostSaveResponseDto> save(@LoginUser UserPrincipal userPrincipal, @Validated @RequestBody PostSaveRequestDto requestDto) {
+        PostSaveResponseDto responseDto = postService.save(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -54,5 +54,4 @@ public class PostController {
         postService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(PostSaveResponseDto.builder().postId(id).build());
     }
-
 }

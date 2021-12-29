@@ -2,7 +2,6 @@ package com.example.usedmarket.web.domain.orderedBook;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.order.Order;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,7 +16,6 @@ import javax.persistence.*;
 @Table(name = "ORDERED_BOOK")
 @EntityListeners(AuditingEntityListener.class)
 public class OrderedBook extends BaseTimeEntity {
-
     //ORDERED BOOK ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,4 +62,8 @@ public class OrderedBook extends BaseTimeEntity {
         this.deleted = true;
     }
 
+    //ORDER 추가
+    public void addOrder(Order order) {
+        this.order = order;
+    }
 }

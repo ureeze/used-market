@@ -1,15 +1,15 @@
 package com.example.usedmarket.web.service.post;
 
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.exception.PostNotFoundException;
-import com.example.usedmarket.web.exception.UserNotFoundException;
-import com.example.usedmarket.web.security.dto.SessionMember;
-import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
+import com.example.usedmarket.web.exception.PostNotFoundException;
+import com.example.usedmarket.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
-public class PostServiceImpl implements PostService {
+@Service
+public class PostServiceImpl implements PostService{
 
-    private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
+    private final PostRepository postsRepository;
+    private final UserRepository userRepository;
 
     /*
      * SessionMember 와 PostResponseDto 를 통한 POST 생성.
@@ -32,16 +32,16 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public PostSaveResponseDto save(SessionMember sessionMember, PostSaveRequestDto requestDTO) {
+    public PostSaveResponseDto save(UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) {
         //Member 조회
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         // Member 와 requestDto 를 이용해 POST 와 Book 생성
         Book book = requestDTO.toBook();
-        Post post = requestDTO.toPost(member, book);
+        Post post = requestDTO.toPost(userEntity, book);
 
         // PostRepository 에 POST 저장
-        Post savedPost = postRepository.save(post);
+        Post savedPost = postsRepository.save(post);
 
         // POST 를 PostResponseDto 로 반환
         return PostSaveResponseDto.toResponseDto(savedPost);
@@ -56,7 +56,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostSaveResponseDto findById(Long id) {
         // POST id로 PostRepository 에서  POST 조회
-        Post findPost = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
+        Post findPost = postsRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // POST 를 PostResponseDto 로 반환
         return PostSaveResponseDto.toResponseDto(findPost);
@@ -69,7 +69,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     @Override
     public List<PostSaveResponseDto> findAll() {
-        return postRepository.findAll().stream().map(post -> PostSaveResponseDto.toResponseDto(post)).collect(Collectors.toList());
+        return postsRepository.findAll().stream().map(post -> PostSaveResponseDto.toResponseDto(post)).collect(Collectors.toList());
     }
 
     /*
@@ -82,7 +82,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostSaveResponseDto update(Long id, PostSaveRequestDto requestDTO) {
         // POST id로 POST 조회
-        Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
+        Post post = postsRepository.findById(id).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // POST 수정
         post.update(requestDTO);
@@ -101,6 +101,6 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public void delete(Long id) {
-        postRepository.deleteById(id);
+        postsRepository.deleteById(id);
     }
 }

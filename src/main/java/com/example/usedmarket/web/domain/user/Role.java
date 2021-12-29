@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.domain.member;
+package com.example.usedmarket.web.domain.user;
 
 import lombok.Getter;
 

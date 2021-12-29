@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
 @Builder
 @AllArgsConstructor
-public class OrderCancelResponseDto {
+public class OrderCancelResponseDto implements Serializable {
 
     //취소된 주문 ID
     private Long cancelOrderId;

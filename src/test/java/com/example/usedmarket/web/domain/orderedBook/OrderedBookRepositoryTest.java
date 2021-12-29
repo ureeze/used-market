@@ -1,37 +1,37 @@
 package com.example.usedmarket.web.domain.orderedBook;
 
+import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
-import com.example.usedmarket.web.domain.member.Role;
+import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.order.OrderRepository;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@Transactional
-@SpringBootTest
-class OrderedBookRepositoryTest {
+public class OrderedBookRepositoryTest {
     @Autowired
     OrderRepository orderRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -42,16 +42,19 @@ class OrderedBookRepositoryTest {
     @Autowired
     OrderedBookRepository orderedBookRepository;
 
-    Member createMember() {
+    @Autowired
+    TestEntityManager testEntityManager;
+
+    UserEntity createUserEntity() {
         int num = (int) (Math.random() * 10000) + 1;
         String name = "pbj" + num;
-        Member member = Member.builder()
+        UserEntity userEntity = UserEntity.builder()
                 .name(name)
                 .email(name + "@google.com")
                 .picture("pic" + num)
                 .role(Role.USER)
                 .build();
-        return memberRepository.save(member);
+        return userRepository.save(userEntity);
     }
 
     Book createBook() {
@@ -66,25 +69,25 @@ class OrderedBookRepositoryTest {
                 .build();
     }
 
-    Post createPost(Member member) {
+    Post createPost(UserEntity userEntity) {
         int num = (int) (Math.random() * 10000) + 1;
         Post post = Post.builder()
                 .title("PostTitle" + num)
                 .content("contentInPost" + num)
                 .status(PostStatus.SELL)
-                .member(member)
+                .userEntity(userEntity)
                 .build();
         return post;
     }
 
-    Order createOrder(Member member, Post post) {
+    Order createOrder(UserEntity userEntity, Post post) {
         int num = (int) (Math.random() * 10000) + 1;
         Order order = Order.builder()
                 .recipient("pbj" + num)
                 .address("seoul " + num)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
                 .phone(num + "")
-                .member(member)
+                .user(userEntity)
                 .post(post)
                 .build();
         return order;
@@ -103,7 +106,7 @@ class OrderedBookRepositoryTest {
 
     @AfterEach
     void clean() {
-        memberRepository.deleteAll();
+        userRepository.deleteAll();
         postRepository.deleteAll();
         orderRepository.deleteAll();
     }
@@ -113,24 +116,21 @@ class OrderedBookRepositoryTest {
     @DisplayName("REPOSITORY - OrderedBook 저장")
     void save() {
         //given
-        Member member = createMember();
+        UserEntity userEntity = createUserEntity();
         Book book = createBook();
-        Post post = createPost(member);
+        Post post = createPost(userEntity);
         book.addPost(post);
         post.addBook(book);
         Post savedPost = postRepository.save(post);
 
-        Order order = createOrder(member, savedPost);
+        Order order = createOrder(userEntity, savedPost);
         OrderedBook orderedBook = createOrderedBook(order, book);
-        orderRepository.save(order);
+        testEntityManager.persist(order);
 
         //when
-        OrderedBook savedOrderedBook = orderedBookRepository.save(orderedBook);
+        testEntityManager.persist(orderedBook);
 
         //then
-        assertEquals(orderedBook.getCount(), savedOrderedBook.getCount());
-        assertEquals(orderedBook.getOrderPrice(), savedOrderedBook.getOrderPrice());
-        assertEquals(orderedBook.getBook().getBookName(), savedOrderedBook.getBook().getBookName());
-        assertEquals(orderedBook.getOrder().getAddress(), savedOrderedBook.getOrder().getAddress());
+        assertThat(orderedBookRepository.findById(orderedBook.getId()).get().getOrderPrice()).isEqualTo(orderedBook.getOrderPrice());
     }
 }

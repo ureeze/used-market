@@ -1,10 +1,9 @@
 package com.example.usedmarket.web.domain.order;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
-import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.member.Member;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.post.Post;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +21,6 @@ import java.util.List;
 @Table(name = "ORDERS")
 @EntityListeners(AuditingEntityListener.class)
 public class Order extends BaseTimeEntity {
-
     // ORDER ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,8 +49,8 @@ public class Order extends BaseTimeEntity {
 
     // 주문과 연관된 사용자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_ID")
-    private Member member;
+    @JoinColumn(name = "USER_ID")
+    private UserEntity user;
 
     // 주문과 연관된 POST
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,12 +62,12 @@ public class Order extends BaseTimeEntity {
     private List<OrderedBook> orderedBookList = new ArrayList<>();
 
     @Builder
-    public Order(String recipient, String address, String phone, DeliveryStatus deliveryStatus, Member member, Post post, boolean deleted) {
+    public Order(String recipient, String address, String phone, DeliveryStatus deliveryStatus, UserEntity user, Post post, boolean deleted) {
         this.recipient = recipient;
         this.address = address;
         this.phone = phone;
         this.deliveryStatus = deliveryStatus;
-        this.member = member;
+        this.user = user;
         this.post = post;
         this.deleted = deleted;
     }
@@ -91,8 +89,8 @@ public class Order extends BaseTimeEntity {
     }
 
     //주문 삭제 가능 확인
-    public boolean isDeletable(Member member) {
-        if (this.member != member) {
+    public boolean isDeletable(UserEntity user) {
+        if (this.user != user) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
         if (this.deleted) {
@@ -107,10 +105,14 @@ public class Order extends BaseTimeEntity {
     }
 
     // 주문 취소 로직
-    public void cancel( Member member) {
+    public void cancel(UserEntity user) {
         // 주문 취소
-        if (isDeletable(member)) {
+        if (isDeletable(user)) {
             deleted();
         }
+    }
+
+    public void addOrderedBook(OrderedBook orderedBook) {
+        this.orderedBookList.add(orderedBook);
     }
 }

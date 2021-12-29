@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.security;
+package com.example.usedmarket.web.security.dto;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

@@ -2,8 +2,6 @@ package com.example.usedmarket.web.service.order;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.member.Member;
-import com.example.usedmarket.web.domain.member.MemberRepository;
 import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.order.OrderRepository;
@@ -11,10 +9,12 @@ import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBookRepository;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.dto.OrderRequestDto;
+import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
+import com.example.usedmarket.web.dto.OrderRequestDto;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.*;
-import com.example.usedmarket.web.security.dto.SessionMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +25,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-
     private final OrderRepository orderRepository;
     private final OrderedBookRepository orderedBookRepository;
     private final PostRepository postRepository;
     private final BookRepository bookRepository;
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
 
     /*
      * 주문 저장
@@ -40,15 +39,15 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional
     @Override
-    public OrderConfirmResponseDto save(SessionMember sessionMember, OrderRequestDto requestDto) {
+    public OrderConfirmResponseDto save(UserPrincipal userPrincipal, OrderRequestDto requestDto) {
         //Member 탐색
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         //POST 탐색
         Post post = postRepository.findById(requestDto.getPostId()).get();
 
         //Member 와 POST 를 통한 Order 생성
-        Order order = requestDto.createOrder(member, post);
+        Order order = requestDto.createOrder(userEntity, post);
 
         //Book 탐색
         Book book = bookRepository.findById(requestDto.getBookId()).orElseThrow(() -> new BookNotFoundException("책이 존재하지 않습니다."));
@@ -88,11 +87,11 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<OrderConfirmResponseDto> findAll(SessionMember sessionMember) {
+    public List<OrderConfirmResponseDto> findAll(UserPrincipal userPrincipal) {
         // Member 탐색
-        Member member = memberRepository.findByEmail(sessionMember.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
-        return orderRepository.findByMemberId(member.getId()).stream()
+        return orderRepository.findByUserId(userEntity.getId()).stream()
                 .map(order -> OrderConfirmResponseDto.toDto(order, order.getOrderedBookList().get(0)))
                 .collect(Collectors.toList());
     }
@@ -105,10 +104,10 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional
     @Override
-    public void cancel(SessionMember sessionMember, Long orderId) {
+    public void cancel(UserPrincipal userPrincipal, Long orderId) {
 
         //사용자 탐색
-        Member member = memberRepository.findById(sessionMember.getId()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         //주문 탐색
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("해당 주문이 존재하지 않습니다."));
@@ -135,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             //주문 취소
-            order.cancel(member);
+            order.cancel(userEntity);
 
         } else if (order.getDeliveryStatus().equals(DeliveryStatus.BEING_DELIVERED)) {
             //배송중인 경우 취소불가
@@ -143,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
         } else if (order.getDeliveryStatus().equals(DeliveryStatus.DELIVERY_COMPLETED)) {
             //배송완료인 경우 취소불가
             throw new OrderCancellationNotAllowed("배송완료이므로 주문 취소 불가합니다.");
-        } else if (order.getDeliveryStatus().equals(DeliveryStatus.PAYMENT_COMPLETED)) {
+        } else if (order.getDeliveryStatus().equals(DeliveryStatus.CANCEL_COMPLETED)) {
             //취소완료인 경우 취소불가
             throw new OrderCancellationNotAllowed("이미 취소된 주문입니다.");
         }
