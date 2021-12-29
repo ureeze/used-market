@@ -1,5 +1,6 @@
 package com.example.usedmarket;
 
+import com.example.usedmarket.web.config.AppProperties;
 import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
@@ -12,6 +13,7 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -20,6 +22,7 @@ import java.util.stream.IntStream;
 
 @EnableJpaAuditing
 @SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
 public class UsedMarketApplication {
 
     public static void main(String[] args) {
