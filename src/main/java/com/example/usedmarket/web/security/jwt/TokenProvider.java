@@ -18,11 +18,11 @@ public class TokenProvider {
     private final AppProperties appProperties;
 
 
-    public String create(UserEntity userEntity) {
+    public String create(String email) {
         Date expiryDate = new Date(new Date().getTime() + appProperties.getAuth().getTokenExpirationMsec());
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
-                .setSubject(userEntity.getEmail())
+                .setSubject(email)
                 .setIssuer("demo app")
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)

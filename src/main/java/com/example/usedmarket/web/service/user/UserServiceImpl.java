@@ -4,13 +4,18 @@ import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.*;
 import com.example.usedmarket.web.exception.UserNotFoundException;
+import com.example.usedmarket.web.security.dto.LoginUser;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,21 +26,20 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
+    private final HttpServletResponse response;
 
 
     /*
-    UserRepository 에서 User 조회
+    UserRepository 에서 UserEntity 조회
     @param 찾고자 하는 UserEntity ID 값
     @return findUser 를 UserResponseDto 로 변환 후 반환
      */
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long id) {
-        // id 값을 이용해 MemberRepository 에서 Member 조회
+        // id 값을 이용해 UserRepository 에서 UserEntity 조회
         UserEntity findUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User 가 존재하지 않습니다."));
 
-        // findMember 를 MemberResponseDto 로 변환 후 반환
+        // findUser 를 UserResponseDto 로 변환 후 반환
         return UserResponseDto.toDto(findUser);
     }
 
@@ -59,9 +63,10 @@ public class UserServiceImpl implements UserService {
     @return 수정된 UserEntity 를 UserResponseDto 로 변환 후 반환
      */
     @Transactional
-    public UserResponseDto update(Long id, UserUpdateRequestDto requestDto) {
+    public UserResponseDto updatePersonalInfo(UserPrincipal userPrincipal, UserUpdateRequestDto requestDto) {
+
         // ID 값을 이용해 UserRepository 에서 UserEntity 조회
-        UserEntity user = userRepository.getById(id);
+        UserEntity user = userRepository.getById(userPrincipal.getId());
         // requestDto 를 이용해 UserEntity 수정
         user.update(requestDto);
         // user 가 영속성 컨텍스트에 존재하기 때문에 바로 UserResponseDto 로 반환
@@ -69,12 +74,17 @@ public class UserServiceImpl implements UserService {
     }
 
     /*
+     * 회원 탈퇴
      * Input 으로 들어온 Id 값에 해당하는 UserEntity 제거
      * @param id - 삭제하고자 하는 UserEntity 의 ID
      */
     @Transactional
-    public void delete(Long id) {
+    public void delete(UserPrincipal userPrincipal, Long id) throws IOException {
         // UserRepository 에서 ID 에 맞는 UserEntity 삭제
         userRepository.deleteById(id);
+        // SecurityContextHolder 에서 context 삭제
+        SecurityContextHolder.clearContext();
+
+        response.sendRedirect("/main");
     }
 }

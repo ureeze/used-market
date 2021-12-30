@@ -75,7 +75,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("service - 포스트 생성 테스트")
+    @DisplayName("포스트 생성 테스트")
     void createPost() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -90,7 +90,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("service - 포스트 개별 조회 테스트")
+    @DisplayName("포스트 개별 조회 테스트")
     void findPost() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -110,7 +110,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("service - 전체 포스트 조회 테스트")
+    @DisplayName("전체 포스트 조회 테스트")
     void findAllPost() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -134,7 +134,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("service - 포스트 수정 테스트")
+    @DisplayName("포스트 수정 테스트")
     void updatePost() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -159,7 +159,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("service - 포스트 삭제 테스트")
+    @DisplayName("포스트 삭제 테스트")
     void deletePost() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();

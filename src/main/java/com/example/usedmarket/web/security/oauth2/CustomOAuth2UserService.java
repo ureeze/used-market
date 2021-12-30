@@ -2,6 +2,7 @@ package com.example.usedmarket.web.security.oauth2;
 
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +48,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         userRepository.save(userEntity);
         log.info("Oauth2 UserEndPoint Save");
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity, oAuth2UserInfo);
 
-        String token = tokenProvider.create(userEntity);
+        String token = tokenProvider.create(userEntity.getEmail());
         response.addHeader("Authorization", token);
         log.info("token : " + token);
-
-        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),oAuth2UserInfo.getAttributes(),nameAttributeKey);
+        return userPrincipal;
     }
 }

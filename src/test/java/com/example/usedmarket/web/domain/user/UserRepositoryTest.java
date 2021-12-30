@@ -59,7 +59,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("UserEntity 저장 테스트")
+    @DisplayName("저장 테스트")
     void saveUserTest() {
         //given
         UserEntity userEntity = createUserEntity();
@@ -73,7 +73,7 @@ class UserRepositoryTest {
 
 
     @Test
-    @DisplayName("UserEntity 조회 테스트")
+    @DisplayName("조회 테스트")
     void findMemberTest() {
         //given
         UserEntity userEntity1 = createUserEntity();

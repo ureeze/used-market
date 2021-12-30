@@ -37,7 +37,7 @@ public class PostSaveResponseDto implements Serializable {
                 .content(post.getContent())
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
-                .userId(post.getUser().getId())
+                .userId(post.getUserEntity().getId())
                 .booksList(post.getBookList())
                 .build();
     }

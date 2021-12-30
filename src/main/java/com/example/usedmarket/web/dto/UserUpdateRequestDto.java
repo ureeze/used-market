@@ -13,8 +13,8 @@ public class UserUpdateRequestDto {
     @NotNull(message = "name 필드가 Null 입니다.")
     private String name;
 
-    @Email
-    @NotNull(message = "email 필드가 Null 입니다.")
-    private String email;
+//    @Email
+//    @NotNull(message = "email 필드가 Null 입니다.")
+//    private String email;
 
 }

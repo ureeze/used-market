@@ -91,7 +91,7 @@ public class UserEntity extends BaseTimeEntity {
      */
     public UserEntity update(UserUpdateRequestDto requestDto) {
         this.name = requestDto.getName();
-        this.email = requestDto.getEmail();
+//        this.email = requestDto.getEmail();
         return this;
     }
 

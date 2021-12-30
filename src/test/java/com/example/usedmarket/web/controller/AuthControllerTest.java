@@ -68,7 +68,7 @@ public class AuthControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    @DisplayName("CONTROLLER - USER 등록 테스트")
+    @DisplayName("USER 등록 테스트")
     void signUp() throws Exception {
         //given
         String name = "PBJ";
@@ -98,7 +98,7 @@ public class AuthControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    @DisplayName("CONTROLLER - USER 조회 테스트")
+    @DisplayName("USER 조회 테스트")
     void login() throws Exception {
         //given
         String name = "PBJ";

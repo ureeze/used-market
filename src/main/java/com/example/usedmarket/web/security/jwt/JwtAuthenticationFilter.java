@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = parseBearerToken(request);
-            log.info("Filter is running...");
+            log.info("JWT Filter is running...");
             if (token != null && !token.equalsIgnoreCase("null")) {
                 String email = tokenProvider.validateAndGetEmail(token);
                 log.info("Authenticated Email : " + email);
@@ -41,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("가입되지 않은 유저입니다."));
                 UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(user);
 
-//                AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.singleton(new SimpleGrantedAuthority("USER_ROLE")));
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();

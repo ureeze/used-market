@@ -2,7 +2,9 @@ package com.example.usedmarket.web.service.user;
 
 import com.example.usedmarket.web.dto.UserResponseDto;
 import com.example.usedmarket.web.dto.UserUpdateRequestDto;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -11,7 +13,7 @@ public interface UserService {
 
     List<UserResponseDto> findAll();
 
-    UserResponseDto update(Long id, UserUpdateRequestDto requestDto);
+    UserResponseDto updatePersonalInfo(UserPrincipal userPrincipal, UserUpdateRequestDto requestDto);
 
-    void delete(Long id);
+    void delete(UserPrincipal userPrincipal, Long id) throws IOException;
 }

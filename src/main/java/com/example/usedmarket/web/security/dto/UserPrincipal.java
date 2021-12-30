@@ -1,11 +1,10 @@
 package com.example.usedmarket.web.security.dto;
 
 
+import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.user.UserEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.usedmarket.web.security.oauth2.OAuth2UserInfo;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,20 +24,28 @@ public class UserPrincipal implements UserDetails, OAuth2User, Serializable {
     private Long id;
     private String name;
     private String email;
+    private String password;
     private String picture;
     private Collection<? extends GrantedAuthority> authorities;
+    @Setter
     private Map<String, Object> attributes;
 
 
-    public static UserPrincipal createUserPrincipal(UserEntity user){
+    public static UserPrincipal createUserPrincipal(UserEntity userEntity) {
         return UserPrincipal.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .picture(user.getPicture())
-                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
-                .attributes(null)
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .password(userEntity.getPassword())
+                .picture(userEntity.getPicture())
+                .authorities(Collections.singleton(new SimpleGrantedAuthority(Role.USER.name())))
                 .build();
+    }
+
+    public static UserPrincipal createUserPrincipal(UserEntity userEntity, OAuth2UserInfo oAuth2UserInfo) {
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        userPrincipal.setAttributes(oAuth2UserInfo.getAttributes());
+        return userPrincipal;
     }
 
     @Override
@@ -58,7 +65,7 @@ public class UserPrincipal implements UserDetails, OAuth2User, Serializable {
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
@@ -68,21 +75,21 @@ public class UserPrincipal implements UserDetails, OAuth2User, Serializable {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

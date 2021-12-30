@@ -2,6 +2,8 @@ package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.UserResponseDto;
 import com.example.usedmarket.web.dto.UserUpdateRequestDto;
+import com.example.usedmarket.web.security.dto.LoginUser;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -25,12 +28,6 @@ public class UserController {
     public String base() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return "base";
-    }
-
-    @GetMapping("/home")
-    public String home() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return "home";
     }
 
     /*
@@ -55,17 +52,17 @@ public class UserController {
     /*
      *  회원정보 수정
      * */
-    @PutMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> updateOne(@PathVariable Long id, @Validated @RequestBody UserUpdateRequestDto responseDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(id, responseDto));
+    @PutMapping("/users")
+    public ResponseEntity<UserResponseDto> updateOne(@LoginUser UserPrincipal userPrincipal, @Validated @RequestBody UserUpdateRequestDto responseDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updatePersonalInfo(userPrincipal, responseDto));
     }
 
     /*
      *  회원 탈퇴
      * */
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> delete(@PathVariable Long id) {
-        userService.delete(id);
+    public ResponseEntity<UserResponseDto> delete(@LoginUser UserPrincipal userPrincipal, @PathVariable Long id) throws IOException {
+        userService.delete(userPrincipal, id);
         return ResponseEntity.status(HttpStatus.OK).body(UserResponseDto.builder().id(id).build());
     }
 }

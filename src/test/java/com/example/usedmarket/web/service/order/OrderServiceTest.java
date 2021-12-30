@@ -124,7 +124,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("SERVICE - 주문 저장")
+    @DisplayName("주문 저장")
     void save() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -145,7 +145,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("SERVICE - 개별 주문 조회")
+    @DisplayName("개별 주문 조회")
     void findById() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -169,7 +169,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("SERVICE - 해당 세션의 전체 주문 조회")
+    @DisplayName("해당 세션의 전체 주문 조회")
     void findAll() {
         //given
         UserPrincipal userPrincipal = createUserPrincipal();
@@ -192,7 +192,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("SERVICE - 주문 취소")
+    @DisplayName("주문 취소")
     void cancel() {
         //given
         UserEntity userEntity = createUserEntity();

@@ -106,7 +106,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "pbj", roles = "USER")
-    @DisplayName("CONTROLLER - USER 전체조회")
+    @DisplayName("USER 전체조회")
     void userRetrieve() throws Exception {
         //given
         SignUpDto requestDto = createSignUpDto();

@@ -106,7 +106,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("controller - POST 등록 테스트")
+    @DisplayName("POST 등록 테스트")
     void save() throws Exception {
         //given
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
@@ -136,7 +136,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("controller - POST 전체조회 테스트")
+    @DisplayName("POST 전체조회 테스트")
     void findAll() throws Exception {
         //given
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
@@ -168,7 +168,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("controller - POST 조회 테스트")
+    @DisplayName("POST 조회 테스트")
     void findById() throws Exception {
         //given
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));

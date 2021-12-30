@@ -46,7 +46,7 @@ public class Post extends BaseTimeEntity {
     //POST 와 관련된 USER
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
-    private UserEntity user;
+    private UserEntity userEntity;
 
     //POST 와 관련된 BOOK
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -57,7 +57,7 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.status = status;
-        this.user = userEntity;
+        this.userEntity = userEntity;
         this.deleted = deleted;
     }
 
@@ -92,8 +92,8 @@ public class Post extends BaseTimeEntity {
     }
 
     //POST 삭제 여부 확인
-    public boolean isDeletable(UserEntity user) {
-        if (this.user != user) {
+    public boolean isDeletable(UserEntity userEntity) {
+        if (this.userEntity != userEntity) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
 

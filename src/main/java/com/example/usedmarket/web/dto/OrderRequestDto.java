@@ -42,13 +42,13 @@ public class OrderRequestDto {
     @NotNull
     private Long bookId;
 
-    public Order createOrder(UserEntity user, Post post) {
+    public Order createOrder(UserEntity userEntity, Post post) {
         Order order = Order.builder()
                 .recipient(this.recipient)
                 .address(this.address)
                 .phone(this.phone)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
-                .user(user)
+                .userEntity(userEntity)
                 .post(post)
                 .build();
         return order;

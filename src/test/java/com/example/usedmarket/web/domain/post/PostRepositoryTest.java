@@ -76,7 +76,7 @@ public class PostRepositoryTest {
 
 
     @Test
-    @DisplayName("repository - 포스트 저장")
+    @DisplayName("포스트 저장")
     void CreatePostAndBook() {
         //given
         UserEntity userEntity = createUserEntity();

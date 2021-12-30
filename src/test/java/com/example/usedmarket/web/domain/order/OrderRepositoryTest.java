@@ -85,7 +85,7 @@ public class OrderRepositoryTest {
                 .address("seoul " + num)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
                 .phone(num + "")
-                .user(userEntity)
+                .userEntity(userEntity)
                 .post(post)
                 .build();
     }
@@ -105,7 +105,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    @DisplayName("REPOSITORY - 주문 저장 및 조회")
+    @DisplayName("주문 저장 및 조회")
     void save() {
         //given
         Order order = createOrder();
@@ -119,7 +119,7 @@ public class OrderRepositoryTest {
 
 
     @Test
-    @DisplayName("REPOSITORY - 주문 취소")
+    @DisplayName("주문 취소")
     void cancel() {
 
     }

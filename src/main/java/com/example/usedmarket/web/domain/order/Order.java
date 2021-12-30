@@ -62,12 +62,12 @@ public class Order extends BaseTimeEntity {
     private List<OrderedBook> orderedBookList = new ArrayList<>();
 
     @Builder
-    public Order(String recipient, String address, String phone, DeliveryStatus deliveryStatus, UserEntity user, Post post, boolean deleted) {
+    public Order(String recipient, String address, String phone, DeliveryStatus deliveryStatus, UserEntity userEntity, Post post, boolean deleted) {
         this.recipient = recipient;
         this.address = address;
         this.phone = phone;
         this.deliveryStatus = deliveryStatus;
-        this.user = user;
+        this.user = userEntity;
         this.post = post;
         this.deleted = deleted;
     }
@@ -89,8 +89,8 @@ public class Order extends BaseTimeEntity {
     }
 
     //주문 삭제 가능 확인
-    public boolean isDeletable(UserEntity user) {
-        if (this.user != user) {
+    public boolean isDeletable(UserEntity userEntity) {
+        if (this.user != userEntity) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
         if (this.deleted) {
@@ -105,9 +105,9 @@ public class Order extends BaseTimeEntity {
     }
 
     // 주문 취소 로직
-    public void cancel(UserEntity user) {
+    public void cancel(UserEntity userEntity) {
         // 주문 취소
-        if (isDeletable(user)) {
+        if (isDeletable(userEntity)) {
             deleted();
         }
     }

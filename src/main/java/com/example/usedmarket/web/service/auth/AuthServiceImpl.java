@@ -4,12 +4,16 @@ import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.LoginRequestDto;
 import com.example.usedmarket.web.dto.SignUpDto;
-import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.PassWordNotMatchException;
 import com.example.usedmarket.web.exception.UserNotFoundException;
+import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,29 +29,29 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final HttpServletResponse response;
+    private final AuthenticationManager authenticationManager;
 
 
     @Override
     public Long createUser(SignUpDto signUpDto) {
-        UserEntity user = UserEntity.create(signUpDto, passwordEncoder);
-        userRepository.save(user);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(user);
+        UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
         return userPrincipal.getId();
     }
 
+
+
     @Override
     public String loginUser(LoginRequestDto loginDto) {
-        UserEntity user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("가입되지 않은 유저입니다."));
-        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new PassWordNotMatchException("잘못된 비밀번호입니다.");
-        }
-        log.info("가입 회원입니다.");
 
-        String token = tokenProvider.create(user);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        String token = tokenProvider.create(userPrincipal.getEmail());
         response.addHeader("Authorization", token);
         log.info("token : " + token);
         return token;
     }
-
 }

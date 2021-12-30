@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,10 +26,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
+
     @PostMapping("/auth/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginDto) {
         String token = authService.loginUser(loginDto);
-        log.info("Token : " + token);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 }

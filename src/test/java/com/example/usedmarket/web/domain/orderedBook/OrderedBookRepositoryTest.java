@@ -87,7 +87,7 @@ public class OrderedBookRepositoryTest {
                 .address("seoul " + num)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
                 .phone(num + "")
-                .user(userEntity)
+                .userEntity(userEntity)
                 .post(post)
                 .build();
         return order;
@@ -113,7 +113,7 @@ public class OrderedBookRepositoryTest {
 
 
     @Test
-    @DisplayName("REPOSITORY - OrderedBook 저장")
+    @DisplayName("OrderedBook 저장")
     void save() {
         //given
         UserEntity userEntity = createUserEntity();
