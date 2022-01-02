@@ -67,7 +67,7 @@ public class UserEntity extends BaseTimeEntity {
     public static UserEntity create(SignUpDto signUpDto, PasswordEncoder passwordEncoder) {
         String pw = passwordEncoder.encode(signUpDto.getPassword());
         return UserEntity.builder()
-                .name(signUpDto.getName())
+                .name(signUpDto.getUserName())
                 .email(signUpDto.getEmail())
                 .password(pw)
                 .picture(null)
@@ -90,7 +90,7 @@ public class UserEntity extends BaseTimeEntity {
     회원정보수정
      */
     public UserEntity update(UserUpdateRequestDto requestDto) {
-        this.name = requestDto.getName();
+        this.name = requestDto.getUserName();
 //        this.email = requestDto.getEmail();
         return this;
     }

@@ -13,6 +13,7 @@ import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
 import com.example.usedmarket.web.dto.OrderRequestDto;
+import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.*;
 import lombok.RequiredArgsConstructor;
@@ -33,20 +34,20 @@ public class OrderServiceImpl implements OrderService {
 
     /*
      * 주문 저장
-     * @param sessionMember - 현재 세션 유저
+     * @param userPrincipal - 현재 사용자
      * @param requestDto - 주문 요청정보
      * @return 주문관련정보를 담은 OrderResponseDto 를 반환
      */
     @Transactional
     @Override
-    public OrderConfirmResponseDto save(UserPrincipal userPrincipal, OrderRequestDto requestDto) {
-        //Member 탐색
+    public OrderConfirmResponseDto save(@LoginUser UserPrincipal userPrincipal, OrderRequestDto requestDto) {
+        //UserEntity 탐색
         UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
         //POST 탐색
         Post post = postRepository.findById(requestDto.getPostId()).get();
 
-        //Member 와 POST 를 통한 Order 생성
+        //UserEntity 와 POST 를 통한 Order 생성
         Order order = requestDto.createOrder(userEntity, post);
 
         //Book 탐색
@@ -57,59 +58,65 @@ public class OrderServiceImpl implements OrderService {
 
         //결제서비스
 
-
         //Order 를 Repository 를 통해 DB 에 저장
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
         //주문관련정보를 담은 OrderResponseDto 를 반환
-        return OrderConfirmResponseDto.toDto(savedOrder, orderedBook);
+        return OrderConfirmResponseDto.toDto(order, orderedBook);
     }
 
     /*
-     * ID 값을 통한 주문 조회
-     * @param id - 주문 ID 값
+     * 주문 ID 값에 의한 주문 조회
+     * @param userPrincipal - 현재 사용자
+     * @param orderId - 주문 ID 값
      * @return
      */
     @Transactional(readOnly = true)
     @Override
-    public OrderConfirmResponseDto findById(Long id) {
+    public OrderConfirmResponseDto findById(@LoginUser UserPrincipal userPrincipal, Long orderId) {
+
         // 주문 조회
-        Order findOrder = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("주문이 존재하지 않습니다."));
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("주문이 존재하지 않습니다."));
+
+        // 조회 요청 사용자와 ORDER 의 주문자가 일치하는지 확인
+        if (userPrincipal.getId() != findOrder.getUser().getId()) {
+            throw new IllegalArgumentException("사용자 ID 불일치로 조회할 수 없습니다.");
+        }
 
         //주문과 주문된 책의 정보를 OrderResponseDto 로 반환
         return OrderConfirmResponseDto.toDto(findOrder, findOrder.getOrderedBookList().get(0));
     }
 
     /*
-     * 해당 세션의 전체 주문 조회
-     * @param sessionMember - 현재 세션 유저
-     * @return 해당 Member 가 주문한 모든 Order 들을 반환
+     * 해당 사용자에 대한 주문 전체 조회
+     * @param userPrincipal - 현재 사용자
+     * @return 해당 userPrincipal 이 주문한 모든 Order 들을 반환
      */
     @Transactional(readOnly = true)
     @Override
-    public List<OrderConfirmResponseDto> findAll(UserPrincipal userPrincipal) {
-        // Member 탐색
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+    public List<OrderConfirmResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
+//        // UserEntity 탐색
+//        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
-        return orderRepository.findByUserId(userEntity.getId()).stream()
+        return orderRepository.findByUserId(userPrincipal.getId()).stream()
                 .map(order -> OrderConfirmResponseDto.toDto(order, order.getOrderedBookList().get(0)))
                 .collect(Collectors.toList());
     }
 
     /*
-     * 해당 세션의 주문 취소
-     * @param sessionMember - 현재 세션 유저
-     * @param id - ORDER 의 ID 값
+     * 해당 사용자의 주문 취소
+     * @param userPrincipal - 현재 사용자
+     * @param orderId - ORDER 의 ID 값
      * @return
      */
     @Transactional
     @Override
-    public void cancel(UserPrincipal userPrincipal, Long orderId) {
+    public void cancel(@LoginUser UserPrincipal userPrincipal, Long orderId) {
 
         //사용자 탐색
         UserEntity userEntity = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
-        //주문 탐색
+        //주문 ID 에 의한 주문 탐색
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("해당 주문이 존재하지 않습니다."));
 
         //주문된 책 탐색
@@ -125,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
             // 책 재고 조정
             if (book != null) {
-                book.stockUp(orderedBook.getCount());
+                book.stockUp(orderedBook.getAmount());
             }
 
             // 주문된 책 삭제

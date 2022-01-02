@@ -4,14 +4,12 @@ package com.example.usedmarket.web.domain.book;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+//@ToString
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,8 +25,8 @@ public class Book extends BaseTimeEntity {
     private Long id;
 
     //책 제목
-    @Column(name = "BOOK_NAME", nullable = false, length = 50)
-    private String bookName;
+    @Column(name = "TITLE", nullable = false, length = 50)
+    private String title;
 
     //책 재고
     @Column(name = "STOCK", nullable = false)
@@ -62,13 +60,14 @@ public class Book extends BaseTimeEntity {
 
     // 책 정보 수정
     public void update(PostSaveRequestDto requestDto) {
-        this.bookName = requestDto.getBookName();
+        this.title = requestDto.getBookTitle();
         this.stock = requestDto.getStock();
         this.unitPrice = requestDto.getUnitPrice();
-        this.category = requestDto.getCategory();
-        this.imgUrl = requestDto.getImgUrl();
+        this.category = requestDto.getBookCategory();
+        this.imgUrl = requestDto.getBookImgUrl();
     }
 
+    // POST 추가
     public void addPost(Post post) {
         this.post = post;
     }
@@ -82,4 +81,5 @@ public class Book extends BaseTimeEntity {
     public void deleted() {
         this.deleted = true;
     }
+
 }

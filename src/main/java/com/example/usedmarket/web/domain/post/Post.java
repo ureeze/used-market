@@ -82,18 +82,24 @@ public class Post extends BaseTimeEntity {
     public void addBook(Book book) {
         this.bookList.add(book);
     }
+
     // 포스트 수정
     public void update(PostSaveRequestDto requestDto) {
         // POST 제목 수정
-        this.title = requestDto.getTitle();
+        this.title = requestDto.getPostTitle();
 
         // POST 내용 수정
-        this.content = requestDto.getContent();
+        this.content = requestDto.getPostContent();
+    }
+
+    // 포스트에 등록된 책 수정
+    public void updateBook(PostSaveRequestDto requestDto) {
+        this.getBookList().get(0).update(requestDto);
     }
 
     //POST 삭제 여부 확인
-    public boolean isDeletable(UserEntity userEntity) {
-        if (this.userEntity != userEntity) {
+    public boolean isDeletable(Long userId) {
+        if (this.userEntity.getId() != userId) {
             throw new IllegalArgumentException("허용 되지 않은 사용자입니다.");
         }
 

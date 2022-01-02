@@ -74,7 +74,7 @@ public class AuthControllerTest {
         String name = "PBJ";
         String email = "PBJ@google.com";
         SignUpDto signUpDto = SignUpDto.builder()
-                .name(name)
+                .userName(name)
                 .email(email)
                 .password("12341234")
                 .build();
@@ -105,7 +105,7 @@ public class AuthControllerTest {
         String email = "PBJ@google.com";
         String password = "123123";
         SignUpDto signUpDto = SignUpDto.builder()
-                .name(name)
+                .userName(name)
                 .email(email)
                 .password(password)
                 .build();

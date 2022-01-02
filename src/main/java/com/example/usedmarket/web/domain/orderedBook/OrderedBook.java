@@ -3,11 +3,13 @@ package com.example.usedmarket.web.domain.orderedBook;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.order.Order;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+@ToString
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +24,8 @@ public class OrderedBook extends BaseTimeEntity {
     private Long id;
 
     //주문한 책 수량
-    @Column(name = "COUNT", nullable = false)
-    private int count;
+    @Column(name = "AMOUNT", nullable = false)
+    private int amount;
 
     //주문 가격
     @Column(name = "ORDER_PRICE", nullable = false)
@@ -43,6 +45,11 @@ public class OrderedBook extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOK_ID")
     private Book book;
+
+    //ORDERED BOOK 와 관련된 UserEntity
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private UserEntity user;
 
     //ORDERED BOOK 삭제 가능 확인
     public boolean isDeletable(Order order) {
@@ -66,4 +73,5 @@ public class OrderedBook extends BaseTimeEntity {
     public void addOrder(Order order) {
         this.order = order;
     }
+
 }

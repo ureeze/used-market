@@ -23,6 +23,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,8 +36,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,14 +67,14 @@ public class PostControllerTest {
     PostSaveRequestDto createPostSaveRequestDto() {
         int num = (int) (Math.random() * 10000) + 1;
         return PostSaveRequestDto.builder()
-                .title("TEST 제목" + num)
-                .content("내용" + num)
-                .bookName("책이름" + num)
+                .postTitle("웹서비스책 판매합니다." + num)
+                .postContent("내용" + num)
+                .bookTitle("웹서비스" + num)
                 .stock(1)
                 .unitPrice(10000)
-                .category("경제" + num)
+                .bookCategory("경제" + num)
                 .bookStatus("S")
-                .imgUrl("img" + num)
+                .bookImgUrl("img" + num)
                 .build();
 
     }
@@ -125,9 +125,8 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("title").value(requestDto.getTitle()))
-                .andExpect(jsonPath("content").value(requestDto.getContent()))
-                .andExpect(jsonPath("status").value(PostStatus.SELL.name()))
+                .andExpect(jsonPath("$.postTitle").value(requestDto.getPostTitle()))
+                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
                 .andDo(print());
 
         //then
@@ -136,22 +135,23 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("POST 전체조회 테스트")
-    void findAll() throws Exception {
+    @DisplayName("POST ID로 포스트 조회 테스트")
+    void findById() throws Exception {
         //given
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        PostSaveRequestDto requestDto = createPostSaveRequestDto();
         UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity, book);
-
+        PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
+        Book book = requestDto0.toBook();
+        Post post = requestDto0.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
         postRepository.save(post);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
-                .path("/posts")
-                .build()
+                .path("/posts/{id}")
+                .build().expand(post.getId())
                 .encode()
                 .toUri();
 
@@ -160,34 +160,145 @@ public class PostControllerTest {
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.[0].title").value(post.getTitle()));
-
-        List<Book> list = bookRepository.findAll();
-        assertThat(list.get(0).getBookName()).isEqualTo(book.getBookName());
+                .andExpect(jsonPath("$.postTitle").value(post.getTitle()))
+                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
+                .andDo(print());
     }
 
     @Test
-    @DisplayName("POST 조회 테스트")
-    void findById() throws Exception {
+    @DisplayName("POST 제목으로 포스트 목록 조회 테스트")
+    void findByPostTitle() throws Exception {
         //given
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
         UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
         PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
         Book book = requestDto0.toBook();
-        Post post = requestDto0.toPost(userEntity, book);
+        Post post = requestDto0.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
         postRepository.save(post);
 
-        String url = "http://localhost:" + port + "/posts/" + post.getId();
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/all/title")
+                .build()
+                .encode()
+                .toUri();
 
         //when
         //then
-        mvc.perform(get(url).with(user(userPrincipal))
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .queryParam("postTitle", "웹서비스")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("title").value(post.getTitle()))
-                .andExpect(jsonPath("content").value(post.getContent()))
-                .andExpect(jsonPath("status").value(PostStatus.SELL.name()))
+                .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()))
+                .andExpect(jsonPath("$.[0].postStatus").value(PostStatus.SELL.name()))
                 .andDo(print());
     }
+
+
+    @Test
+    @DisplayName("전체 POST 조회 테스트")
+    void findAll() throws Exception {
+        //given
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
+        PostSaveRequestDto requestDto = createPostSaveRequestDto();
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Book book = requestDto.toBook();
+        Post post = requestDto.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+
+        postRepository.save(post);
+
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/all")
+                .build()
+                .encode()
+                .toUri();
+
+        //when
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()));
+
+        //then
+        List<Book> list = bookRepository.findAll();
+        assertThat(list.get(0).getTitle()).isEqualTo(book.getTitle());
+    }
+
+
+    @Test
+    @DisplayName("POST 수정 테스트")
+    void update() throws Exception {
+        //given
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
+        PostSaveRequestDto requestDto = createPostSaveRequestDto();
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Book book = requestDto.toBook();
+        Post post = requestDto.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+
+        postRepository.save(post);
+
+        PostSaveRequestDto newRequestDto = createPostSaveRequestDto();
+
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/{id}")
+                .build().expand(post.getId())
+                .encode()
+                .toUri();
+
+        //when
+        mvc.perform(put(uri).with(user(userPrincipal))
+                        .content(new ObjectMapper().writeValueAsString(newRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.postTitle").value(newRequestDto.getPostTitle()));
+
+    }
+
+
+    @Test
+    @DisplayName("POST 의 ID 을 이용해 POST 삭제 테스트")
+    void delete() throws Exception {
+        //given
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
+        PostSaveRequestDto requestDto = createPostSaveRequestDto();
+        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        Book book = requestDto.toBook();
+        Post post = requestDto.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+
+        postRepository.save(post);
+
+
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/{id}")
+                .build().expand(post.getId())
+                .encode()
+                .toUri();
+
+        //when
+        mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$").value(post.getId()));
+
+    }
+
+
 }

@@ -1,29 +1,29 @@
 package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.user.UserEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
-
+@ToString
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 public class UserResponseDto implements Serializable {
-    private Long id;
+    //회원 ID
+    private Long userId;
 
-    private String name;
+    //회원 이름
+    private String userName;
 
+    //회원 EMAIL
     private String email;
 
 
     public static UserResponseDto toDto(UserEntity user){
         return UserResponseDto.builder()
-                .id(user.getId())
-                .name(user.getName())
+                .userId(user.getId())
+                .userName(user.getName())
                 .email(user.getEmail())
                 .build();
     }

@@ -5,29 +5,28 @@ import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.user.UserEntity;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class PostSaveRequestDto {
 
     //포스트 제목
     @NotNull
-    private String title;
+    private String postTitle;
 
     //포스트 상세내용
     @NotNull
-    private String content;
+    private String postContent;
 
     //책 제목
     @NotNull
-    private String bookName;
+    private String bookTitle;
 
     //판매 권 수
     @NotNull
@@ -39,50 +38,37 @@ public class PostSaveRequestDto {
 
     //책 카테고리
     @NotNull
-    private String category;
+    private String bookCategory;
 
     //책 상태
     @NotNull
     private String bookStatus;
 
     //책 img URL
-    private String imgUrl;
-
-    @Builder
-    public PostSaveRequestDto(String title, String content, String bookName, int stock, int unitPrice, String imgUrl, String category, String bookStatus) {
-        this.title = title;
-        this.content = content;
-        this.bookName = bookName;
-        this.stock = stock;
-        this.unitPrice = unitPrice;
-        this.imgUrl = imgUrl;
-        this.category = category;
-        this.bookStatus = bookStatus;
-    }
+    private String bookImgUrl;
 
 
     public Book toBook() {
         return Book.builder()
-                .bookName(this.bookName)
+                .title(this.bookTitle)
                 .stock(this.stock)
                 .unitPrice(this.unitPrice)
-                .category(this.category)
+                .category(this.bookCategory)
                 .bookStatus(BookStatus.valueOf(this.bookStatus))
                 .deleted(false)
-                .imgUrl(this.imgUrl)
+                .imgUrl(this.bookImgUrl)
                 .build();
     }
 
-    public Post toPost(UserEntity user, Book book) {
+    public Post toPost(UserEntity user) {
         // requestDto 로 POST 생성
         Post post = Post.builder()
-                .title(this.title)
-                .content(this.content)
+                .title(this.postTitle)
+                .content(this.postContent)
                 .status(PostStatus.SELL)
                 .deleted(false)
                 .userEntity(user)
                 .build();
-        post.addBook(book);
         return post;
     }
 }

@@ -26,25 +26,37 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final HttpServletResponse response;
-
 
     /*
-    UserRepository 에서 UserEntity 조회
-    @param 찾고자 하는 UserEntity ID 값
+    본인 정보 조회
+    @param userPrincipal - 현재 사용자
     @return findUser 를 UserResponseDto 로 변환 후 반환
      */
     @Transactional(readOnly = true)
-    public UserResponseDto findById(Long id) {
-        // id 값을 이용해 UserRepository 에서 UserEntity 조회
-        UserEntity findUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User 가 존재하지 않습니다."));
+    public UserResponseDto getCurrentUser(@LoginUser UserPrincipal userPrincipal) {
+        // email 값을 이용해 UserRepository 에서 UserEntity 조회
+        UserEntity findUser = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("User 가 존재하지 않습니다."));
 
         // findUser 를 UserResponseDto 로 변환 후 반환
         return UserResponseDto.toDto(findUser);
     }
 
     /*
-    UserRepository 에서 UserEntity 리스트 조회
+    USER ID 를 이용한 사용자 조회 (ADMIN)
+    @param 찾고자 하는 UserEntity ID 값
+    @return findUser 를 UserResponseDto 로 변환 후 반환
+     */
+    @Transactional(readOnly = true)
+    public UserResponseDto findByUserId(Long userId) {
+        // userId 값을 이용해 UserRepository 에서 UserEntity 조회
+        UserEntity findUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User 가 존재하지 않습니다."));
+
+        // findUser 를 UserResponseDto 로 변환 후 반환
+        return UserResponseDto.toDto(findUser);
+    }
+
+    /*
+    전체 USER 목록 조회 (ADMIN)
     @return UserEntity 를 UserResponseDto 로 stream 을 이용해 변환 후 리스트로 반환
      */
     @Transactional(readOnly = true)
@@ -57,34 +69,34 @@ public class UserServiceImpl implements UserService {
     }
 
     /*
-    UserEntity 의 ID 값과 수정하고자 하는 UserUpdateRequestDto 를 Input 으로 받음
-    @param ID - 찾고자 하는 UserEntity ID 값
+    사용자 정보 수정
+    @param userPrincipal - 현재 사용자
     @param requestDto - 업데이트 하고자 하는 요청 정보
     @return 수정된 UserEntity 를 UserResponseDto 로 변환 후 반환
      */
     @Transactional
-    public UserResponseDto updatePersonalInfo(UserPrincipal userPrincipal, UserUpdateRequestDto requestDto) {
+    public UserResponseDto updatePersonalInfo(@LoginUser UserPrincipal userPrincipal, UserUpdateRequestDto requestDto) {
 
         // ID 값을 이용해 UserRepository 에서 UserEntity 조회
         UserEntity user = userRepository.getById(userPrincipal.getId());
+
         // requestDto 를 이용해 UserEntity 수정
         user.update(requestDto);
+
         // user 가 영속성 컨텍스트에 존재하기 때문에 바로 UserResponseDto 로 반환
         return UserResponseDto.toDto(user);
     }
 
     /*
      * 회원 탈퇴
-     * Input 으로 들어온 Id 값에 해당하는 UserEntity 제거
-     * @param id - 삭제하고자 하는 UserEntity 의 ID
+     * @param userPrincipal - 현재 사용자
      */
     @Transactional
-    public void delete(UserPrincipal userPrincipal, Long id) throws IOException {
-        // UserRepository 에서 ID 에 맞는 UserEntity 삭제
-        userRepository.deleteById(id);
+    public void delete(@LoginUser UserPrincipal userPrincipal) throws IOException {
+        // Repository 에서 UserEntity 삭제
+        userRepository.deleteById(userPrincipal.getId());
+
         // SecurityContextHolder 에서 context 삭제
         SecurityContextHolder.clearContext();
-
-        response.sendRedirect("/main");
     }
 }

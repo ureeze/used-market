@@ -28,7 +28,7 @@ public class OrderRequestDto {
 
     //책 권수
     @NotNull
-    private int count;
+    private int bookAmount;
 
     //주문 가격
     @NotNull
@@ -56,7 +56,7 @@ public class OrderRequestDto {
 
     public OrderedBook createOrderedBook(Order order, Book book) {
         OrderedBook orderedBook = OrderedBook.builder()
-                .count(this.count)
+                .amount(this.bookAmount)
                 .orderPrice(this.orderPrice)
                 .order(order)
                 .book(book)

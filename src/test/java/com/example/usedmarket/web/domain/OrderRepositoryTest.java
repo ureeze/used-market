@@ -1,12 +1,12 @@
-package com.example.usedmarket.web.domain.orderedBook;
+package com.example.usedmarket.web.domain;
 
 import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.order.OrderRepository;
+import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
@@ -22,11 +22,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class OrderedBookRepositoryTest {
+public class OrderRepositoryTest {
+
     @Autowired
     OrderRepository orderRepository;
 
@@ -38,9 +40,6 @@ public class OrderedBookRepositoryTest {
 
     @Autowired
     BookRepository bookRepository;
-
-    @Autowired
-    OrderedBookRepository orderedBookRepository;
 
     @Autowired
     TestEntityManager testEntityManager;
@@ -60,7 +59,7 @@ public class OrderedBookRepositoryTest {
     Book createBook() {
         int num = (int) (Math.random() * 10000) + 1;
         return Book.builder()
-                .bookName("bookTitle" + num)
+                .title("bookTitle" + num)
                 .category("it" + num)
                 .imgUrl("url" + num)
                 .unitPrice(10000 + num)
@@ -69,7 +68,7 @@ public class OrderedBookRepositoryTest {
                 .build();
     }
 
-    Post createPost(UserEntity userEntity) {
+    Post createPost(UserEntity userEntity, Book book) {
         int num = (int) (Math.random() * 10000) + 1;
         Post post = Post.builder()
                 .title("PostTitle" + num)
@@ -77,12 +76,14 @@ public class OrderedBookRepositoryTest {
                 .status(PostStatus.SELL)
                 .userEntity(userEntity)
                 .build();
-        return post;
+        post.addBook(book);
+        return postRepository.save(post);
     }
+
 
     Order createOrder(UserEntity userEntity, Post post) {
         int num = (int) (Math.random() * 10000) + 1;
-        Order order = Order.builder()
+        return Order.builder()
                 .recipient("pbj" + num)
                 .address("seoul " + num)
                 .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
@@ -90,19 +91,14 @@ public class OrderedBookRepositoryTest {
                 .userEntity(userEntity)
                 .post(post)
                 .build();
-        return order;
     }
 
-    OrderedBook createOrderedBook(Order order, Book book) {
-        int num = (int) (Math.random() * 10000) + 1;
-        return OrderedBook.builder()
-                .count(1)
-                .orderPrice(10000 + num)
-                .order(order)
-                .book(book)
-                .build();
+    Order createOrder() {
+        UserEntity userEntity = createUserEntity();
+        Book book = createBook();
+        Post post = createPost(userEntity, book);
+        return createOrder(userEntity, post);
     }
-
 
     @AfterEach
     void clean() {
@@ -111,26 +107,23 @@ public class OrderedBookRepositoryTest {
         orderRepository.deleteAll();
     }
 
-
     @Test
-    @DisplayName("OrderedBook 저장")
+    @DisplayName("주문 저장 및 조회")
     void save() {
         //given
-        UserEntity userEntity = createUserEntity();
-        Book book = createBook();
-        Post post = createPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        Post savedPost = postRepository.save(post);
-
-        Order order = createOrder(userEntity, savedPost);
-        OrderedBook orderedBook = createOrderedBook(order, book);
-        testEntityManager.persist(order);
+        Order order = createOrder();
 
         //when
-        testEntityManager.persist(orderedBook);
+        testEntityManager.persist(order);
 
         //then
-        assertThat(orderedBookRepository.findById(orderedBook.getId()).get().getOrderPrice()).isEqualTo(orderedBook.getOrderPrice());
+        assertThat(orderRepository.findById(order.getId()).get().getAddress()).isEqualTo(order.getAddress());
+    }
+
+
+    @Test
+    @DisplayName("주문 취소")
+    void cancel() {
+
     }
 }

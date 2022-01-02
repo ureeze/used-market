@@ -11,10 +11,10 @@ public interface OrderService {
     //주문 진행
     OrderConfirmResponseDto save(UserPrincipal userPrincipal, OrderRequestDto requestDto);
 
-    //주문 조회
-    OrderConfirmResponseDto findById(Long id);
+    //주문 ID 값에 의한 주문 조회
+    OrderConfirmResponseDto findById(UserPrincipal userPrincipal,Long id);
 
-    //세션에 의한 주문 전체조회
+    //해당 사용자에 대한 주문 전체 조회
     List<OrderConfirmResponseDto> findAll(UserPrincipal userPrincipal);
 
     //주문 취소

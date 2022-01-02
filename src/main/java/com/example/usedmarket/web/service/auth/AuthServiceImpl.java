@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final HttpServletResponse response;
     private final AuthenticationManager authenticationManager;
 
-
+    //회원 가입
     @Override
     public Long createUser(SignUpDto signUpDto) {
         UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
@@ -41,10 +41,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-
+    //로그인
     @Override
     public String loginUser(LoginRequestDto loginDto) {
-
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();

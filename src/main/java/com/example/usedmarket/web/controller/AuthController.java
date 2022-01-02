@@ -2,6 +2,7 @@ package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.LoginRequestDto;
 import com.example.usedmarket.web.dto.SignUpDto;
+import com.example.usedmarket.web.service.auth.AuthService;
 import com.example.usedmarket.web.service.auth.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
 
+    //회원 가입
     @PostMapping("/auth/signup")
     public ResponseEntity<Long> signup(@RequestBody SignUpDto signUpDto) {
         Long id = authService.createUser(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
-
+    //로그인(Email+Password)
     @PostMapping("/auth/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginDto) {
         String token = authService.loginUser(loginDto);

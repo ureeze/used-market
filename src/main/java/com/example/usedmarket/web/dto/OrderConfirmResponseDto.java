@@ -4,9 +4,11 @@ import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
+@ToString
 @Getter
 @Builder
 public class OrderConfirmResponseDto implements Serializable {
@@ -20,12 +22,12 @@ public class OrderConfirmResponseDto implements Serializable {
     private String phone;
 
     //카테고리
-    private String category;
+    private String bookCategory;
 
     //구매 권 수
-    private int count;
+    private int bookAmount;
 
-    //결제금액
+    //결제 금액
     private int orderPrice;
 
     //책 상태
@@ -50,12 +52,12 @@ public class OrderConfirmResponseDto implements Serializable {
                 .recipient(order.getRecipient())
                 .address(order.getAddress())
                 .phone(order.getPhone())
-                .category(orderedBook.getBook().getCategory())
-                .count(orderedBook.getCount())
+                .bookCategory(orderedBook.getBook().getCategory())
+                .bookAmount(orderedBook.getAmount())
                 .orderPrice(orderedBook.getOrderPrice())
                 .bookStatus(orderedBook.getBook().getBookStatus().name())
                 .deliveryStatus(order.getDeliveryStatus().name())
-                .bookName(orderedBook.getBook().getBookName())
+                .bookName(orderedBook.getBook().getTitle())
                 .orderId(order.getId())
                 .orderedBookId(orderedBook.getId())
                 .build();

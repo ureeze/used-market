@@ -1,10 +1,11 @@
 package com.example.usedmarket.web.controller;
 
+import com.example.usedmarket.web.dto.PostDetailsResponseDto;
+import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
-import com.example.usedmarket.web.service.post.PostServiceImpl;
+import com.example.usedmarket.web.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,41 +18,47 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostServiceImpl postService;
+    private final PostService postService;
 
-    //포스트 저장
+    //POST 등록
     @PostMapping("/posts")
-    public ResponseEntity<PostSaveResponseDto> save(@LoginUser UserPrincipal userPrincipal, @Validated @RequestBody PostSaveRequestDto requestDto) {
-        PostSaveResponseDto responseDto = postService.save(userPrincipal, requestDto);
+    public ResponseEntity<PostResponseDto> save(@LoginUser UserPrincipal userPrincipal, @Validated @RequestBody PostSaveRequestDto requestDto) {
+        PostResponseDto responseDto = postService.save(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    //포스트 조회
+    //POST ID로 포스트 조회
     @GetMapping("/posts/{id}")
-    public ResponseEntity<PostSaveResponseDto> findById(@PathVariable Long id) {
-        PostSaveResponseDto responseDto = postService.findById(id);
+    public ResponseEntity<PostDetailsResponseDto> findById(@PathVariable Long id) {
+        PostDetailsResponseDto responseDto = postService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //POST 제목으로 포스트 목록 조회
+    @GetMapping("/posts/all/title")
+    public ResponseEntity<List<PostResponseDto>> findByPostTitle(@RequestParam("postTitle") String postTitle) {
+        List<PostResponseDto> responseDto = postService.findByPostTitle(postTitle);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
-    //포스트 전체조회
-    @GetMapping("/posts")
-    public ResponseEntity<List<PostSaveResponseDto>> findAll() {
-        List<PostSaveResponseDto> responseDtoList = postService.findAll();
+    //전체 POST 조회
+    @GetMapping("/posts/all")
+    public ResponseEntity<List<PostResponseDto>> findAll() {
+        List<PostResponseDto> responseDtoList = postService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
-    //포스트 수정
+    //POST 수정
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostSaveResponseDto> update(@PathVariable Long id, @Validated @RequestBody PostSaveRequestDto requestDto) {
-        PostSaveResponseDto responseDto = postService.update(id, requestDto);
+    public ResponseEntity<PostResponseDto> update(@PathVariable Long id, @LoginUser UserPrincipal userPrincipal, @Validated @RequestBody PostSaveRequestDto requestDto) {
+        PostResponseDto responseDto = postService.updatePost(id, userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    //포스트 삭제
+    //POST 의 ID 을 이용해 POST 삭제
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<PostSaveResponseDto> delete(@PathVariable Long id) {
-        postService.delete(id);
-        return ResponseEntity.status(HttpStatus.OK).body(PostSaveResponseDto.builder().postId(id).build());
+    public ResponseEntity<Long> delete(@PathVariable Long id, @LoginUser UserPrincipal userPrincipal) {
+        postService.delete(id, userPrincipal);
+        return ResponseEntity.status(HttpStatus.OK).body(id);
     }
 }

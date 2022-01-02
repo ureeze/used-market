@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.service.post;
+package com.example.usedmarket.web.service;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
@@ -7,10 +7,12 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
+import com.example.usedmarket.web.dto.PostDetailsResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import com.example.usedmarket.web.dto.PostSaveResponseDto;
+import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.exception.UserNotFoundException;
+import com.example.usedmarket.web.service.post.PostServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,12 +66,12 @@ public class PostServiceTest {
         int num = (int) (Math.random() * 10000) + 1;
 
         return PostSaveRequestDto.builder()
-                .title("스프링부트 책 팝니다." + num)
-                .content("스프링부트는 스프링 프레임워크의 복잡한 환경설정을 간편하게 해놓은 ..." + num)
-                .bookName("스프링부트로 앱 만들기" + num)
+                .postTitle("스프링부트 책 팝니다." + num)
+                .postContent("스프링부트는 스프링 프레임워크의 복잡한 환경설정을 간편하게 해놓은 ..." + num)
+                .bookTitle("스프링부트로 앱 만들기" + num)
                 .stock(1)
                 .unitPrice(num)
-                .category("it" + num)
+                .bookCategory("it" + num)
                 .bookStatus("S")
                 .build();
     }
@@ -82,11 +84,12 @@ public class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
         //when
-        PostSaveResponseDto responseDto = postService.save(userPrincipal, requestDto);
+        PostResponseDto responseDto = postService.save(userPrincipal, requestDto);
 
         //then
-        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
-        assertThat(responseDto.getBooksList().get(0).getBookName()).isEqualTo(requestDto.getBookName());
+        assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
+        System.out.println(responseDto.toString());
+        System.out.println(bookRepository.findAll().get(0).toString());
     }
 
     @Test
@@ -98,16 +101,46 @@ public class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(user, book);
+        Post post = requestDto.toPost(user);
+        book.addPost(post);
+        post.addBook(book);
 
         postRepository.save(post);
 
         //when
-        PostSaveResponseDto responseDto = postService.findById(post.getId());
+        PostDetailsResponseDto responseDto = postService.findById(post.getId());
 
         //then
-        assertThat(responseDto.getContent()).isEqualTo(requestDto.getContent());
+        assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
+        assertThat(responseDto.getPostContent()).isEqualTo(requestDto.getPostContent());
     }
+
+    @Test
+    @DisplayName("POST TITLE 로 포스트 조회")
+    void findByPostTitle() {
+        //given
+        UserPrincipal userPrincipal = createUserPrincipal();
+        UserEntity user = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        PostSaveRequestDto requestDto = createRequestDto();
+
+        Book book = requestDto.toBook();
+        Post post1 = requestDto.toPost(user);
+        Post post2 = createRequestDto().toPost(user);
+        book.addPost(post1);
+        post1.addBook(book);
+        post2.addBook(book);
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+
+        //when
+        List<PostResponseDto> responseDto = postService.findByPostTitle("스프링부트");
+
+        //then
+        assertThat(responseDto.get(0).getPostTitle()).contains("스프링부트");
+        assertThat(responseDto.get(1).getPostTitle()).contains("스프링부트");
+    }
+
 
     @Test
     @DisplayName("전체 포스트 조회 테스트")
@@ -119,18 +152,22 @@ public class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post0 = requestDto.toPost(user, book);
-        Post post1 = createRequestDto().toPost(user, book);
+        Post post0 = requestDto.toPost(user);
+        Post post1 = createRequestDto().toPost(user);
+        book.addPost(post0);
+        post0.addBook(book);
+        book.addPost(post1);
+        post1.addBook(book);
 
         postRepository.save(post0);
         postRepository.save(post1);
 
         //when
-        List<PostSaveResponseDto> findAll = postService.findAll();
+        List<PostResponseDto> findAll = postService.findAll();
 
         //then
-        assertThat(findAll.get(0).getContent()).isEqualTo(post0.getContent());
-        assertThat(findAll.get(1).getContent()).isEqualTo(post1.getContent());
+        assertThat(findAll.get(0).getPostTitle()).isEqualTo(post0.getTitle());
+        assertThat(findAll.get(1).getPostTitle()).isEqualTo(post1.getTitle());
     }
 
     @Test
@@ -144,18 +181,19 @@ public class PostServiceTest {
 
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(user, book);
-
+        Post post = requestDto.toPost(user);
+        book.addPost(post);
+        post.addBook(book);
 
         postRepository.save(post);
 
         PostSaveRequestDto newRequestDto = createRequestDto();
 
         //when
-        PostSaveResponseDto postResponseDto = postService.update(post.getId(), newRequestDto);
+        PostResponseDto postResponseDto = postService.updatePost(post.getId(), userPrincipal, newRequestDto);
 
         //then
-        assertThat(postResponseDto.getContent()).isEqualTo(newRequestDto.getContent());
+        assertThat(postResponseDto.getPostTitle()).isEqualTo(newRequestDto.getPostTitle());
     }
 
     @Test
@@ -168,11 +206,13 @@ public class PostServiceTest {
         PostSaveRequestDto requestDto = createRequestDto();
 
         Book book = requestDto.toBook();
-        Post post = requestDto.toPost(user, book);
+        Post post = requestDto.toPost(user);
+        book.addPost(post);
+        post.addBook(book);
         postRepository.save(post);
 
         //when
-        postService.delete(post.getId());
+        postService.delete(post.getId(), userPrincipal);
 
         //then
         System.out.println("삭제 완료");

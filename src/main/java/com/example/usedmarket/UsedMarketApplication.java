@@ -54,7 +54,7 @@ public class UsedMarketApplication {
                                 .userEntity(userEntity)
                                 .build();
                         Book book = Book.builder()
-                                .bookName("name" + index)
+                                .title("name" + index)
                                 .imgUrl("img" + index)
                                 .unitPrice(10000)
                                 .category("cate")

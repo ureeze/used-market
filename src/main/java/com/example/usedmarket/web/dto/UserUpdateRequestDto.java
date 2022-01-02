@@ -10,11 +10,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserUpdateRequestDto {
-    @NotNull(message = "name 필드가 Null 입니다.")
-    private String name;
 
-//    @Email
-//    @NotNull(message = "email 필드가 Null 입니다.")
-//    private String email;
+    //수정하고자 하는 회원 이름
+    @NotNull(message = "name 필드가 Null 입니다.")
+    private String userName;
 
 }
