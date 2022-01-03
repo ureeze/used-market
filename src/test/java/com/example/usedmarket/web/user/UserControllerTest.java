@@ -1,5 +1,6 @@
-package com.example.usedmarket.web.controller;
+package com.example.usedmarket.web.user;
 
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.SignUpDto;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,20 +57,10 @@ public class UserControllerTest {
     @Autowired
     WebApplicationContext context;
 
-    MockMvc mvc;
+    private Setup setup = new Setup();
 
-    SignUpDto createSignUpDto() {
-        int num = (int) (Math.random() * 10000) + 1;
+    private MockMvc mvc;
 
-        String name = "PBJ" + num;
-        String email = name + "@google.com";
-        SignUpDto requestDto = SignUpDto.builder()
-                .userName(name)
-                .email(email)
-                .password(num + "")
-                .build();
-        return requestDto;
-    }
 
     @BeforeEach
     void setup() {
@@ -80,18 +70,18 @@ public class UserControllerTest {
                 .build();
 
     }
-
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-    }
+//
+//    @AfterEach
+//    void clean() {
+//        userRepository.deleteAll();
+//    }
 
 
     @Test
     @DisplayName("본인 정보 조회")
     void getCurrentUser() throws Exception {
         //given
-        SignUpDto requestDto = createSignUpDto();
+        SignUpDto requestDto = setup.createSignUpDto();
         UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
@@ -116,12 +106,12 @@ public class UserControllerTest {
 
     }
 
-
+//
 //    @Test
 //    @DisplayName("USER ID 를 이용한 사용자 조회 (ADMIN)")
 //    void findByUserId() throws Exception {
 //        //given
-//        SignUpDto requestDto = createSignUpDto();
+//        SignUpDto requestDto = setup.createSignUpDto();
 //        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
 //        userRepository.save(userEntity);
 //        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
@@ -136,7 +126,7 @@ public class UserControllerTest {
 //
 //        //when
 //        //then
-//        mvc.perform(get(uri).with(user(userPrincipal)).
+//        mvc.perform(get(uri).with(user(userPrincipal))
 //         .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.userId").value(userEntity.getId()))
@@ -151,7 +141,7 @@ public class UserControllerTest {
 //    @DisplayName("전체 USER 목록 조회 (ADMIN)")
 //    void findAll() throws Exception {
 //        //given
-//        SignUpDto requestDto = createSignUpDto();
+//        SignUpDto requestDto = setup.createSignUpDto();
 //        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
 //        userRepository.save(userEntity);
 //        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
@@ -174,13 +164,13 @@ public class UserControllerTest {
 //                .andExpect(jsonPath("$.[0].email").value(userEntity.getEmail()))
 //                .andDo(print());
 //    }
-
+//
 
     @Test
     @DisplayName("사용자 정보 수정")
     void updatePersonalInfo() throws Exception {
         //given
-        SignUpDto requestDto = createSignUpDto();
+        SignUpDto requestDto = setup.createSignUpDto();
         UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
@@ -212,7 +202,7 @@ public class UserControllerTest {
     @DisplayName("회원 탈퇴")
     void delete() throws Exception {
         //given
-        SignUpDto requestDto = createSignUpDto();
+        SignUpDto requestDto = setup.createSignUpDto();
         UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);

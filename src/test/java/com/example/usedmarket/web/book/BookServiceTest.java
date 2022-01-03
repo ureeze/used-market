@@ -1,5 +1,6 @@
-package com.example.usedmarket.web.service;
+package com.example.usedmarket.web.book;
 
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
 import com.example.usedmarket.web.domain.book.BookStatus;
@@ -40,53 +41,19 @@ class BookServiceTest {
     @Autowired
     BookService bookService;
 
-
-    Book createBook() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return Book.builder()
-                .title("깃허브와 깃" + num)
-                .category("it" + num)
-                .imgUrl("url" + num)
-                .bookStatus(BookStatus.S)
-                .unitPrice(10000)
-                .stock(1)
-                .build();
-    }
-
-    Post createPost(UserEntity userEntity) {
-        int num = (int) (Math.random() * 10000) + 1;
-        Post post = Post.builder()
-                .title("PostTitle" + num)
-                .content("contentInPost" + num)
-                .status(PostStatus.SELL)
-                .userEntity(userEntity)
-                .build();
-        return post;
-    }
-
-    UserEntity createUserEntity() {
-        int num = (int) (Math.random() * 10000) + 1;
-        String name = "pbj" + num;
-        return UserEntity.builder()
-                .name(name)
-                .email(name + "@google.com")
-                .picture("pic" + num)
-                .role(Role.USER)
-                .build();
-    }
+    private Setup setup = new Setup();
 
     @DisplayName("책 상세 조회")
     @Test
     void findById() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
 
-        Post post = createPost(userEntity);
-        Book book = createBook();
+        Post post = setup.createPost(userEntity);
+        Book book = setup.createBook();
         post.addBook(book);
         book.addPost(post);
-
         postRepository.save(post);
 
         //when
@@ -102,74 +69,71 @@ class BookServiceTest {
     @Test
     void findByStatusIsSell() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
 
-        Post post = createPost(userEntity);
-        Book book1 = createBook();
-        Book book2 = createBook();
+        Post post = setup.createPost(userEntity);
+        Book book0 = setup.createBook();
+        Book book1 = setup.createBook();
+        post.addBook(book0);
         post.addBook(book1);
-        post.addBook(book2);
+        book0.addPost(post);
         book1.addPost(post);
-        book2.addPost(post);
-
         postRepository.save(post);
 
         //when
         List<BookResponseDto> responseDtoList = bookService.findByStatusIsSell();
 
         //then
-        assertThat(responseDtoList.get(0).getBookStatus()).isEqualTo(book1.getBookStatus());
-        assertThat(responseDtoList.get(1).getBookStatus()).isEqualTo(book2.getBookStatus());
+        assertThat(responseDtoList.get(0).getBookStatus()).isEqualTo(book0.getBookStatus().name());
+        assertThat(responseDtoList.get(1).getBookStatus()).isEqualTo(book1.getBookStatus().name());
     }
 
     @DisplayName("등록된 도서 전체 조회")
     @Test
     void findAll() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
 
-        Post post = createPost(userEntity);
-        Book book1 = createBook();
-        Book book2 = createBook();
+        Post post = setup.createPost(userEntity);
+        Book book0 = setup.createBook();
+        Book book1 = setup.createBook();
+        post.addBook(book0);
         post.addBook(book1);
-        post.addBook(book2);
+        book0.addPost(post);
         book1.addPost(post);
-        book2.addPost(post);
-
         postRepository.save(post);
 
         //when
         List<BookResponseDto> responseDtoList = bookService.findAll();
 
         //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book2.getTitle());
+        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
+        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
     }
 
     @DisplayName("도서 제목 검색")
     @Test
     void findByBookTitle() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
 
-        Post post = createPost(userEntity);
-        Book book1 = createBook();
-        Book book2 = createBook();
+        Post post = setup.createPost(userEntity);
+        Book book0 = setup.createBook();
+        Book book1 = setup.createBook();
+        post.addBook(book0);
         post.addBook(book1);
-        post.addBook(book2);
+        book0.addPost(post);
         book1.addPost(post);
-        book2.addPost(post);
-
         postRepository.save(post);
 
         //when
-        List<BookResponseDto> responseDtoList = bookService.findByBookTitle("깃허브");
+        List<BookResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
 
         //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book2.getTitle());
+        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
+        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
     }
 }

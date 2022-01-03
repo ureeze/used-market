@@ -1,5 +1,6 @@
-package com.example.usedmarket.web.controller;
+package com.example.usedmarket.web.auth;
 
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.LoginRequestDto;
@@ -50,7 +51,7 @@ public class AuthControllerTest {
     WebApplicationContext context;
 
     MockMvc mvc;
-
+    private Setup setup = new Setup();
 
     @BeforeEach
     void setup() {
@@ -61,23 +62,17 @@ public class AuthControllerTest {
 
     }
 
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-    }
+//    @AfterEach
+//    void clean() {
+//        userRepository.deleteAll();
+//    }
 
     @Test
     @WithMockUser(roles = "USER")
     @DisplayName("USER 등록 테스트")
     void signUp() throws Exception {
         //given
-        String name = "PBJ";
-        String email = "PBJ@google.com";
-        SignUpDto signUpDto = SignUpDto.builder()
-                .userName(name)
-                .email(email)
-                .password("12341234")
-                .build();
+        SignUpDto signUpDto = setup.createSignUpDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -101,21 +96,12 @@ public class AuthControllerTest {
     @DisplayName("USER 조회 테스트")
     void login() throws Exception {
         //given
-        String name = "PBJ";
-        String email = "PBJ@google.com";
-        String password = "123123";
-        SignUpDto signUpDto = SignUpDto.builder()
-                .userName(name)
-                .email(email)
-                .password(password)
-                .build();
+        SignUpDto signUpDto = setup.createSignUpDto();
+
         UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
         userRepository.save(userEntity);
 
-        LoginRequestDto loginDto = LoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+        LoginRequestDto loginDto = setup.createLoginRequestDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")

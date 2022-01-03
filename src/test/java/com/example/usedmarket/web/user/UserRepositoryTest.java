@@ -1,6 +1,6 @@
-package com.example.usedmarket.web.domain;
+package com.example.usedmarket.web.user;
 
-import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -27,45 +26,13 @@ class UserRepositoryTest {
     @Autowired
     TestEntityManager testEntityManager;
 
-    /*
-    FormLogin 용 UserEntity 생성
-     */
-    UserEntity createUserEntity() {
-        int num = (int) (Math.random() * 10000) + 1;
-        String name = "PBJ" + num;
-        String email = name + "@google.com";
-        String password = num + "";
-
-        UserEntity userEntity = UserEntity.builder()
-                .name(name).password(password)
-                .email(email).picture(null).registrationId(null)
-                .role(Role.USER)
-                .build();
-        return userEntity;
-    }
-
-    /*
-    OAuth2.0 용 UserEntity 생성
-     */
-    UserEntity createUserEntity_OAuth2() {
-        int num = (int) (Math.random() * 10000) + 1;
-        String name = "PBJ" + num;
-        String email = name + "@google.com";
-        String registrationId = "google";
-
-        UserEntity userEntity = UserEntity.builder()
-                .name(name).password(null)
-                .email(email).picture(num + "").registrationId(registrationId)
-                .role(Role.USER)
-                .build();
-        return userEntity;
-    }
+    private Setup setup = new Setup();
 
     @Test
     @DisplayName("저장 테스트")
     void saveUserTest() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
 
         //when
         testEntityManager.persist(userEntity);
@@ -79,16 +46,16 @@ class UserRepositoryTest {
     @DisplayName("조회 테스트")
     void findMemberTest() {
         //given
-        UserEntity userEntity1 = createUserEntity();
-        UserEntity userEntity2 = createUserEntity();
+        UserEntity userEntity0 = setup.createUserEntity();
+        UserEntity userEntity1 = setup.createUserEntity();
 
         //when
+        testEntityManager.persist(userEntity0);
         testEntityManager.persist(userEntity1);
-        testEntityManager.persist(userEntity2);
 
         //then
+        assertThat(userRepository.findById(userEntity0.getId()).get()).isEqualTo(userEntity0);
         assertThat(userRepository.findById(userEntity1.getId()).get()).isEqualTo(userEntity1);
-        assertThat(userRepository.findById(userEntity2.getId()).get()).isEqualTo(userEntity2);
     }
 
     @Test
@@ -97,7 +64,7 @@ class UserRepositoryTest {
         //given
         LocalDateTime now = LocalDateTime.now();
         now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        UserEntity user = createUserEntity();
+        UserEntity user = setup.createUserEntity();
 
         //when
         testEntityManager.persist(user);
@@ -106,7 +73,7 @@ class UserRepositoryTest {
         UserEntity findUser = userRepository.findById(user.getId()).get();
         System.out.println("createdAt : " + user.getCreatedAt());
         System.out.println("modifiedAt : " + user.getModifiedAt());
-//        assertThat(findUser.getCreatedAt()).isAfter(now);
-//        assertThat(findUser.getModifiedAt()).isAfter(now);
+        assertThat(findUser.getCreatedAt()).isBefore(LocalDateTime.now());
+        assertThat(findUser.getModifiedAt()).isBefore(LocalDateTime.now());
     }
 }

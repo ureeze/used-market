@@ -1,15 +1,13 @@
-package com.example.usedmarket.web.service;
+package com.example.usedmarket.web.orderedbook;
 
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
-import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.order.OrderRepository;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBookRepository;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderedBookDetailsResponseDto;
@@ -54,62 +52,20 @@ class OrderedBookServiceTest {
     @Autowired
     OrderedBookService orderedBookService;
 
-    UserEntity createUserEntity() {
-        int num = (int) (Math.random() * 10000) + 1;
-        String name = "pbj" + num;
-        return UserEntity.builder()
-                .name(name)
-                .email(name + "@google.com")
-                .picture("pic" + num)
-                .role(Role.USER)
-                .build();
-    }
-
-    Order createOrder() {
-        int num = (int) (Math.random() * 10000) + 1;
-        Order order = Order.builder()
-                .recipient("pbj" + num)
-                .address("seoul " + num)
-                .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
-                .phone(num + "")
-                .build();
-        return order;
-    }
-
-    OrderedBook createOrderedBook(UserEntity userEntity, Book book) {
-        int num = (int) (Math.random() * 10000) + 1;
-        return OrderedBook.builder()
-                .amount(1)
-                .orderPrice(10000 + num)
-                .book(book)
-                .user(userEntity)
-                .build();
-    }
-
-    Book createBook() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return Book.builder()
-                .title("bookTitle" + num)
-                .category("it" + num)
-                .imgUrl("url" + num)
-                .bookStatus(BookStatus.S)
-                .unitPrice(10000)
-                .stock(1)
-                .build();
-    }
+    private Setup setup = new Setup();
 
     @Test
     @DisplayName("주문한 책 조회")
     void findOne() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = createBook();
+        Book book = setup.createBook();
         bookRepository.save(book);
 
-        Order order = createOrder();
-        OrderedBook orderedBook = createOrderedBook(userEntity, book);
+        Order order = setup.createOrder(userEntity, null);
+        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
 
         orderedBook.addOrder(order);
         order.addOrderedBook(orderedBook);
@@ -129,16 +85,16 @@ class OrderedBookServiceTest {
     @DisplayName("주문한 책 목록 조회")
     void findAll() {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book0 = createBook();
-        Book book1 = createBook();
+        Book book0 = setup.createBook();
+        Book book1 = setup.createBook();
         bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
 
-        Order order = createOrder();
-        OrderedBook orderedBook0 = createOrderedBook(userEntity, book0);
-        OrderedBook orderedBook1 = createOrderedBook(userEntity, book1);
+        Order order = setup.createOrder(userEntity, null);
+        OrderedBook orderedBook0 = setup.createOrderedBook(userEntity, book0);
+        OrderedBook orderedBook1 = setup.createOrderedBook(userEntity, book1);
 
         orderedBook0.addOrder(order);
         orderedBook1.addOrder(order);

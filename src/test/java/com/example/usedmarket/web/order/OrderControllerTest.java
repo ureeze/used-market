@@ -1,14 +1,12 @@
-package com.example.usedmarket.web.controller;
+package com.example.usedmarket.web.order;
 
-import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.user.Role;
+import com.example.usedmarket.web.domain.book.BookRepository;
 import com.example.usedmarket.web.domain.order.DeliveryStatus;
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.order.OrderRepository;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
-import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
@@ -68,6 +66,8 @@ public class OrderControllerTest {
 
     MockMvc mvc;
 
+    private Setup setup = new Setup();
+
     @BeforeEach
     void setup() {
         mvc = MockMvcBuilders
@@ -79,84 +79,21 @@ public class OrderControllerTest {
 
     }
 
-    OrderedBook createOrderedBook(UserEntity userEntity, Book book) {
-        int num = (int) (Math.random() * 10000) + 1;
-        return OrderedBook.builder()
-                .amount(1)
-                .orderPrice(10000 + num)
-                .book(book)
-                .user(userEntity)
-                .build();
-    }
-
-    Order createOrder() {
-        int num = (int) (Math.random() * 10000) + 1;
-        Order order = Order.builder()
-                .recipient("pbj" + num)
-                .address("seoul " + num)
-                .deliveryStatus(DeliveryStatus.PAYMENT_COMPLETED)
-                .phone(num + "")
-                .build();
-        return order;
-    }
-
-    Book createBook() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return Book.builder()
-                .title("bookTitle" + num)
-                .category("it" + num)
-                .imgUrl("url" + num)
-                .bookStatus(BookStatus.S)
-                .unitPrice(10000 + num)
-                .stock(1)
-                .build();
-    }
-
-    Post createPost(UserEntity userEntity, Book book) {
-        int num = (int) (Math.random() * 10000) + 1;
-        Post post = Post.builder()
-                .title("PostTitle" + num)
-                .content("contentInPost" + num)
-                .status(PostStatus.SELL)
-                .userEntity(userEntity)
-                .build();
-        post.addBook(book);
-        return postRepository.save(post);
-    }
-
-    UserEntity createUserEntity() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return userRepository.save(UserEntity.builder()
-                .name("test" + num)
-                .email("test" + num + "@google.com")
-                .picture("pic" + num)
-                .role(Role.USER)
-                .build());
-    }
-
-    OrderRequestDto createOrderRequestDto(Post post, Book book) {
-        int num = (int) (Math.random() * 10000) + 1;
-        return OrderRequestDto.builder()
-                .recipient("PBJ" + num)
-                .address("서울 영등포구 여의도동 32-1 " + num)
-                .phone("01012345678")
-                .bookAmount(1)
-                .orderPrice(15000 + num)
-                .postId(post.getId())
-                .bookId(book.getId())
-                .build();
-    }
-
-
     @Test
     @DisplayName("주문 요청")
     void save() throws Exception {
         //given
-        Book book = createBook();
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Post post = createPost(userEntity, book);
-        OrderRequestDto requestDto = createOrderRequestDto(post, book);
+
+        Book book = setup.createBook();
+        Post post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        postRepository.save(post);
+
+        OrderRequestDto requestDto = setup.createOrderRequestDto(post, book);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -185,23 +122,27 @@ public class OrderControllerTest {
     @DisplayName("주문 ID 값에 의한 주문 조회")
     void findById() throws Exception {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = createBook();
-        Post post = createPost(userEntity, book);
-        OrderRequestDto requestDto = createOrderRequestDto(post, book);
-        Order order = requestDto.createOrder(userEntity, post);
 
-        OrderedBook orderedBook = requestDto.createOrderedBook(order, book);
+        Book book = setup.createBook();
+        Post post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        postRepository.save(post);
+
+        Order order = setup.createOrder(userEntity, post);
+        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
         orderedBook.addOrder(order);
         order.addOrderedBook(orderedBook);
+        orderRepository.save(order);
 
-        Order savedOrder = orderRepository.save(order);
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(8080)
                 .path("/orders/{id}")
-                .build().expand(savedOrder.getId())
+                .build().expand(order.getId())
                 .encode()
                 .toUri();
 
@@ -211,10 +152,10 @@ public class OrderControllerTest {
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.recipient").value(savedOrder.getRecipient()))
-//                .andExpect(jsonPath("$.address").value(savedOrder.getAddress()))
-//                .andExpect(jsonPath("$.phone").value(savedOrder.getPhone()))
-//                .andExpect(jsonPath("$.deliveryStatus").value(savedOrder.getDeliveryStatus().name()))
+                .andExpect(jsonPath("$.recipient").value(order.getRecipient()))
+                .andExpect(jsonPath("$.address").value(order.getAddress()))
+                .andExpect(jsonPath("$.phone").value(order.getPhone()))
+                .andExpect(jsonPath("$.deliveryStatus").value(order.getDeliveryStatus().name()))
                 .andDo(print());
     }
 
@@ -222,17 +163,22 @@ public class OrderControllerTest {
     @DisplayName("해당 사용자에 대한 주문 전체 조회")
     void findAll() throws Exception {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = createBook();
-        Post post = createPost(userEntity, book);
-        OrderRequestDto requestDto = createOrderRequestDto(post, book);
-        Order order = requestDto.createOrder(userEntity, post);
-        OrderedBook orderedBook = requestDto.createOrderedBook(order, book);
+
+        Book book = setup.createBook();
+        Post post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        postRepository.save(post);
+
+        Order order = setup.createOrder(userEntity, post);
+        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
         orderedBook.addOrder(order);
         order.addOrderedBook(orderedBook);
+        orderRepository.save(order);
 
-        Order savedOrder = orderRepository.save(order);
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -247,10 +193,10 @@ public class OrderControllerTest {
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].recipient").value(savedOrder.getRecipient()))
-                .andExpect(jsonPath("$.[0].address").value(savedOrder.getAddress()))
-                .andExpect(jsonPath("$.[0].phone").value(savedOrder.getPhone()))
-                .andExpect(jsonPath("$.[0].deliveryStatus").value(savedOrder.getDeliveryStatus().name()))
+                .andExpect(jsonPath("$.[0].recipient").value(order.getRecipient()))
+                .andExpect(jsonPath("$.[0].address").value(order.getAddress()))
+                .andExpect(jsonPath("$.[0].phone").value(order.getPhone()))
+                .andExpect(jsonPath("$.[0].deliveryStatus").value(order.getDeliveryStatus().name()))
                 .andDo(print());
     }
 
@@ -258,17 +204,22 @@ public class OrderControllerTest {
     @DisplayName("주문 취소")
     void cancel() throws Exception {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = createBook();
-        Post post = createPost(userEntity, book);
-        OrderRequestDto requestDto = createOrderRequestDto(post, book);
-        Order order = requestDto.createOrder(userEntity, post);
-        OrderedBook orderedBook = requestDto.createOrderedBook(order, book);
+
+        Book book = setup.createBook();
+        Post post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        postRepository.save(post);
+
+        Order order = setup.createOrder(userEntity, post);
+        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
         orderedBook.addOrder(order);
         order.addOrderedBook(orderedBook);
-
         orderRepository.save(order);
+
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(8080)
@@ -291,15 +242,18 @@ public class OrderControllerTest {
     @DisplayName("주문한 책 조회")
     void findOrderedBook() throws Exception {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = createBook();
-        bookRepository.save(book);
 
-        Order order = createOrder();
-        OrderedBook orderedBook = createOrderedBook(userEntity, book);
+        Book book = setup.createBook();
+        Post post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        postRepository.save(post);
 
+        Order order = setup.createOrder(userEntity, post);
+        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
         orderedBook.addOrder(order);
         order.addOrderedBook(orderedBook);
         orderRepository.save(order);
@@ -327,22 +281,23 @@ public class OrderControllerTest {
     @DisplayName("현재 사용자가 주문한 책 목록 조회")
     void findByCurrentUser() throws Exception {
         //given
-        UserEntity userEntity = createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book0 = createBook();
-        Book book1 = createBook();
+
+        Book book0 = setup.createBook();
+        Book book1 = setup.createBook();
         bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
 
-        Order order = createOrder();
-        OrderedBook orderedBook0 = createOrderedBook(userEntity, book0);
-        OrderedBook orderedBook1 = createOrderedBook(userEntity, book1);
-
+        Order order = setup.createOrder(userEntity, null);
+        OrderedBook orderedBook0 = setup.createOrderedBook(userEntity, book0);
+        OrderedBook orderedBook1 = setup.createOrderedBook(userEntity, book1);
         orderedBook0.addOrder(order);
         orderedBook1.addOrder(order);
         order.addOrderedBook(orderedBook0);
         order.addOrderedBook(orderedBook1);
         orderRepository.save(order);
+
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")

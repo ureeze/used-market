@@ -1,16 +1,15 @@
-package com.example.usedmarket.web.controller;
+package com.example.usedmarket.web.post;
 
+import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.user.Role;
-import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
-import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -64,30 +62,7 @@ public class PostControllerTest {
 
     MockMvc mvc;
 
-    PostSaveRequestDto createPostSaveRequestDto() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return PostSaveRequestDto.builder()
-                .postTitle("웹서비스책 판매합니다." + num)
-                .postContent("내용" + num)
-                .bookTitle("웹서비스" + num)
-                .stock(1)
-                .unitPrice(10000)
-                .bookCategory("경제" + num)
-                .bookStatus("S")
-                .bookImgUrl("img" + num)
-                .build();
-
-    }
-
-    UserEntity createUserEntity() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return userRepository.save(UserEntity.builder()
-                .name("test" + num)
-                .email("test" + num + "@google.com")
-                .picture("pic" + num)
-                .role(Role.USER)
-                .build());
-    }
+    private Setup setup = new Setup();
 
     @BeforeEach
     void setup() {
@@ -96,21 +71,22 @@ public class PostControllerTest {
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .apply(springSecurity())
                 .build();
-
-
     }
-
-    @AfterEach
-    void clean() {
-        postRepository.deleteAll();
-    }
+//
+//    @AfterEach
+//    void clean() {
+//        postRepository.deleteAll();
+//        userRepository.deleteAll();
+//    }
 
     @Test
     @DisplayName("POST 등록 테스트")
     void save() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        PostSaveRequestDto requestDto = createPostSaveRequestDto();
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -130,7 +106,7 @@ public class PostControllerTest {
                 .andDo(print());
 
         //then
-        Post post = postRepository.findAll().get(0);
+        assertThat(postRepository.findAll().get(0).getTitle()).isEqualTo(requestDto.getPostTitle());
 
     }
 
@@ -138,11 +114,13 @@ public class PostControllerTest {
     @DisplayName("POST ID로 포스트 조회 테스트")
     void findById() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-        PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
-        Book book = requestDto0.toBook();
-        Post post = requestDto0.toPost(userEntity);
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
+        Book book = requestDto.toBook();
+        Post post = requestDto.toPost(userEntity);
         book.addPost(post);
         post.addBook(book);
         postRepository.save(post);
@@ -156,24 +134,28 @@ public class PostControllerTest {
                 .toUri();
 
         //when
-        //then
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postTitle").value(post.getTitle()))
                 .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
                 .andDo(print());
+
+        //then
+        assertThat(postRepository.findById(post.getId()).get().getTitle()).isEqualTo(requestDto.getPostTitle());
     }
 
     @Test
     @DisplayName("POST 제목으로 포스트 목록 조회 테스트")
     void findByPostTitle() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-        PostSaveRequestDto requestDto0 = createPostSaveRequestDto();
-        Book book = requestDto0.toBook();
-        Post post = requestDto0.toPost(userEntity);
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
+        Book book = requestDto.toBook();
+        Post post = requestDto.toPost(userEntity);
         book.addPost(post);
         post.addBook(book);
         postRepository.save(post);
@@ -187,14 +169,16 @@ public class PostControllerTest {
                 .toUri();
 
         //when
-        //then
         mvc.perform(get(uri).with(user(userPrincipal))
-                        .queryParam("postTitle", "웹서비스")
+                        .queryParam("postTitle", post.getTitle())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()))
                 .andExpect(jsonPath("$.[0].postStatus").value(PostStatus.SELL.name()))
                 .andDo(print());
+
+        //then
+        assertThat(postRepository.findById(post.getId()).get().getTitle()).isEqualTo(requestDto.getPostTitle());
     }
 
 
@@ -202,9 +186,11 @@ public class PostControllerTest {
     @DisplayName("전체 POST 조회 테스트")
     void findAll() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        PostSaveRequestDto requestDto = createPostSaveRequestDto();
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
         Book book = requestDto.toBook();
         Post post = requestDto.toPost(userEntity);
         book.addPost(post);
@@ -228,8 +214,7 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()));
 
         //then
-        List<Book> list = bookRepository.findAll();
-        assertThat(list.get(0).getTitle()).isEqualTo(book.getTitle());
+        assertThat(bookRepository.findAll().get(0).getTitle()).isEqualTo(book.getTitle());
     }
 
 
@@ -237,9 +222,11 @@ public class PostControllerTest {
     @DisplayName("POST 수정 테스트")
     void update() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        PostSaveRequestDto requestDto = createPostSaveRequestDto();
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
         Book book = requestDto.toBook();
         Post post = requestDto.toPost(userEntity);
         book.addPost(post);
@@ -247,7 +234,7 @@ public class PostControllerTest {
 
         postRepository.save(post);
 
-        PostSaveRequestDto newRequestDto = createPostSaveRequestDto();
+        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -259,12 +246,11 @@ public class PostControllerTest {
 
         //when
         mvc.perform(put(uri).with(user(userPrincipal))
-                        .content(new ObjectMapper().writeValueAsString(newRequestDto))
+                        .content(new ObjectMapper().writeValueAsString(updateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.postTitle").value(newRequestDto.getPostTitle()));
-
+                .andExpect(jsonPath("$.postTitle").value(updateRequestDto.getPostTitle()));
     }
 
 
@@ -272,16 +258,17 @@ public class PostControllerTest {
     @DisplayName("POST 의 ID 을 이용해 POST 삭제 테스트")
     void delete() throws Exception {
         //given
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal((createUserEntity()));
-        PostSaveRequestDto requestDto = createPostSaveRequestDto();
-        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+        UserEntity userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
         Book book = requestDto.toBook();
         Post post = requestDto.toPost(userEntity);
         book.addPost(post);
         post.addBook(book);
-
+        bookRepository.save(book);
         postRepository.save(post);
-
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -297,8 +284,5 @@ public class PostControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$").value(post.getId()));
-
     }
-
-
 }

@@ -29,7 +29,7 @@ public class BookResponseDto implements Serializable {
     private String bookCategory;
 
     //책 상태
-    private BookStatus bookStatus;
+    private String bookStatus;
 
     //책 이미지 주소
     private String bookImgUrl;
@@ -41,7 +41,7 @@ public class BookResponseDto implements Serializable {
                 .stock(retrieveBook.getStock())
                 .unitPrice(retrieveBook.getUnitPrice())
                 .bookCategory(retrieveBook.getCategory())
-                .bookStatus(retrieveBook.getBookStatus())
+                .bookStatus(retrieveBook.getBookStatus().name())
                 .bookImgUrl(retrieveBook.getImgUrl())
                 .build();
     }
