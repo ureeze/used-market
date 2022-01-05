@@ -17,13 +17,17 @@ import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.order.OrderService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @SpringBootTest
 public class OrderServiceTest {
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Autowired
     OrderedBookRepository orderedBookRepository;
@@ -55,8 +62,37 @@ public class OrderServiceTest {
     OrderService orderService;
 
     private Setup setup = new Setup();
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
+    private Book book;
+    private Post post;
+    private OrderRequestDto requestDto;
+    private Order order0;
+    private Order order1;
+    private OrderedBook orderedBook;
 
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
+        book = setup.createBook();
+        post = setup.createPost(userEntity);
+        post.addBook(book);
+        book.addPost(post);
+        postRepository.save(post);
+
+        requestDto = setup.createOrderRequestDto(post, book);
+        order0 = setup.createOrder(userEntity, post);
+        order1 = setup.createOrder(userEntity, post);
+        orderedBook = setup.createOrderedBook(userEntity, book);
+        order0.addOrderedBook(orderedBook);
+        order1.addOrderedBook(orderedBook);
+        orderedBook.addOrder(order0);
+        orderRepository.save(order0);
+        orderRepository.save(order1);
+    }
 //    @AfterEach
 //    void clean() {
 //        orderRepository.deleteAll();
@@ -68,19 +104,9 @@ public class OrderServiceTest {
     @DisplayName("주문 진행")
     void save() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
-        OrderRequestDto requestDto = setup.createOrderRequestDto(post, book);
 
         //when
+        entityManager.clear();
         OrderConfirmResponseDto responseDto = orderService.save(userPrincipal, requestDto);
 
         //then
@@ -92,27 +118,13 @@ public class OrderServiceTest {
     @DisplayName("주문 ID 값에 의한 주문 조회")
     void findById() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
-        Order order = setup.createOrder(userEntity, post);
-        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
-        order.addOrderedBook(orderedBook);
-        orderedBook.addOrder(order);
-        orderRepository.save(order);
 
         //when
-        OrderConfirmResponseDto responseDto = orderService.findById(userPrincipal, order.getId());
+        entityManager.clear();
+        OrderConfirmResponseDto responseDto = orderService.findById(userPrincipal, order0.getId());
 
         //then
-        assertThat(responseDto.getAddress()).isEqualTo(order.getAddress());
+        assertThat(responseDto.getAddress()).isEqualTo(order0.getAddress());
         assertThat(responseDto.getBookName()).isEqualTo(orderedBook.getBook().getTitle());
     }
 
@@ -120,54 +132,24 @@ public class OrderServiceTest {
     @DisplayName("해당 사용자에 대한 주문 전체 조회")
     void findAll() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
-        Order order0 = setup.createOrder(userEntity, post);
-        Order order1 = setup.createOrder(userEntity, post);
-        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
-        order0.addOrderedBook(orderedBook);
-        order1.addOrderedBook(orderedBook);
-        orderedBook.addOrder(order0);
-        orderedBook.addOrder(order1);
-        orderRepository.saveAll(new ArrayList<>(Arrays.asList(order0, order1)));
 
         //when
+        entityManager.clear();
         List<OrderConfirmResponseDto> orderResponseDtoList = orderService.findAll(userPrincipal);
 
         //then
         assertThat(orderResponseDtoList.get(0).getBookName()).isEqualTo(order0.getOrderedBookList().get(0).getBook().getTitle());
+        orderResponseDtoList.forEach(System.out::println);
     }
 
     @Test
     @DisplayName("주문 취소")
     void cancel() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
-        Order order = setup.createOrder(userEntity, post);
-        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
-        order.addOrderedBook(orderedBook);
-        orderedBook.addOrder(order);
-        orderRepository.save(order);
 
         //when
-        orderService.cancel(userPrincipal, order.getId());
+        entityManager.clear();
+        orderService.cancel(userPrincipal, order0.getId());
 
         //then
         System.out.println("취소 완료");

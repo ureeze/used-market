@@ -8,8 +8,9 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-//@ToString
+@ToString
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +18,7 @@ import javax.persistence.*;
 @Builder
 @Table(name = "BOOK")
 @EntityListeners(AuditingEntityListener.class)
-public class Book extends BaseTimeEntity {
+public class Book extends BaseTimeEntity implements Serializable {
 
     //Book ID
     @Id
@@ -82,4 +83,19 @@ public class Book extends BaseTimeEntity {
         this.deleted = true;
     }
 
+    @Override
+    public int hashCode() {
+        return id.intValue();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Book) {
+            Book book = (Book) obj;
+            if (id == book.getId() && title.equals(book.getTitle())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

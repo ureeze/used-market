@@ -105,8 +105,8 @@ public class Setup {
                 .build();
     }
 
-    public SignUpDto createSignUpDto() {
-        return SignUpDto.builder()
+    public SignUpRequestDto createSignUpDto() {
+        return SignUpRequestDto.builder()
                 .userName(USER_NAME)
                 .email(EMAIL)
                 .password(PASSWORD)

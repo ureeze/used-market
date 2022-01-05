@@ -13,6 +13,7 @@ import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.post.PostServiceImpl;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +46,17 @@ public class PostServiceTest {
     @Autowired
     BookRepository bookRepository;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     private Setup setup = new Setup();
+
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
+    private PostSaveRequestDto requestDto;
+    private Book book;
+    private Post post0;
+    private Post post1;
 
 //    @AfterEach
 //    void clean() {
@@ -52,39 +65,45 @@ public class PostServiceTest {
 //        userRepository.deleteAll();
 //    }
 
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        requestDto = setup.createPostSaveRequestDto();
+
+        book = requestDto.toBook();
+        post0 = requestDto.toPost(userEntity);
+        post1 = setup.createPostSaveRequestDto().toPost(userEntity);
+
+        book.addPost(post0);
+        post0.addBook(book);
+        post1.addBook(book);
+
+        postRepository.saveAll(new ArrayList<>(Arrays.asList(post0, post1)));
+    }
+
     @Test
-    @DisplayName("포스트 생성 테스트")
+    @DisplayName("POST 등록 테스트")
     void createPost() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
 
         //when
         PostResponseDto responseDto = postService.save(userPrincipal, requestDto);
+        entityManager.clear();
 
         //then
         assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
     }
 
     @Test
-    @DisplayName("포스트 개별 조회 테스트")
+    @DisplayName("POST ID로 POST 상세 조회")
     void findPost() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-
-        postRepository.save(post);
 
         //when
-        PostDetailsResponseDto responseDto = postService.findById(post.getId());
+        entityManager.clear();
+        PostDetailsResponseDto responseDto = postService.findById(post0.getId());
 
         //then
         assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
@@ -95,21 +114,9 @@ public class PostServiceTest {
     @DisplayName("POST TITLE 로 포스트 조회")
     void findByPostTitle() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
-        Book book = requestDto.toBook();
-        Post post0 = requestDto.toPost(userEntity);
-        Post post1 = setup.createPostSaveRequestDto().toPost(userEntity);
-
-        book.addPost(post0);
-        post0.addBook(book);
-        post1.addBook(book);
-
-        postRepository.saveAll(new ArrayList<>(Arrays.asList(post0, post1)));
 
         //when
+        entityManager.clear();
         List<PostResponseDto> responseDto = postService.findByPostTitle("스프링부트");
 
         //then
@@ -122,21 +129,9 @@ public class PostServiceTest {
     @DisplayName("전체 포스트 조회 테스트")
     void findAllPost() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
-        Book book = requestDto.toBook();
-        Post post0 = requestDto.toPost(userEntity);
-        Post post1 = setup.createPostSaveRequestDto().toPost(userEntity);
-
-        book.addPost(post0);
-        post0.addBook(book);
-        post1.addBook(book);
-
-        postRepository.saveAll(new ArrayList<>(Arrays.asList(post0, post1)));
 
         //when
+        entityManager.clear();
         List<PostResponseDto> findAll = postService.findAll();
 
         //then
@@ -148,22 +143,12 @@ public class PostServiceTest {
     @DisplayName("포스트 수정 테스트")
     void updatePost() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-
-        postRepository.save(post);
 
         PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto();
 
         //when
-        PostResponseDto postResponseDto = postService.updatePost(post.getId(), userPrincipal, updateRequestDto);
+        entityManager.clear();
+        PostResponseDto postResponseDto = postService.updatePost(post0.getId(), userPrincipal, updateRequestDto);
 
         //then
         assertThat(postResponseDto.getPostTitle()).isEqualTo(updateRequestDto.getPostTitle());
@@ -173,19 +158,10 @@ public class PostServiceTest {
     @DisplayName("포스트 삭제 테스트")
     void deletePost() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        postRepository.save(post);
 
         //when
-        postService.delete(post.getId(), userPrincipal);
+        entityManager.clear();
+        postService.delete(post0.getId(), userPrincipal);
 
         //then
         System.out.println("삭제 완료");

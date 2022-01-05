@@ -11,7 +11,7 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +45,11 @@ public class OrderedBookRepositoryTest {
     TestEntityManager testEntityManager;
 
     private Setup setup = new Setup();
+    private UserEntity userEntity;
+    private Book book;
+    private Post post;
+    private Order order;
+    private OrderedBook orderedBook;
 
 //    @AfterEach
 //    void clean() {
@@ -53,26 +58,30 @@ public class OrderedBookRepositoryTest {
 //        orderRepository.deleteAll();
 //    }
 
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        testEntityManager.persist(userEntity);
+
+        book = setup.createBook();
+        post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+        testEntityManager.persist(post);
+
+        order = setup.createOrder(userEntity, null);
+        orderedBook = setup.createOrderedBook(userEntity, book);
+        testEntityManager.persist(order);
+    }
 
     @Test
     @DisplayName("OrderedBook 저장")
     void saveOrderedBook() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        testEntityManager.persist(userEntity);
-
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        testEntityManager.persist(post);
-
-        Order order = setup.createOrder(userEntity, null);
-        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
-        testEntityManager.persist(order);
 
         //when
         testEntityManager.persist(orderedBook);
+        testEntityManager.clear();
 
         //then
         assertThat(orderedBookRepository.findById(orderedBook.getId()).get().getOrderPrice()).isEqualTo(orderedBook.getOrderPrice());

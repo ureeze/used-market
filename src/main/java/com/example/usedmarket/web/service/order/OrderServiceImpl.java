@@ -13,13 +13,17 @@ import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
 import com.example.usedmarket.web.dto.OrderRequestDto;
+import com.example.usedmarket.web.exception.*;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
-import com.example.usedmarket.web.exception.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +42,12 @@ public class OrderServiceImpl implements OrderService {
      * @param requestDto - 주문 요청정보
      * @return 주문관련정보를 담은 OrderResponseDto 를 반환
      */
+    @Caching(evict = {
+            //해당 사용자에 대한 주문 전체 조회
+            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user"),
+            //현재 사용자가 주문한 책 목록 조회
+            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
+    })
     @Transactional
     @Override
     public OrderConfirmResponseDto save(@LoginUser UserPrincipal userPrincipal, OrderRequestDto requestDto) {
@@ -71,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderId - 주문 ID 값
      * @return
      */
+    @Cacheable(key = "'order-'+#orderId", value = "orderDetails")
     @Transactional(readOnly = true)
     @Override
     public OrderConfirmResponseDto findById(@LoginUser UserPrincipal userPrincipal, Long orderId) {
@@ -92,15 +103,19 @@ public class OrderServiceImpl implements OrderService {
      * @param userPrincipal - 현재 사용자
      * @return 해당 userPrincipal 이 주문한 모든 Order 들을 반환
      */
+    @Cacheable(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user")
     @Transactional(readOnly = true)
     @Override
     public List<OrderConfirmResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
-//        // UserEntity 탐색
-//        UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
-
-        return orderRepository.findByUserId(userPrincipal.getId()).stream()
-                .map(order -> OrderConfirmResponseDto.toDto(order, order.getOrderedBookList().get(0)))
-                .collect(Collectors.toList());
+        List<Order> orderList = orderRepository.findByUserId(userPrincipal.getId());
+        List<OrderConfirmResponseDto> responseDtoList = new ArrayList<>();
+        for (Order order : orderList) {
+            List<OrderedBook> orderedBookList = order.getOrderedBookList();
+            for (OrderedBook orderedBook : orderedBookList) {
+                responseDtoList.add(OrderConfirmResponseDto.toDto(order, orderedBook));
+            }
+        }
+        return responseDtoList;
     }
 
     /*
@@ -109,6 +124,14 @@ public class OrderServiceImpl implements OrderService {
      * @param orderId - ORDER 의 ID 값
      * @return
      */
+    @Caching(evict = {
+            //해당 사용자에 대한 주문 전체 조회
+            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user"),
+            //주문 ID 값에 의한 주문 조회
+            @CacheEvict(key = "'order-'+#orderId", value = "orderDetails"),
+            //현재 사용자가 주문한 책 목록 조회
+            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
+    })
     @Transactional
     @Override
     public void cancel(@LoginUser UserPrincipal userPrincipal, Long orderId) {

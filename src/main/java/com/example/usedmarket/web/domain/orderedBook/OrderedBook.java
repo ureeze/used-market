@@ -74,4 +74,19 @@ public class OrderedBook extends BaseTimeEntity {
         this.order = order;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof OrderedBook) {
+            OrderedBook orderedBook = (OrderedBook) obj;
+            if (id == orderedBook.id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.intValue();
+    }
 }

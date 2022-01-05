@@ -1,9 +1,8 @@
 package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.LoginRequestDto;
-import com.example.usedmarket.web.dto.SignUpDto;
+import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.service.auth.AuthService;
-import com.example.usedmarket.web.service.auth.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
@@ -23,7 +20,7 @@ public class AuthController {
 
     //회원 가입
     @PostMapping("/auth/signup")
-    public ResponseEntity<Long> signup(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<Long> signup(@RequestBody SignUpRequestDto signUpDto) {
         Long id = authService.createUser(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }

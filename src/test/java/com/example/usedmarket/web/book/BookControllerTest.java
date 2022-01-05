@@ -9,7 +9,6 @@ import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.net.URI;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -45,6 +46,9 @@ class BookControllerTest {
     @LocalServerPort
     int port;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     @Autowired
     UserRepository userRepository;
 
@@ -59,6 +63,10 @@ class BookControllerTest {
 
     private Setup setup = new Setup();
     private MockMvc mvc;
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
+    private Post post;
+    private Book book;
 
     @BeforeEach
     void setup() {
@@ -68,7 +76,15 @@ class BookControllerTest {
                 .apply(springSecurity())
                 .build();
 
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
+        post = setup.createPost(userEntity);
+        book = setup.createBook();
+        post.addBook(book);
+        book.addPost(post);
+        postRepository.save(post);
     }
 
 //    @AfterEach
@@ -81,16 +97,6 @@ class BookControllerTest {
     @DisplayName("책 상세 조회")
     void findById() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book = setup.createBook();
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -100,6 +106,8 @@ class BookControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -113,16 +121,6 @@ class BookControllerTest {
     @DisplayName("판매중인 도서 조회")
     void findByStatusIsSell() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book = setup.createBook();
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -132,6 +130,8 @@ class BookControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -145,16 +145,6 @@ class BookControllerTest {
     @DisplayName("등록된 도서 전체 조회")
     void findAll() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book = setup.createBook();
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -164,6 +154,8 @@ class BookControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -177,16 +169,6 @@ class BookControllerTest {
     @DisplayName("도서 제목 검색")
     void findByBookTitle() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book = setup.createBook();
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -196,6 +178,8 @@ class BookControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(get(uri).with(user(userPrincipal)).queryParam("bookTitle", book.getTitle())
                         .contentType(MediaType.APPLICATION_JSON))

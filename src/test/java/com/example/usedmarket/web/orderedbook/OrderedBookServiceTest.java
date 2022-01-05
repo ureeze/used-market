@@ -13,6 +13,7 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderedBookDetailsResponseDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.orderedBook.OrderedBookService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +36,7 @@ class OrderedBookServiceTest {
     @Autowired
     OrderedBookRepository orderedBookRepository;
 
-    @Autowired
+    @PersistenceContext
     EntityManager entityManager;
 
     @Autowired
@@ -53,56 +55,59 @@ class OrderedBookServiceTest {
     OrderedBookService orderedBookService;
 
     private Setup setup = new Setup();
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
+    private Book book0;
+    private Book book1;
+    private Order order;
+    private OrderedBook orderedBook0;
+    private OrderedBook orderedBook1;
+
+
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+
+        book0 = setup.createBook();
+        book1 = setup.createBook();
+        bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
+
+        order = setup.createOrder(userEntity, null);
+        orderedBook0 = setup.createOrderedBook(userEntity, book0);
+        orderedBook1 = setup.createOrderedBook(userEntity, book1);
+
+        orderedBook0.addOrder(order);
+        orderedBook1.addOrder(order);
+        order.addOrderedBook(orderedBook0);
+        order.addOrderedBook(orderedBook1);
+
+        orderRepository.save(order);
+    }
+
 
     @Test
     @DisplayName("주문한 책 조회")
     void findOne() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book = setup.createBook();
-        bookRepository.save(book);
-
-        Order order = setup.createOrder(userEntity, null);
-        OrderedBook orderedBook = setup.createOrderedBook(userEntity, book);
-
-        orderedBook.addOrder(order);
-        order.addOrderedBook(orderedBook);
-        orderRepository.save(order);
-
-        entityManager.clear();
 
         //when
-        OrderedBookDetailsResponseDto orderedBookDetailsResponseDto = orderedBookService.findOrderedBook(userPrincipal, orderedBook.getId());
+        entityManager.clear();
+        OrderedBookDetailsResponseDto orderedBookDetailsResponseDto = orderedBookService.findOrderedBook(userPrincipal, orderedBook0.getId());
 
         //then
-        assertThat(orderedBookDetailsResponseDto.getBookTitle()).isEqualTo(book.getTitle());
-        assertThat(orderedBookDetailsResponseDto.getId()).isEqualTo(orderedBook.getId());
+        assertThat(orderedBookDetailsResponseDto.getBookTitle()).isEqualTo(book0.getTitle());
+        assertThat(orderedBookDetailsResponseDto.getId()).isEqualTo(orderedBook0.getId());
     }
 
     @Test
     @DisplayName("주문한 책 목록 조회")
     void findAll() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        Book book0 = setup.createBook();
-        Book book1 = setup.createBook();
-        bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
-
-        Order order = setup.createOrder(userEntity, null);
-        OrderedBook orderedBook0 = setup.createOrderedBook(userEntity, book0);
-        OrderedBook orderedBook1 = setup.createOrderedBook(userEntity, book1);
-
-        orderedBook0.addOrder(order);
-        orderedBook1.addOrder(order);
-        order.addOrderedBook(orderedBook0);
-        order.addOrderedBook(orderedBook1);
-        orderRepository.save(order);
 
         //when
+        entityManager.clear();
         List<OrderedBookDetailsResponseDto> responseDtoList = orderedBookService.findByCurrentUser(userPrincipal);
 
         //then

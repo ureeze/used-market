@@ -1,7 +1,7 @@
 package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
-import com.example.usedmarket.web.dto.BookResponseDto;
+import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.service.book.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,25 +21,25 @@ public class BookController {
 
     //책 상세 조회
     @GetMapping("/books/{id}")
-    public ResponseEntity<BookDetailsResponseDto> findById(@PathVariable Long id) {
+    public ResponseEntity<BookSearchListResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.findById(id));
     }
 
     //판매중인 도서 조회
     @GetMapping("/books/all/sell")
-    ResponseEntity<List<BookResponseDto>> findByStatusIsSell() {
+    ResponseEntity<List<BookDetailsResponseDto>> findByStatusIsSell() {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.findByStatusIsSell());
     }
 
     //등록된 도서 전체 조회
     @GetMapping("/books/all")
-    ResponseEntity<List<BookResponseDto>> findAll() {
+    ResponseEntity<List<BookDetailsResponseDto>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.findAll());
     }
 
     //도서 제목 검색
     @GetMapping("/books/all/title")
-    ResponseEntity<List<BookResponseDto>> findByBookTitle(@RequestParam String bookTitle) {
+    ResponseEntity<List<BookDetailsResponseDto>> findByBookTitle(@RequestParam String bookTitle) {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.findByBookTitle(bookTitle));
     }
 }

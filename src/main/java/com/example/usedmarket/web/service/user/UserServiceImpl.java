@@ -9,6 +9,9 @@ import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
     @param userPrincipal - 현재 사용자
     @return findUser 를 UserResponseDto 로 변환 후 반환
      */
+    @Cacheable(key = "'user-'+#userPrincipal.id", value = "user")
     @Transactional(readOnly = true)
     public UserResponseDto getCurrentUser(@LoginUser UserPrincipal userPrincipal) {
         // email 값을 이용해 UserRepository 에서 UserEntity 조회
@@ -46,6 +49,7 @@ public class UserServiceImpl implements UserService {
     @param 찾고자 하는 UserEntity ID 값
     @return findUser 를 UserResponseDto 로 변환 후 반환
      */
+    @Cacheable(key = "'user-'+#userId", value = "user")
     @Transactional(readOnly = true)
     public UserResponseDto findByUserId(Long userId) {
         // userId 값을 이용해 UserRepository 에서 UserEntity 조회
@@ -59,6 +63,7 @@ public class UserServiceImpl implements UserService {
     전체 USER 목록 조회 (ADMIN)
     @return UserEntity 를 UserResponseDto 로 stream 을 이용해 변환 후 리스트로 반환
      */
+    @Cacheable(key = "'userAll'", value = "userAll")
     @Transactional(readOnly = true)
     public List<UserResponseDto> findAll() {
         // UserRepository 에서 UserEntity 전체 조회
@@ -74,6 +79,12 @@ public class UserServiceImpl implements UserService {
     @param requestDto - 업데이트 하고자 하는 요청 정보
     @return 수정된 UserEntity 를 UserResponseDto 로 변환 후 반환
      */
+    @Caching(evict = {
+            //USER 개인 상세 정보
+            @CacheEvict(key = "'user-'+#userPrincipal.id", value = "user"),
+            //USER 전체 리스트
+            @CacheEvict(key = "'userAll'", value = "userAll")
+    })
     @Transactional
     public UserResponseDto updatePersonalInfo(@LoginUser UserPrincipal userPrincipal, UserUpdateRequestDto requestDto) {
 
@@ -91,6 +102,12 @@ public class UserServiceImpl implements UserService {
      * 회원 탈퇴
      * @param userPrincipal - 현재 사용자
      */
+    @Caching(evict = {
+            //USER 개인 상세 정보
+            @CacheEvict(key = "'user-'+#userPrincipal.id", value = "user"),
+            //USER 전체 리스트
+            @CacheEvict(key = "'userAll'", value = "userAll")
+    })
     @Transactional
     public void delete(@LoginUser UserPrincipal userPrincipal) throws IOException {
         // Repository 에서 UserEntity 삭제

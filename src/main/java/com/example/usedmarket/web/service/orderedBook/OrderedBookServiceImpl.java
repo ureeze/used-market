@@ -7,6 +7,8 @@ import com.example.usedmarket.web.exception.OrderedBookNotFoundException;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,7 @@ public class OrderedBookServiceImpl implements OrderedBookService {
     /*
     현재 사용자가 주문한 책 목록 조회
      */
+    @Cacheable(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
     @Override
     public List<OrderedBookDetailsResponseDto> findByCurrentUser(@LoginUser UserPrincipal userPrincipal) {
         List<OrderedBook> orderedBookList = orderedBookRepository.findByCurrentUser(userPrincipal.getId());

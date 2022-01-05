@@ -12,10 +12,10 @@ public interface PostService {
     //POST 등록
     PostResponseDto save(UserPrincipal userPrincipal, PostSaveRequestDto requestDTO);
 
-    //POST ID로 포스트 조회
+    //POST ID로 POST 상세 조회
     PostDetailsResponseDto findById(Long postId);
 
-    //POST 제목으로 포스트 조회
+    //POST 제목으로 POST 조회
     List<PostResponseDto> findByPostTitle(String postTitle);
 
     //전체 POST 조회

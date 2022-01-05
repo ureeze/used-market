@@ -1,14 +1,15 @@
 package com.example.usedmarket.web.dto;
 
-import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.Post;
-import com.example.usedmarket.web.domain.post.PostStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @ToString
 @Getter
 @Setter
@@ -27,9 +28,10 @@ public class PostDetailsResponseDto implements Serializable {
     private String postContent;
 
     //POST STATUS
-    private PostStatus postStatus;
+    private String postStatus;
 
     //POST 등록시간
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     //POST 작성자 ID
@@ -37,18 +39,22 @@ public class PostDetailsResponseDto implements Serializable {
 
     //POST 와 함께 등록된 책
     @JsonIgnore
-    private List<Book> bookList;
+    private List<BookDetailsResponseDto> bookList;
 
 
     public static PostDetailsResponseDto toResponseDto(Post post) {
+        List<BookDetailsResponseDto> bookDetailsDto = post.getBookList()
+                .stream()
+                .map(book -> BookDetailsResponseDto.toDto(book))
+                .collect(Collectors.toList());
         return PostDetailsResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
                 .postContent(post.getContent())
-                .postStatus(post.getStatus())
+                .postStatus(post.getStatus().name())
                 .createdAt(post.getCreatedAt())
                 .writerId(post.getUserEntity().getId())
-                .bookList(post.getBookList())
+                .bookList(bookDetailsDto)
                 .build();
     }
 }

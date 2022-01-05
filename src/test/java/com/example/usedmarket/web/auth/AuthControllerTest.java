@@ -4,9 +4,8 @@ import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.LoginRequestDto;
-import com.example.usedmarket.web.dto.SignUpDto;
+import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.net.URI;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -40,6 +41,9 @@ public class AuthControllerTest {
 
     @LocalServerPort
     int port;
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -72,7 +76,7 @@ public class AuthControllerTest {
     @DisplayName("USER 등록 테스트")
     void signUp() throws Exception {
         //given
-        SignUpDto signUpDto = setup.createSignUpDto();
+        SignUpRequestDto signUpDto = setup.createSignUpDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -96,7 +100,7 @@ public class AuthControllerTest {
     @DisplayName("USER 조회 테스트")
     void login() throws Exception {
         //given
-        SignUpDto signUpDto = setup.createSignUpDto();
+        SignUpRequestDto signUpDto = setup.createSignUpDto();
 
         UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
         userRepository.save(userEntity);
@@ -112,6 +116,8 @@ public class AuthControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(post(uri)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +125,5 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isString())
                 .andDo(print());
-
-
     }
 }

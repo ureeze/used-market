@@ -3,9 +3,7 @@ package com.example.usedmarket.web.service.auth;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.LoginRequestDto;
-import com.example.usedmarket.web.dto.SignUpDto;
-import com.example.usedmarket.web.exception.PassWordNotMatchException;
-import com.example.usedmarket.web.exception.UserNotFoundException;
+import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
 
     //회원 가입
     @Override
-    public Long createUser(SignUpDto signUpDto) {
+    public Long createUser(SignUpRequestDto signUpDto) {
         UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
         userRepository.save(userEntity);
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);

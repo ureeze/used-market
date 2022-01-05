@@ -15,6 +15,10 @@ import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
@@ -36,9 +41,11 @@ public class PostServiceImpl implements PostService {
      * @param requestDto - 포스트등록 내용
      * @return POST 를 PostResponseDto 로 변환 후 반환
      */
+    @CacheEvict(key = "'postAll'", value = "postAll")
     @Transactional
     @Override
     public PostResponseDto save(@LoginUser UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) {
+        log.info("get Service Method Call");
         // UserEntity 조회
         UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
 
@@ -56,13 +63,16 @@ public class PostServiceImpl implements PostService {
     }
 
     /*
-     * POST ID로 포스트 조회
+     * POST ID로 POST 상세 조회
      * @param postId - 찾고자 하는 POST ID 값
      * @return findPOST 를 PostResponseDto 로 변환 후 반환
      */
+    @Cacheable(key = "'post-'+ #postId", value = "PostDetails")
     @Transactional(readOnly = true)
     @Override
     public PostDetailsResponseDto findById(Long postId) {
+        log.info("get Service Method Call");
+
         // POST 의 ID로 PostRepository 에서  POST 조회
         Post findPost = postsRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
@@ -85,6 +95,7 @@ public class PostServiceImpl implements PostService {
      * 전체 POST 조회
      * @return findPOST 를 stream 을 이용해 PostResponseDto 로 변환 후 리스트로 반환
      */
+    @Cacheable(key = "'postAll'", value = "postAll")
     @Transactional(readOnly = true)
     @Override
     public List<PostResponseDto> findAll() {
@@ -98,6 +109,12 @@ public class PostServiceImpl implements PostService {
      * @param requestDto - 수정하고자 하는 요청 정보
      * @return POST 를 PostResponseDto 로 변환 후 반환
      */
+    @Caching(evict = {
+            //전체 POST 리스트
+            @CacheEvict(key = "'postAll'", value = "postAll"),
+            //POST ID로 조회
+            @CacheEvict(key = "'post-'+ #postId", value = "PostDetails")
+    })
     @Transactional
     @Override
     public PostResponseDto updatePost(Long postId, @LoginUser UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) {
@@ -124,6 +141,12 @@ public class PostServiceImpl implements PostService {
      * @param id - 삭제하고자 하는 POST 의 ID 값
      * @param userPrincipal - 현재 사용자
      */
+    @Caching(evict = {
+            //전체 POST 리스트
+            @CacheEvict(key = "'postAll'", value = "postAll"),
+            //POST ID로 조회
+            @CacheEvict(key = "'post-'+ #postId", value = "PostDetails")
+    })
     @Transactional
     @Override
     public void delete(Long postId, @LoginUser UserPrincipal userPrincipal) {

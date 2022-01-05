@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 @ToString
 @Getter
@@ -44,8 +45,6 @@ public class OrderConfirmResponseDto implements Serializable {
 
     //주문된 책 ID
     private Long orderedBookId;
-
-
 
     public static OrderConfirmResponseDto toDto(Order order, OrderedBook orderedBook) {
         return OrderConfirmResponseDto.builder()

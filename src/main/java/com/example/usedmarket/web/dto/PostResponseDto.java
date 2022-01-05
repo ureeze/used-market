@@ -3,6 +3,7 @@ package com.example.usedmarket.web.dto;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.PostStatus;
 import com.example.usedmarket.web.domain.post.Post;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -25,9 +26,10 @@ public class PostResponseDto implements Serializable {
     private String postTitle;
 
     //POST STATUS
-    private PostStatus postStatus;
+    private String postStatus;
 
     //POST 등록시간
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     //POST 작성자 ID
@@ -37,7 +39,7 @@ public class PostResponseDto implements Serializable {
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
-                .postStatus(post.getStatus())
+                .postStatus(post.getStatus().name())
                 .createdAt(post.getCreatedAt())
                 .writerId(post.getUserEntity().getId())
                 .build();

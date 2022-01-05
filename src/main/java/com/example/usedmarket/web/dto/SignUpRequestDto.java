@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpDto {
+public class SignUpRequestDto {
 
     //회원 가입자 이름
     private String userName;

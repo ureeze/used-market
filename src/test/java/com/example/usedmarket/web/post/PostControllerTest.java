@@ -11,7 +11,6 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,9 +61,18 @@ public class PostControllerTest {
     @Autowired
     WebApplicationContext context;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     MockMvc mvc;
 
     private Setup setup = new Setup();
+
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
+    private PostSaveRequestDto requestDto;
+    private Book book;
+    private Post post;
 
     @BeforeEach
     void setup() {
@@ -71,6 +81,18 @@ public class PostControllerTest {
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .apply(springSecurity())
                 .build();
+
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        requestDto = setup.createPostSaveRequestDto();
+
+        book = requestDto.toBook();
+        post = requestDto.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+
+        postRepository.save(post);
     }
 //
 //    @AfterEach
@@ -83,11 +105,6 @@ public class PostControllerTest {
     @DisplayName("POST 등록 테스트")
     void save() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -97,6 +114,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(post(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
@@ -107,24 +125,12 @@ public class PostControllerTest {
 
         //then
         assertThat(postRepository.findAll().get(0).getTitle()).isEqualTo(requestDto.getPostTitle());
-
     }
 
     @Test
     @DisplayName("POST ID로 포스트 조회 테스트")
     void findById() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -134,6 +140,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -143,23 +150,13 @@ public class PostControllerTest {
 
         //then
         assertThat(postRepository.findById(post.getId()).get().getTitle()).isEqualTo(requestDto.getPostTitle());
+
     }
 
     @Test
     @DisplayName("POST 제목으로 포스트 목록 조회 테스트")
     void findByPostTitle() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -169,6 +166,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(get(uri).with(user(userPrincipal))
                         .queryParam("postTitle", post.getTitle())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -186,18 +184,6 @@ public class PostControllerTest {
     @DisplayName("전체 POST 조회 테스트")
     void findAll() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -207,6 +193,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -222,18 +209,6 @@ public class PostControllerTest {
     @DisplayName("POST 수정 테스트")
     void update() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-
-        postRepository.save(post);
-
         PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto();
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
@@ -245,6 +220,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(put(uri).with(user(userPrincipal))
                         .content(new ObjectMapper().writeValueAsString(updateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -258,18 +234,6 @@ public class PostControllerTest {
     @DisplayName("POST 의 ID 을 이용해 POST 삭제 테스트")
     void delete() throws Exception {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
-        Book book = requestDto.toBook();
-        Post post = requestDto.toPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
-        bookRepository.save(book);
-        postRepository.save(post);
-
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
                 .port(port)
@@ -279,6 +243,7 @@ public class PostControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
         mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

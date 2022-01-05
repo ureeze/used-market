@@ -1,18 +1,17 @@
 package com.example.usedmarket.web.domain.user;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
-import com.example.usedmarket.web.dto.SignUpDto;
+import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.dto.UserUpdateRequestDto;
 import com.example.usedmarket.web.security.oauth2.OAuth2UserInfo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+@ToString
 @Getter
 @Entity
 @Builder
@@ -20,7 +19,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class UserEntity extends BaseTimeEntity {
+public class UserEntity extends BaseTimeEntity implements Serializable {
 
     @Id
     @Column
@@ -64,7 +63,7 @@ public class UserEntity extends BaseTimeEntity {
     /*
     ID/PW 가입
      */
-    public static UserEntity create(SignUpDto signUpDto, PasswordEncoder passwordEncoder) {
+    public static UserEntity create(SignUpRequestDto signUpDto, PasswordEncoder passwordEncoder) {
         String pw = passwordEncoder.encode(signUpDto.getPassword());
         return UserEntity.builder()
                 .name(signUpDto.getUserName())
@@ -95,4 +94,19 @@ public class UserEntity extends BaseTimeEntity {
         return this;
     }
 
+    @Override
+    public int hashCode() {
+        return id.intValue();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof UserEntity) {
+            UserEntity userEntity = (UserEntity) obj;
+            if (email.equals(userEntity.getEmail()) && id == userEntity.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

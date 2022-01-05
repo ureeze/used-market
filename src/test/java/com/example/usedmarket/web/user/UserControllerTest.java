@@ -3,11 +3,10 @@ package com.example.usedmarket.web.user;
 import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
-import com.example.usedmarket.web.dto.SignUpDto;
+import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.dto.UserUpdateRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.net.URI;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -45,6 +46,9 @@ public class UserControllerTest {
     @LocalServerPort
     int port;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -61,6 +65,9 @@ public class UserControllerTest {
 
     private MockMvc mvc;
 
+    private SignUpRequestDto requestDto;
+    private UserEntity userEntity;
+    private UserPrincipal userPrincipal;
 
     @BeforeEach
     void setup() {
@@ -69,6 +76,10 @@ public class UserControllerTest {
                 .apply(springSecurity())
                 .build();
 
+        requestDto = setup.createSignUpDto();
+        userEntity = UserEntity.create(requestDto, passwordEncoder);
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
     }
 //
 //    @AfterEach
@@ -81,10 +92,6 @@ public class UserControllerTest {
     @DisplayName("본인 정보 조회")
     void getCurrentUser() throws Exception {
         //given
-        SignUpDto requestDto = setup.createSignUpDto();
-        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")
@@ -95,6 +102,8 @@ public class UserControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(get(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -106,15 +115,11 @@ public class UserControllerTest {
 
     }
 
-//
+
 //    @Test
 //    @DisplayName("USER ID 를 이용한 사용자 조회 (ADMIN)")
 //    void findByUserId() throws Exception {
 //        //given
-//        SignUpDto requestDto = setup.createSignUpDto();
-//        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
-//        userRepository.save(userEntity);
-//        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 //
 //        URI uri = UriComponentsBuilder.newInstance().scheme("http")
 //                .host("localhost")
@@ -125,6 +130,8 @@ public class UserControllerTest {
 //                .toUri();
 //
 //        //when
+//        entityManager.clear();
+//
 //        //then
 //        mvc.perform(get(uri).with(user(userPrincipal))
 //         .contentType(MediaType.APPLICATION_JSON))
@@ -141,10 +148,6 @@ public class UserControllerTest {
 //    @DisplayName("전체 USER 목록 조회 (ADMIN)")
 //    void findAll() throws Exception {
 //        //given
-//        SignUpDto requestDto = setup.createSignUpDto();
-//        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
-//        userRepository.save(userEntity);
-//        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 //
 //        URI uri = UriComponentsBuilder.newInstance().scheme("http")
 //                .host("localhost")
@@ -155,6 +158,8 @@ public class UserControllerTest {
 //                .toUri();
 //
 //        //when
+//        entityManager.clear();
+//
 //        //then
 //        mvc.perform(get(uri).with(user(userPrincipal))
 //                       .contentType(MediaType.APPLICATION_JSON))
@@ -164,17 +169,12 @@ public class UserControllerTest {
 //                .andExpect(jsonPath("$.[0].email").value(userEntity.getEmail()))
 //                .andDo(print());
 //    }
-//
+
 
     @Test
     @DisplayName("사용자 정보 수정")
     void updatePersonalInfo() throws Exception {
         //given
-        SignUpDto requestDto = setup.createSignUpDto();
-        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
         UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
                 .userName("park")
                 .build();
@@ -188,6 +188,8 @@ public class UserControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(put(uri).with(user(userPrincipal))
                         .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
@@ -202,11 +204,6 @@ public class UserControllerTest {
     @DisplayName("회원 탈퇴")
     void delete() throws Exception {
         //given
-        SignUpDto requestDto = setup.createSignUpDto();
-        UserEntity userEntity = UserEntity.create(requestDto, passwordEncoder);
-        userRepository.save(userEntity);
-        UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
         UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
                 .userName("park")
                 .build();
@@ -220,13 +217,13 @@ public class UserControllerTest {
                 .toUri();
 
         //when
+        entityManager.clear();
+
         //then
         mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
                         .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
-
     }
-
 }

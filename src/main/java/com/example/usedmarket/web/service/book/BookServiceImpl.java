@@ -2,26 +2,20 @@ package com.example.usedmarket.web.service.book;
 
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookRepositoryCustom;
-import com.example.usedmarket.web.domain.book.QBook;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
-import com.example.usedmarket.web.domain.post.QPost;
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
-import com.example.usedmarket.web.dto.BookResponseDto;
-import com.example.usedmarket.web.dto.PostResponseDto;
+import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.exception.BookNotFoundException;
 import com.example.usedmarket.web.exception.PostNotFoundException;
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -32,26 +26,26 @@ public class BookServiceImpl implements BookService {
     private final PostRepository postRepository;
 
     /*
-    책 상세 조회
+    BOOK ID로 BOOK 상세 조회
      */
     @Override
-    public BookDetailsResponseDto findById(Long bookId) {
+    public BookSearchListResponseDto findById(Long bookId) {
 
         Book retrieveBook = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("책이 존재하지 않습니다."));
         Post retrievePost = postRepository.findById(retrieveBook.getPost().getId()).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
-        return BookDetailsResponseDto.toDto(retrieveBook, retrievePost);
+        return BookSearchListResponseDto.toDto(retrieveBook, retrievePost);
     }
 
     /*
     판매중인 도서 조회
      */
     @Override
-    public List<BookResponseDto> findByStatusIsSell() {
+    public List<BookDetailsResponseDto> findByStatusIsSell() {
         List<Post> postList = postRepository.findByStatusIsSell();
-        List<BookResponseDto> responseDtoList = new ArrayList<>();
+        List<BookDetailsResponseDto> responseDtoList = new ArrayList<>();
 
         postList.stream().forEach(post -> {
-            responseDtoList.addAll(post.getBookList().stream().map(book -> BookResponseDto.toDto(book)).collect(Collectors.toList()));
+            responseDtoList.addAll(post.getBookList().stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList()));
         });
         return responseDtoList;
     }
@@ -60,12 +54,12 @@ public class BookServiceImpl implements BookService {
     등록된 도서 전체 조회 (ADMIN)
      */
     @Override
-    public List<BookResponseDto> findAll() {
+    public List<BookDetailsResponseDto> findAll() {
         List<Post> postList = postRepository.findAll();
-        List<BookResponseDto> responseDtoList = new ArrayList<>();
+        List<BookDetailsResponseDto> responseDtoList = new ArrayList<>();
         postList.forEach(post -> {
             for (Book retrieveBook : post.getBookList()) {
-                responseDtoList.add(BookResponseDto.toDto(retrieveBook));
+                responseDtoList.add(BookDetailsResponseDto.toDto(retrieveBook));
             }
         });
         return responseDtoList;
@@ -75,14 +69,8 @@ public class BookServiceImpl implements BookService {
     도서 제목 검색
      */
     @Override
-    public List<BookResponseDto> findByBookTitle(String bookTitle) {
-//        BooleanBuilder booleanBuilder = new BooleanBuilder();
-//        QBook qBook = QBook.book;
-//        booleanBuilder.and(qBook.title.like("%" + bookTitle + "%"));
-//        Iterable<Book> bookIterable = bookRepository.findAll(booleanBuilder);
-//        return StreamSupport.stream(bookIterable.spliterator(), false).map(book -> BookResponseDto.toDto(book)).collect(Collectors.toList());
-
+    public List<BookDetailsResponseDto> findByBookTitle(String bookTitle) {
         List<Book> bookList = bookRepository.findByBookTitle(bookTitle);
-        return bookList.stream().map(book -> BookResponseDto.toDto(book)).collect(Collectors.toList());
+        return bookList.stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList());
     }
 }

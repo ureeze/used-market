@@ -7,6 +7,7 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +35,27 @@ public class PostRepositoryTest {
     TestEntityManager testEntityManager;
 
     private Setup setup = new Setup();
+    private UserEntity userEntity;
+    private Book book;
+    private Post post;
+
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        book = setup.createBook();
+        post = setup.createPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+    }
 
     @Test
     @DisplayName("포스트 저장")
     void CreatePostAndBook() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        Book book = setup.createBook();
-        Post post = setup.createPost(userEntity);
-        book.addPost(post);
-        post.addBook(book);
 
         //when
         testEntityManager.persist(post);
+        testEntityManager.clear();
 
         //then
         assertThat(postsRepository.findById(post.getId()).get()).isEqualTo(post);

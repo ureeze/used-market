@@ -4,16 +4,15 @@ import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.user.UserEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -58,6 +57,7 @@ public class Order extends BaseTimeEntity {
     private Post post;
 
     // 주문과 연관된 ORDERED BOOK
+    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderedBook> orderedBookList = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class Order extends BaseTimeEntity {
     public boolean equals(Object obj) {
         if (obj instanceof Order) {
             Order order = (Order) obj;
-            if (id.equals(order.id)) {
+            if (id == order.id) {
                 return true;
             }
         }
@@ -112,6 +112,7 @@ public class Order extends BaseTimeEntity {
         }
     }
 
+    //OrderedBook 추가
     public void addOrderedBook(OrderedBook orderedBook) {
         this.orderedBookList.add(orderedBook);
     }

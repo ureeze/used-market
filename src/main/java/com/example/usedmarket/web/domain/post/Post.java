@@ -4,23 +4,23 @@ import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @Entity
 @Table(name = "POST")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Post extends BaseTimeEntity {
+public class Post extends BaseTimeEntity implements Serializable {
     //POST ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +49,7 @@ public class Post extends BaseTimeEntity {
     private UserEntity userEntity;
 
     //POST 와 관련된 BOOK
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Book> bookList = new ArrayList<>();
 
@@ -70,7 +71,7 @@ public class Post extends BaseTimeEntity {
     public boolean equals(Object obj) {
         if (obj instanceof Post) {
             Post post = (Post) obj;
-            if (id.equals(post.id)) {
+            if (id.equals(post.id) && title.equals(post.title)) {
                 return true;
             }
         }

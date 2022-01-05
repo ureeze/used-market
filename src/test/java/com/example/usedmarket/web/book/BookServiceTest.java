@@ -3,16 +3,14 @@ package com.example.usedmarket.web.book;
 import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.book.BookRepository;
-import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.PostStatus;
-import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
-import com.example.usedmarket.web.dto.BookResponseDto;
+import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.service.book.BookService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,8 +28,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 class BookServiceTest {
+    @PersistenceContext
+    EntityManager entityManager;
+
     @Autowired
     PostRepository postRepository;
+
     @Autowired
     UserRepository userRepository;
 
@@ -42,26 +44,39 @@ class BookServiceTest {
     BookService bookService;
 
     private Setup setup = new Setup();
+    private UserEntity userEntity;
+
+    private Post post;
+    private Book book0;
+    private Book book1;
+
+    @BeforeEach
+    void setup() {
+        userEntity = setup.createUserEntity();
+        userRepository.save(userEntity);
+
+        post = setup.createPost(userEntity);
+        book0 = setup.createBook();
+        book1 = setup.createBook();
+        post.addBook(book0);
+        post.addBook(book1);
+        book0.addPost(post);
+        book1.addPost(post);
+        postRepository.save(post);
+    }
 
     @DisplayName("책 상세 조회")
     @Test
     void findById() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book = setup.createBook();
-        post.addBook(book);
-        book.addPost(post);
-        postRepository.save(post);
 
         //when
-        BookDetailsResponseDto responseDto = bookService.findById(book.getId());
+        entityManager.clear();
+        BookSearchListResponseDto responseDto = bookService.findById(book0.getId());
 
         //then
         assertThat(responseDto.getPostTitle()).isEqualTo(post.getTitle());
-        assertThat(responseDto.getBookTitle()).isEqualTo(book.getTitle());
+        assertThat(responseDto.getBookTitle()).isEqualTo(book0.getTitle());
     }
 
 
@@ -69,20 +84,10 @@ class BookServiceTest {
     @Test
     void findByStatusIsSell() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book0 = setup.createBook();
-        Book book1 = setup.createBook();
-        post.addBook(book0);
-        post.addBook(book1);
-        book0.addPost(post);
-        book1.addPost(post);
-        postRepository.save(post);
 
         //when
-        List<BookResponseDto> responseDtoList = bookService.findByStatusIsSell();
+        entityManager.clear();
+        List<BookDetailsResponseDto> responseDtoList = bookService.findByStatusIsSell();
 
         //then
         assertThat(responseDtoList.get(0).getBookStatus()).isEqualTo(book0.getBookStatus().name());
@@ -93,20 +98,10 @@ class BookServiceTest {
     @Test
     void findAll() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book0 = setup.createBook();
-        Book book1 = setup.createBook();
-        post.addBook(book0);
-        post.addBook(book1);
-        book0.addPost(post);
-        book1.addPost(post);
-        postRepository.save(post);
 
         //when
-        List<BookResponseDto> responseDtoList = bookService.findAll();
+        entityManager.clear();
+        List<BookDetailsResponseDto> responseDtoList = bookService.findAll();
 
         //then
         assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
@@ -117,20 +112,10 @@ class BookServiceTest {
     @Test
     void findByBookTitle() {
         //given
-        UserEntity userEntity = setup.createUserEntity();
-        userRepository.save(userEntity);
-
-        Post post = setup.createPost(userEntity);
-        Book book0 = setup.createBook();
-        Book book1 = setup.createBook();
-        post.addBook(book0);
-        post.addBook(book1);
-        book0.addPost(post);
-        book1.addPost(post);
-        postRepository.save(post);
 
         //when
-        List<BookResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
+        entityManager.clear();
+        List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
 
         //then
         assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
