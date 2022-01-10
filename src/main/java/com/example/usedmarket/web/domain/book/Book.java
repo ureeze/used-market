@@ -83,6 +83,12 @@ public class Book extends BaseTimeEntity implements Serializable {
         this.deleted = true;
     }
 
+    //img 추가
+    public void addImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+
     @Override
     public int hashCode() {
         return id.intValue();

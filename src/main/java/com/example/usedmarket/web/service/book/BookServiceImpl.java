@@ -6,12 +6,22 @@ import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
 import com.example.usedmarket.web.dto.BookSearchListResponseDto;
+import com.example.usedmarket.web.dto.NaverBookInfo;
 import com.example.usedmarket.web.exception.BookNotFoundException;
 import com.example.usedmarket.web.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,5 +82,23 @@ public class BookServiceImpl implements BookService {
     public List<BookDetailsResponseDto> findByBookTitle(String bookTitle) {
         List<Book> bookList = bookRepository.findByBookTitle(bookTitle);
         return bookList.stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public NaverBookInfo retrieveBookInfo(String bookTitle) throws ParseException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
+        headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
+        String url = "https://openapi.naver.com/v1/search/book.json?query="+bookTitle+"&display=10&start=1";
+        HttpEntity httpEntity = new HttpEntity(headers);
+        ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
+        JSONArray items = (JSONArray) body.get("items");
+        JSONObject book = (JSONObject) items.get(0);
+        return NaverBookInfo.toDto(book);
     }
 }

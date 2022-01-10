@@ -11,6 +11,10 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,15 +22,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -48,6 +57,9 @@ public class PostControllerTest {
 
     @LocalServerPort
     int port;
+
+
+    WebClient webClient;
 
     @Autowired
     BookRepository bookRepository;
@@ -249,5 +261,25 @@ public class PostControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$").value(post.getId()));
+    }
+
+
+    @Test
+    @DisplayName("Book 이미지 가져오기")
+    void retrieveBookImg() throws ParseException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
+        headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
+        String url = "https://openapi.naver.com/v1/search/book.json?query=스프링 부트와 AWS로 혼자 구현하는 웹 서비스 &display=10&start=1";
+        HttpEntity httpEntity = new HttpEntity(headers);
+        ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
+        JSONArray items = (JSONArray) body.get("items");
+        JSONObject book = (JSONObject) items.get(0);
+        String imgUrl = (String) book.get("image");
+        System.out.println(imgUrl);
     }
 }

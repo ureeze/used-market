@@ -32,4 +32,12 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
+
+    @Override
+    public List<Post> findByAllPost() {
+        return queryFactory.select(post)
+                .from(post)
+                .orderBy(post.createdAt.desc())
+                .fetch();
+    }
 }

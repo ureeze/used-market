@@ -38,15 +38,14 @@ public class PostDetailsResponseDto implements Serializable {
     private Long writerId;
 
     //POST 와 함께 등록된 책
-    @JsonIgnore
-    private List<BookDetailsResponseDto> bookList;
+    private BookDetailsResponseDto book;
 
 
     public static PostDetailsResponseDto toResponseDto(Post post) {
-        List<BookDetailsResponseDto> bookDetailsDto = post.getBookList()
-                .stream()
-                .map(book -> BookDetailsResponseDto.toDto(book))
-                .collect(Collectors.toList());
+//        List<BookDetailsResponseDto> bookDetailsDto = post.getBookList()
+//                .stream()
+//                .map(book -> BookDetailsResponseDto.toDto(book))
+//                .collect(Collectors.toList());
         return PostDetailsResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
@@ -54,7 +53,7 @@ public class PostDetailsResponseDto implements Serializable {
                 .postStatus(post.getStatus().name())
                 .createdAt(post.getCreatedAt())
                 .writerId(post.getUserEntity().getId())
-                .bookList(bookDetailsDto)
+                .book(BookDetailsResponseDto.toDto(post.getBookList().get(0)))
                 .build();
     }
 }

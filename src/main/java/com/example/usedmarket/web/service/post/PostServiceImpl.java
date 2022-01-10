@@ -6,6 +6,7 @@ import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.post.QPost;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
+import com.example.usedmarket.web.dto.NaverBookInfo;
 import com.example.usedmarket.web.dto.PostDetailsResponseDto;
 import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
@@ -13,14 +14,17 @@ import com.example.usedmarket.web.exception.PostNotFoundException;
 import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
+import com.example.usedmarket.web.service.book.BookService;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
+    private final BookService bookService;
 
     /*
      * POST 등록
@@ -44,16 +49,21 @@ public class PostServiceImpl implements PostService {
     @CacheEvict(key = "'postAll'", value = "postAll")
     @Transactional
     @Override
-    public PostResponseDto save(@LoginUser UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) {
+    public PostResponseDto save(@LoginUser UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) throws ParseException {
         log.info("get Service Method Call");
         // UserEntity 조회
         UserEntity userEntity = userRepository.findByEmail(userPrincipal.getEmail()).orElseThrow(() -> new UserNotFoundException("사용자가 존재하지 않습니다."));
+
+        // 네이버 책 정보 가져오기
+        String bookTitle = requestDTO.getBookTitle();
+        NaverBookInfo naverBookInfo = bookService.retrieveBookInfo(bookTitle);
 
         // UserEntity 와 requestDto 를 이용해 POST 와 Book 생성
         Book book = requestDTO.toBook();
         Post post = requestDTO.toPost(userEntity);
         post.addBook(book);
         book.addPost(post);
+        book.addImgUrl(naverBookInfo.getImage());
 
         // PostRepository 에 POST 저장
         postsRepository.save(post);
@@ -99,7 +109,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     @Override
     public List<PostResponseDto> findAll() {
-        return postsRepository.findAll().stream().map(post -> PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
+        return postsRepository.findByAllPost().stream().map(post -> PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
     }
 
     /*

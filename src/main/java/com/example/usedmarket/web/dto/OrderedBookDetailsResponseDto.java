@@ -29,7 +29,7 @@ public class OrderedBookDetailsResponseDto implements Serializable {
     //ORDERED BOOK 제목
     private String bookTitle;
 
-    //ORDERED BOOK 분류
+    //ORDERED BOOK 카테고리
     private String bookCategory;
 
     //ORDERED BOOK 상태

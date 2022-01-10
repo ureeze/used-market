@@ -1,6 +1,7 @@
 package com.example.usedmarket.web.controller;
 
 import com.example.usedmarket.web.dto.LoginRequestDto;
+import com.example.usedmarket.web.dto.LoginResponseDto;
 import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,9 @@ public class AuthController {
 
     //로그인(Email+Password)
     @PostMapping("/auth/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto) {
         String token = authService.loginUser(loginDto);
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(LoginResponseDto.builder().token(token).build());
     }
 }

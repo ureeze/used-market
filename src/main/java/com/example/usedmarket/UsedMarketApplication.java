@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.stream.IntStream;
 
-@EnableCaching
+//@EnableCaching
 @EnableJpaAuditing
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
@@ -39,7 +39,7 @@ public class UsedMarketApplication {
         return (args) -> {
             System.out.println("dataLoader 시작");
             UserEntity userEntity = userRepository.save(UserEntity.builder()
-                    .name("default 이름")
+                    .name("사용자_이름")
                     .role(Role.USER)
                     .email("default@gmail.com")
                     .picture("picDefault")
@@ -49,17 +49,17 @@ public class UsedMarketApplication {
             IntStream.rangeClosed(1, 10).forEach(index -> {
 
                         Post post = Post.builder()
-                                .title("게시글" + index)
-                                .content("콘텐츠" + index)
+                                .title("포스트_제목_" + index)
+                                .content("포스트_CONTENT_" + index)
                                 .status(PostStatus.SELL)
                                 .deleted(false)
                                 .userEntity(userEntity)
                                 .build();
                         Book book = Book.builder()
-                                .title("name" + index)
-                                .imgUrl("img" + index)
+                                .title("BOOK_제목_" + index)
+                                .imgUrl("http://bookthumb.phinf.naver.net/cover/108/346/10834650.jpg?type=m1&udate=20160902")
                                 .unitPrice(10000)
-                                .category("cate")
+                                .category("정보/컴퓨터")
                                 .deleted(false)
                                 .bookStatus(BookStatus.S)
                                 .stock(1)

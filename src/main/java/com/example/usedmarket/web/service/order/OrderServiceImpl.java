@@ -13,6 +13,7 @@ import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
 import com.example.usedmarket.web.dto.OrderRequestDto;
+import com.example.usedmarket.web.dto.OrderedBookDetailsResponseDto;
 import com.example.usedmarket.web.exception.*;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
@@ -71,7 +72,8 @@ public class OrderServiceImpl implements OrderService {
         //Order 를 Repository 를 통해 DB 에 저장
         orderRepository.save(order);
 
-        //주문관련정보를 담은 OrderResponseDto 를 반환
+
+        //주문관련정보를 담은 OrderConfirmResponseDto 를 반환
         return OrderConfirmResponseDto.toDto(order, orderedBook);
     }
 

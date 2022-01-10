@@ -5,6 +5,7 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -15,7 +16,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -26,6 +29,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final TokenProvider tokenProvider;
     private final HttpServletResponse response;
 
+    @SneakyThrows
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         //OAuth2User
@@ -53,6 +57,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String token = tokenProvider.create(userEntity.getEmail());
         response.addHeader("Authorization", token);
         log.info("token : " + token);
+        response.sendRedirect("http://localhost:3000/");
+
+
         return userPrincipal;
     }
 }
