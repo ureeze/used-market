@@ -43,22 +43,12 @@ public class PostResponseDto implements Serializable {
     //현재 로그인 된 USER ID
     private Long authenticationId;
 
-//    //Book 제목
-//    private String bookTitle;
-//
-//    //Book 재고수량
-//    private int stock;
-//
-//    //Book Image Url
-//    private String imgUrl;
+    //POST 삭제여부
+    private boolean isDeleted;
+
 
     public static PostResponseDto toResponseDto(Long authenticationId, Post post) {
-//        StringBuilder content = new StringBuilder();
-//        content.append(post.getContent());
-//        if (content.length() > 20) {
-//            content.substring(0, 20);
-//            content.append("...");
-//        }
+
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
@@ -69,9 +59,7 @@ public class PostResponseDto implements Serializable {
                 .writerName(post.getUserEntity().getName())
                 .book(BookDetailsResponseDto.toDto(post.getBookList().get(0)))
                 .authenticationId(authenticationId)
+                .isDeleted(post.isDeleted())
                 .build();
-//                .bookTitle(post.getBookList().get(0).getTitle())
-//                .stock(post.getBookList().get(0).getStock())
-//                .imgUrl(post.getBookList().get(0).getImgUrl())
     }
 }

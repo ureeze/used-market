@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.domain.post;
 
-import com.example.usedmarket.web.domain.book.QBook;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.persistence.EntityManager;
@@ -21,7 +20,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<Post> findByPostTitle(String postTitle) {
         return queryFactory.select(post)
                 .from(post)
+                .leftJoin(post.bookList, book)
+                .fetchJoin()
                 .where(post.title.like("%" + postTitle + "%"))
+                .where(book.deleted.eq(false))
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
@@ -30,16 +32,21 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<Post> findByStatusIsSell() {
         return queryFactory.select(post)
                 .from(post)
+                .leftJoin(post.bookList, book)
+                .fetchJoin()
                 .where(post.status.eq(PostStatus.SELL))
+                .where(post.deleted.eq(false))
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
 
     @Override
-    public List<Post> findByAllPost() {
+    public List<Post> findByPostIsNotDeleted() {
         return queryFactory.select(post)
                 .from(post)
-                .leftJoin(post.bookList, book).fetchJoin()
+                .leftJoin(post.bookList, book)
+                .fetchJoin()
+                .where(post.deleted.eq(false))
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
@@ -48,6 +55,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<Post> findByAllPostAboutMyself(Long userId) {
         return queryFactory.select(post)
                 .from(post)
+                .leftJoin(post.bookList, book)
+                .fetchJoin()
                 .where(post.userEntity.id.eq(userId))
                 .orderBy(post.createdAt.desc())
                 .fetch();

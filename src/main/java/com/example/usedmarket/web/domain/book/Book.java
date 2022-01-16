@@ -76,6 +76,9 @@ public class Book extends BaseTimeEntity implements Serializable {
 
     // 주문취소로 인한 책 재고 증가
     public void stockUp(int count) {
+        if (this.stock < 0) {
+            throw new BookIsNotExistException("책이 존재하지 않습니다.");
+        }
         this.stock += count;
     }
 
@@ -98,6 +101,17 @@ public class Book extends BaseTimeEntity implements Serializable {
     //img 추가
     public void addImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    //BOOK 재고 존재 확인
+    public boolean existStock() {
+        if (this.stock == 0) {
+            return false;
+        } else if (this.stock < 0) {
+            throw new BookIsNotExistException("책이 존재하지 않습니다.");
+        } else {
+            return true;
+        }
     }
 
 

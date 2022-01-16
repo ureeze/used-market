@@ -21,6 +21,8 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
         return queryFactory.select(book)
                 .from(book)
                 .where(book.title.like("%" + bookTitle + "%"))
+                .where(book.deleted.eq(false))
+                .orderBy(book.createdAt.desc())
                 .fetch();
     }
 }

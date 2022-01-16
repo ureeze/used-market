@@ -6,6 +6,6 @@ public interface PostRepositoryCustom {
     List<Post> findByPostTitle(String postTitle);
 
     List<Post> findByStatusIsSell();
-    List<Post> findByAllPost();
+    List<Post> findByPostIsNotDeleted();
     List<Post> findByAllPostAboutMyself(Long userId);
 }

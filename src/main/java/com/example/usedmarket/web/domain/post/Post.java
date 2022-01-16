@@ -33,7 +33,7 @@ public class Post extends BaseTimeEntity implements Serializable {
     @Column(name = "CONTENT", length = 200, nullable = false)
     private String content;
 
-    //POST 상태 (SELL, SOLD_OUT)
+    //POST 상태 (SELL, SOLD_OUT, DELETED)
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private PostStatus status;
@@ -112,8 +112,12 @@ public class Post extends BaseTimeEntity implements Serializable {
 
     //POST 삭제
     public void deleted() {
+        //BOOK isDeleted 처리
         this.bookList.get(0).deleted();
+        //POST isDeleted 처리
         this.deleted = true;
+        //POST 판매상태 변경(DELETED)
+        this.status = PostStatus.DELETED;
     }
 
     //POST 가 SOLD_OUT 상태인지 체크
@@ -131,7 +135,7 @@ public class Post extends BaseTimeEntity implements Serializable {
     }
 
     //POST 판매상태 변경
-    public void statusToSoldOut() {
+    public void changeToSoldOut() {
         this.status = PostStatus.SOLD_OUT;
     }
 }

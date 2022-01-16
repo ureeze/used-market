@@ -107,7 +107,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     @Override
     public List<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
-        List<Post> postList = postsRepository.findByAllPost();
+        List<Post> postList = postsRepository.findByPostIsNotDeleted();
         return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
     }
 
@@ -150,6 +150,13 @@ public class PostServiceImpl implements PostService {
         // POST 와 연관된 책 수정
         post.updateBook(requestDTO);
 
+        // 책 재고수량에 따른 POST 판매상태 변경
+        if(post.getBookList().get(0).existStock()){
+            post.changeToStatusIsSell();
+        }else{
+            post.changeToSoldOut();
+        }
+
         // POST 를 PostResponseDto 로 반환
         return PostResponseDto.toResponseDto(userPrincipal.getId(), post);
     }
@@ -179,7 +186,6 @@ public class PostServiceImpl implements PostService {
         // POST 및 BOOK 삭제
         if (post.isDeletable(userPrincipal.getId())) {
             post.deleted();
-            post.getBookList().get(0).deleted();
         } else {
             throw new IllegalArgumentException("POST 를 삭제할 수 없습니다.");
         }

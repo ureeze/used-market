@@ -79,7 +79,9 @@ public class OrderServiceImpl implements OrderService {
         //재고 0 일시 자동 판매종료
         int updatedBookStock = book.stockDown(requestDto.getBookAmount());
         if (updatedBookStock == 0) {
-            post.statusToSoldOut();
+            post.changeToSoldOut();
+        } else if (updatedBookStock < 0) {
+            throw new BookIsNotExistException("책이 존재하지 않습니다.");
         }
 
         //주문관련정보를 담은 OrderConfirmResponseDto 를 반환
@@ -163,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
 
         //결제완료의 경우에만 취소가능
         if (order.getDeliveryStatus().equals(DeliveryStatus.PAYMENT_COMPLETED)) {
-            //결제 취소
+            // 결제 취소
 
             // 책 재고 조정
             if (book != null) {
@@ -175,13 +177,13 @@ public class OrderServiceImpl implements OrderService {
                 orderedBook.deleted();
             }
 
-            //주문 취소
+            // 주문 취소
             order.cancel(userEntity);
 
-            //포스트 상태 점검
-            //SOLD_OUT(품절) 상태일 시 SELL(판매중)으로 변경
+            // 포스트 상태 점검
+            // SOLD_OUT(품절) 상태일 시 SELL(판매중)으로 변경
             Post post = order.getPost();
-            if(post.isSoldOut()){
+            if (post.isSoldOut()) {
                 post.changeToStatusIsSell();
             }
 
