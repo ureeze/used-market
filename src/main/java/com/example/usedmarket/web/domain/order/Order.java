@@ -4,6 +4,7 @@ import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.exception.OrderCancellationNotAllowed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,7 +38,7 @@ public class Order extends BaseTimeEntity {
     @Column(name = "PHONE", nullable = false, length = 30)
     private String phone;
 
-    // 배송 상태
+    // 배송 상태 (CANCEL_COMPLETED, PAYMENT_COMPLETED, BEING_DELIVERED, DELIVERY_COMPLETED)
     @Column(name = "DELIVERY_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
@@ -109,6 +110,26 @@ public class Order extends BaseTimeEntity {
         // 주문 취소
         if (isDeletable(userEntity)) {
             deleted();
+            // 배송상태를 주문취소로 변경
+            this.changeDeliveryStatusToCancel();
+        }else {
+            //주문취소 불가
+            throw new OrderCancellationNotAllowed("주문 취소 불가");
+        }
+    }
+
+    //배송상태를 주문취소로 변경
+    public void changeDeliveryStatusToCancel() {
+        switch (this.deliveryStatus) {
+            //배송상태가 배송중, 배송완료 인 경우 주문취소 불가
+            //배송상태가 취소완료인 경우 주문취소 불가
+            case BEING_DELIVERED:
+            case DELIVERY_COMPLETED:
+                throw new OrderCancellationNotAllowed("이미 배송 진행 중으로 취소 할 수 없습니다.");
+            case CANCEL_COMPLETED:
+                throw new OrderCancellationNotAllowed("이미 취소 완료된 주문입니다.");
+            case PAYMENT_COMPLETED:
+                this.deliveryStatus = DeliveryStatus.CANCEL_COMPLETED;
         }
     }
 

@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.service.post;
 
-import com.example.usedmarket.web.dto.PostDetailsResponseDto;
 import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
@@ -14,13 +13,16 @@ public interface PostService {
     PostResponseDto save(UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) throws ParseException;
 
     //POST ID로 POST 상세 조회
-    PostDetailsResponseDto findById(Long postId);
+    PostResponseDto findById(UserPrincipal userPrincipal, Long postId);
 
     //POST 제목으로 POST 조회
-    List<PostResponseDto> findByPostTitle(String postTitle);
+    List<PostResponseDto> findByPostTitle(UserPrincipal userPrincipal, String postTitle);
 
     //전체 POST 조회
-    List<PostResponseDto> findAll();
+    List<PostResponseDto> findAll(UserPrincipal userPrincipal);
+
+    //자신의 전체 POST 조회
+    List<PostResponseDto> findByAllPostAboutMyself(UserPrincipal userPrincipal);
 
     //POST 수정
     PostResponseDto updatePost(Long postId, UserPrincipal userPrincipal, PostSaveRequestDto requestDTO);

@@ -7,4 +7,5 @@ public interface PostRepositoryCustom {
 
     List<Post> findByStatusIsSell();
     List<Post> findByAllPost();
+    List<Post> findByAllPostAboutMyself(Long userId);
 }

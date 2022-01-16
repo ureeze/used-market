@@ -3,11 +3,9 @@ package com.example.usedmarket.web.service.post;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
-import com.example.usedmarket.web.domain.post.QPost;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.NaverBookInfo;
-import com.example.usedmarket.web.dto.PostDetailsResponseDto;
 import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.exception.PostNotFoundException;
@@ -15,7 +13,6 @@ import com.example.usedmarket.web.exception.UserNotFoundException;
 import com.example.usedmarket.web.security.dto.LoginUser;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.book.BookService;
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -24,12 +21,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,13 +58,15 @@ public class PostServiceImpl implements PostService {
         Post post = requestDTO.toPost(userEntity);
         post.addBook(book);
         book.addPost(post);
-        book.addImgUrl(naverBookInfo.getImage());
+        if (naverBookInfo != null) {
+            book.addImgUrl(naverBookInfo.getImage());
+        }
 
         // PostRepository 에 POST 저장
         postsRepository.save(post);
 
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(post);
+        return PostResponseDto.toResponseDto(userPrincipal.getId(),post);
     }
 
     /*
@@ -80,14 +77,14 @@ public class PostServiceImpl implements PostService {
     @Cacheable(key = "'post-'+ #postId", value = "PostDetails")
     @Transactional(readOnly = true)
     @Override
-    public PostDetailsResponseDto findById(Long postId) {
+    public PostResponseDto findById(@LoginUser UserPrincipal userPrincipal, Long postId) {
         log.info("get Service Method Call");
 
         // POST 의 ID로 PostRepository 에서  POST 조회
         Post findPost = postsRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // POST 를 PostResponseDto 로 반환
-        return PostDetailsResponseDto.toResponseDto(findPost);
+        return PostResponseDto.toResponseDto(userPrincipal.getId(), findPost);
     }
 
     /*
@@ -95,10 +92,11 @@ public class PostServiceImpl implements PostService {
      * @param postTitle - 검색하고자 하는 POST TITLE 값
      * @return findPOST 를 PostResponseDto 로 변환 후 반환
      */
+    @Transactional(readOnly = true)
     @Override
-    public List<PostResponseDto> findByPostTitle(String postTitle) {
+    public List<PostResponseDto> findByPostTitle(@LoginUser UserPrincipal userPrincipal, String postTitle) {
         List<Post> postList = postsRepository.findByPostTitle(postTitle);
-        return postList.stream().map(post -> PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
+        return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
     }
 
     /*
@@ -108,8 +106,18 @@ public class PostServiceImpl implements PostService {
     @Cacheable(key = "'postAll'", value = "postAll")
     @Transactional(readOnly = true)
     @Override
-    public List<PostResponseDto> findAll() {
-        return postsRepository.findByAllPost().stream().map(post -> PostResponseDto.toResponseDto(post)).collect(Collectors.toList());
+    public List<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
+        List<Post> postList = postsRepository.findByAllPost();
+        return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
+    }
+
+
+    //자신의 전체 POST 조회
+    @Transactional(readOnly = true)
+    @Override
+    public List<PostResponseDto> findByAllPostAboutMyself(@LoginUser UserPrincipal userPrincipal) {
+        List<Post> postList = postsRepository.findByAllPostAboutMyself(userPrincipal.getId());
+        return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
     }
 
     /*
@@ -132,7 +140,7 @@ public class PostServiceImpl implements PostService {
         Post post = postsRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // 수정요청 사용자 ID 와 POST 작성자 ID 확인
-        if (userPrincipal.getId() != post.getUserEntity().getId()) {
+        if (!Objects.equals(userPrincipal.getId(), post.getUserEntity().getId())) {
             throw new IllegalArgumentException("사용자 ID 불일치로 수정할 수 없습니다.");
         }
 
@@ -143,7 +151,7 @@ public class PostServiceImpl implements PostService {
         post.updateBook(requestDTO);
 
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(post);
+        return PostResponseDto.toResponseDto(userPrincipal.getId(), post);
     }
 
     /*
@@ -164,7 +172,7 @@ public class PostServiceImpl implements PostService {
         Post post = postsRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
 
         // 수정요청 사용자 ID 와 POST 작성자 ID 확인
-        if (userPrincipal.getId() != post.getUserEntity().getId()) {
+        if (!Objects.equals(userPrincipal.getId(), post.getUserEntity().getId())) {
             throw new IllegalArgumentException("사용자 ID 불일치로 삭제할 수 없습니다.");
         }
 

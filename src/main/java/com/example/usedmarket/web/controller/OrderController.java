@@ -49,11 +49,8 @@ public class OrderController {
     //주문 취소
     @DeleteMapping("/orders/{id}")
     public ResponseEntity<OrderCancelResponseDto> cancel(@LoginUser UserPrincipal userPrincipal, @PathVariable Long id) {
-        orderService.cancel(userPrincipal, id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(OrderCancelResponseDto.builder()
-                .cancelOrderId(id)
-                .deliveryStatus(DeliveryStatus.CANCEL_COMPLETED.name())
-                .build());
+        OrderCancelResponseDto orderCancelResponseDto = orderService.cancel(userPrincipal, id);
+        return ResponseEntity.status(HttpStatus.OK).body(orderCancelResponseDto);
     }
 
     //주문한 책 조회

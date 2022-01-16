@@ -39,14 +39,14 @@ public class UsedMarketApplication {
         return (args) -> {
             System.out.println("dataLoader 시작");
             UserEntity userEntity = userRepository.save(UserEntity.builder()
-                    .name("사용자_이름")
+                    .name("판매자")
                     .role(Role.USER)
                     .email("default@gmail.com")
                     .picture("picDefault")
                     .build());
 
 
-            IntStream.rangeClosed(1, 10).forEach(index -> {
+            IntStream.rangeClosed(1, 100).forEach(index -> {
 
                         Post post = Post.builder()
                                 .title("포스트_제목_" + index)
@@ -58,11 +58,11 @@ public class UsedMarketApplication {
                         Book book = Book.builder()
                                 .title("BOOK_제목_" + index)
                                 .imgUrl("http://bookthumb.phinf.naver.net/cover/108/346/10834650.jpg?type=m1&udate=20160902")
-                                .unitPrice(10000)
+                                .unitPrice(15000)
                                 .category("정보/컴퓨터")
                                 .deleted(false)
                                 .bookStatus(BookStatus.S)
-                                .stock(1)
+                                .stock(index)
                                 .build();
                         book.addPost(post);
                         post.addBook(book);

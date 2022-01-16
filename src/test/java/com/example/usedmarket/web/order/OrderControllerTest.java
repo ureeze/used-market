@@ -168,7 +168,7 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.recipient").value(order.getRecipient()))
                 .andExpect(jsonPath("$.address").value(order.getAddress()))
                 .andExpect(jsonPath("$.phone").value(order.getPhone()))
-                .andExpect(jsonPath("$.deliveryStatus").value(order.getDeliveryStatus().name()))
+                .andExpect(jsonPath("$.deliveryStatus").value(order.getDeliveryStatus().getValue()))
                 .andDo(print());
     }
 
@@ -195,7 +195,7 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.[0].recipient").value(order.getRecipient()))
                 .andExpect(jsonPath("$.[0].address").value(order.getAddress()))
                 .andExpect(jsonPath("$.[0].phone").value(order.getPhone()))
-                .andExpect(jsonPath("$.[0].deliveryStatus").value(order.getDeliveryStatus().name()))
+                .andExpect(jsonPath("$.[0].deliveryStatus").value(order.getDeliveryStatus().getValue()))
                 .andDo(print());
     }
 
@@ -217,7 +217,7 @@ public class OrderControllerTest {
         //then
         mvc.perform(delete(uri).with(user(userPrincipal))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cancelOrderId").value(order.getId()))
                 .andExpect(jsonPath("$.deliveryStatus").value(DeliveryStatus.CANCEL_COMPLETED.name()))
                 .andDo(print());

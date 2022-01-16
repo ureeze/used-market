@@ -87,18 +87,23 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public NaverBookInfo retrieveBookInfo(String bookTitle) throws ParseException {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
-        headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
-        String url = "https://openapi.naver.com/v1/search/book.json?query="+bookTitle+"&display=10&start=1";
-        HttpEntity httpEntity = new HttpEntity(headers);
-        ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
+            headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
+            String url = "https://openapi.naver.com/v1/search/book.json?query=" + bookTitle + "&display=10&start=1";
+            HttpEntity httpEntity = new HttpEntity(headers);
+            ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
 
-        JSONParser jsonParser = new JSONParser();
-        JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
-        JSONArray items = (JSONArray) body.get("items");
-        JSONObject book = (JSONObject) items.get(0);
-        return NaverBookInfo.toDto(book);
+            JSONParser jsonParser = new JSONParser();
+            JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
+            JSONArray items = (JSONArray) body.get("items");
+            JSONObject book = (JSONObject) items.get(0);
+            System.out.println(book.toString());
+            return NaverBookInfo.toDto(book);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

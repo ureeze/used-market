@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
 @Entity
 @Table(name = "POST")
 @Getter
@@ -34,7 +33,7 @@ public class Post extends BaseTimeEntity implements Serializable {
     @Column(name = "CONTENT", length = 200, nullable = false)
     private String content;
 
-    //POST 상태
+    //POST 상태 (SELL, SOLD_OUT)
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private PostStatus status;
@@ -115,5 +114,24 @@ public class Post extends BaseTimeEntity implements Serializable {
     public void deleted() {
         this.bookList.get(0).deleted();
         this.deleted = true;
+    }
+
+    //POST 가 SOLD_OUT 상태인지 체크
+    public boolean isSoldOut() {
+        if (this.status == PostStatus.SOLD_OUT) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //POST 의 상태를 SELL 로 전환
+    public void changeToStatusIsSell() {
+        this.status = PostStatus.SELL;
+    }
+
+    //POST 판매상태 변경
+    public void statusToSoldOut() {
+        this.status = PostStatus.SOLD_OUT;
     }
 }

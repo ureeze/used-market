@@ -1,9 +1,11 @@
 package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.book.Book;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @ToString
 @Getter
@@ -33,6 +35,13 @@ public class BookDetailsResponseDto implements Serializable {
     //Book 이미지 주소
     private String bookImgUrl;
 
+    //Book 등록 일자
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime createdAt;
+
+    //POST ID
+    private Long postId;
+
     public static BookDetailsResponseDto toDto(Book retrieveBook) {
         return BookDetailsResponseDto.builder()
                 .bookId(retrieveBook.getId())
@@ -42,6 +51,8 @@ public class BookDetailsResponseDto implements Serializable {
                 .bookCategory(retrieveBook.getCategory())
                 .bookStatus(retrieveBook.getBookStatus().name())
                 .bookImgUrl(retrieveBook.getImgUrl())
+                .createdAt(retrieveBook.getCreatedAt())
+                .postId(retrieveBook.getPost().getId())
                 .build();
     }
 }

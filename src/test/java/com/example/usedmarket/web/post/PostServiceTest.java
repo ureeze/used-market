@@ -12,6 +12,7 @@ import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.post.PostServiceImpl;
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,18 +75,19 @@ public class PostServiceTest {
 
         book = requestDto.toBook();
         post0 = requestDto.toPost(userEntity);
-        post1 = setup.createPostSaveRequestDto().toPost(userEntity);
+//        post1 = setup.createPostSaveRequestDto().toPost(userEntity);
 
         book.addPost(post0);
         post0.addBook(book);
-        post1.addBook(book);
+//        post1.addBook(book);
 
-        postRepository.saveAll(new ArrayList<>(Arrays.asList(post0, post1)));
+        postRepository.save(post0);
+//        postRepository.saveAll(new ArrayList<>(Arrays.asList(post0, post1)));
     }
 
     @Test
     @DisplayName("POST 등록 테스트")
-    void createPost() {
+    void createPost() throws ParseException {
         //given
 
         //when
@@ -103,11 +105,12 @@ public class PostServiceTest {
 
         //when
         entityManager.clear();
-        PostDetailsResponseDto responseDto = postService.findById(post0.getId());
+        PostResponseDto responseDto = postService.findById(userPrincipal,post0.getId());
 
         //then
         assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
         assertThat(responseDto.getPostContent()).isEqualTo(requestDto.getPostContent());
+        assertThat(responseDto.getBook().getBookTitle()).isEqualTo(requestDto.getBookTitle());
     }
 
     @Test
@@ -117,11 +120,11 @@ public class PostServiceTest {
 
         //when
         entityManager.clear();
-        List<PostResponseDto> responseDto = postService.findByPostTitle("스프링부트");
+        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,"스프링부트");
 
         //then
         assertThat(responseDto.get(0).getPostTitle()).contains("스프링부트");
-        assertThat(responseDto.get(1).getPostTitle()).contains("스프링부트");
+//        assertThat(responseDto.get(1).getPostTitle()).contains("스프링부트");
     }
 
 
@@ -132,11 +135,12 @@ public class PostServiceTest {
 
         //when
         entityManager.clear();
-        List<PostResponseDto> findAll = postService.findAll();
+        List<PostResponseDto> findAll = postService.findAll(userPrincipal);
 
         //then
         assertThat(findAll.get(0).getPostTitle()).isEqualTo(post0.getTitle());
-        assertThat(findAll.get(1).getPostTitle()).isEqualTo(post1.getTitle());
+        assertThat(findAll.get(0).getBook().getBookTitle()).isEqualTo(requestDto.getBookTitle());
+        findAll.stream().forEach(System.out::println);
     }
 
     @Test

@@ -125,7 +125,7 @@ public class OrderServiceTest {
 
         //then
         assertThat(responseDto.getAddress()).isEqualTo(order0.getAddress());
-        assertThat(responseDto.getBookName()).isEqualTo(orderedBook.getBook().getTitle());
+        assertThat(responseDto.getBookTitle()).isEqualTo(orderedBook.getBook().getTitle());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class OrderServiceTest {
         List<OrderConfirmResponseDto> orderResponseDtoList = orderService.findAll(userPrincipal);
 
         //then
-        assertThat(orderResponseDtoList.get(0).getBookName()).isEqualTo(order0.getOrderedBookList().get(0).getBook().getTitle());
+        assertThat(orderResponseDtoList.get(0).getBookTitle()).isEqualTo(order0.getOrderedBookList().get(0).getBook().getTitle());
         orderResponseDtoList.forEach(System.out::println);
     }
 

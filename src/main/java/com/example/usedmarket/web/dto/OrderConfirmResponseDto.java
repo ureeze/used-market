@@ -2,11 +2,13 @@ package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.order.Order;
 import com.example.usedmarket.web.domain.orderedBook.OrderedBook;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @Getter
 @Builder
 public class OrderConfirmResponseDto implements Serializable {
+
     //주문 ID
     private Long orderId;
 
@@ -29,13 +32,11 @@ public class OrderConfirmResponseDto implements Serializable {
     //주문 상태
     private String deliveryStatus;
 
-
     //총 구매 권 수
     private int bookAmount;
 
     //총 결제 금액
     private int orderPrice;
-
 
     //카테고리(BOOK)
     private String bookCategory;
@@ -44,13 +45,20 @@ public class OrderConfirmResponseDto implements Serializable {
     private String bookStatus;
 
     //책 제목(BOOK)
-    private String bookName;
+    private String bookTitle;
 
     //주문된 책 ID
     private Long orderedBookId;
 
-    //주문된 책 리스트
-    private List<OrderedBookDetailsResponseDto> responseDtoList = new ArrayList<>();
+    //주문 일자
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime createdAt;
+
+    //Book 이미지 주소
+    private String bookImgUrl;
+
+    //주문 POST ID
+    private Long postId;
 
     public static OrderConfirmResponseDto toDto(Order order, OrderedBook orderedBook) {
         return OrderConfirmResponseDto.builder()
@@ -62,28 +70,12 @@ public class OrderConfirmResponseDto implements Serializable {
                 .bookAmount(orderedBook.getAmount())
                 .orderPrice(orderedBook.getOrderPrice())
                 .bookStatus(orderedBook.getBook().getBookStatus().name())
-                .deliveryStatus(order.getDeliveryStatus().name())
-                .bookName(orderedBook.getBook().getTitle())
+                .deliveryStatus(order.getDeliveryStatus().getValue())
+                .bookTitle(orderedBook.getBook().getTitle())
                 .orderedBookId(orderedBook.getId())
-                .build();
-    }
-
-    public static OrderConfirmResponseDto responseDto(Order order, List<OrderedBookDetailsResponseDto> responseDtoList) {
-        int bookAmount = 0;
-        int orderPrice = 0;
-        for (OrderedBookDetailsResponseDto dto : responseDtoList) {
-            bookAmount += dto.getAmount();
-            orderPrice += dto.getOrderPrice();
-        }
-        return OrderConfirmResponseDto.builder()
-                .orderId(order.getId())
-                .recipient(order.getRecipient())
-                .address(order.getAddress())
-                .phone(order.getPhone())
-                .deliveryStatus(order.getDeliveryStatus().name())
-                .bookAmount(bookAmount)
-                .orderPrice(orderPrice)
-                .responseDtoList(responseDtoList)
+                .createdAt(order.getCreatedAt())
+                .bookImgUrl(orderedBook.getBook().getImgUrl())
+                .postId(order.getPost().getId())
                 .build();
     }
 }

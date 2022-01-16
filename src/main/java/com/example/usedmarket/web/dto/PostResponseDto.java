@@ -28,7 +28,7 @@ public class PostResponseDto implements Serializable {
     private String postContent;
 
     //POST 등록시간
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt;
 
     //POST 작성자 ID
@@ -37,25 +37,41 @@ public class PostResponseDto implements Serializable {
     //POST 작성자 이름
     private String writerName;
 
-    //Book Image Url
-    private String imgUrl;
+    //함께 등록한 BOOK
+    private BookDetailsResponseDto book;
 
-    public static PostResponseDto toResponseDto(Post post) {
-        StringBuilder content = new StringBuilder();
-        content.append(post.getContent());
-        if (content.length() > 20) {
-            content.substring(0, 20);
-            content.append("...");
-        }
+    //현재 로그인 된 USER ID
+    private Long authenticationId;
+
+//    //Book 제목
+//    private String bookTitle;
+//
+//    //Book 재고수량
+//    private int stock;
+//
+//    //Book Image Url
+//    private String imgUrl;
+
+    public static PostResponseDto toResponseDto(Long authenticationId, Post post) {
+//        StringBuilder content = new StringBuilder();
+//        content.append(post.getContent());
+//        if (content.length() > 20) {
+//            content.substring(0, 20);
+//            content.append("...");
+//        }
         return PostResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
                 .postStatus(post.getStatus().name())
-                .postContent(content.toString())
+                .postContent(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .writerId(post.getUserEntity().getId())
                 .writerName(post.getUserEntity().getName())
-                .imgUrl(post.getBookList().get(0).getImgUrl())
+                .book(BookDetailsResponseDto.toDto(post.getBookList().get(0)))
+                .authenticationId(authenticationId)
                 .build();
+//                .bookTitle(post.getBookList().get(0).getTitle())
+//                .stock(post.getBookList().get(0).getStock())
+//                .imgUrl(post.getBookList().get(0).getImgUrl())
     }
 }

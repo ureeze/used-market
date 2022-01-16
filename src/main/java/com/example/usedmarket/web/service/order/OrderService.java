@@ -1,5 +1,6 @@
 package com.example.usedmarket.web.service.order;
 
+import com.example.usedmarket.web.dto.OrderCancelResponseDto;
 import com.example.usedmarket.web.dto.OrderRequestDto;
 import com.example.usedmarket.web.dto.OrderConfirmResponseDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
@@ -18,6 +19,6 @@ public interface OrderService {
     List<OrderConfirmResponseDto> findAll(UserPrincipal userPrincipal);
 
     //주문 취소
-    void cancel(UserPrincipal userPrincipal, Long orderId);
+    OrderCancelResponseDto cancel(UserPrincipal userPrincipal, Long orderId);
 
 }

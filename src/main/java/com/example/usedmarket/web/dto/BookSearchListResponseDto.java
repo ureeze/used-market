@@ -49,7 +49,7 @@ public class BookSearchListResponseDto implements Serializable {
     private Long writerId;
 
     //POST 등록 시간
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt;
 
     public static BookSearchListResponseDto toDto(Book retrieveBook, Post retrievePost) {

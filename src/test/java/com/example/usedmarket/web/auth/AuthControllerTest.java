@@ -123,7 +123,6 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(loginDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isString())
                 .andDo(print());
     }
 }

@@ -31,7 +31,7 @@ public class PostDetailsResponseDto implements Serializable {
     private String postStatus;
 
     //POST 등록시간
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt;
 
     //POST 작성자 ID
@@ -42,10 +42,6 @@ public class PostDetailsResponseDto implements Serializable {
 
 
     public static PostDetailsResponseDto toResponseDto(Post post) {
-//        List<BookDetailsResponseDto> bookDetailsDto = post.getBookList()
-//                .stream()
-//                .map(book -> BookDetailsResponseDto.toDto(book))
-//                .collect(Collectors.toList());
         return PostDetailsResponseDto.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())

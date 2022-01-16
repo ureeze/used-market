@@ -33,22 +33,29 @@ public class PostController {
 
     //POST ID로 포스트 조회
     @GetMapping("/posts/{id}")
-    public ResponseEntity<PostDetailsResponseDto> findById(@PathVariable Long id) {
-        PostDetailsResponseDto responseDto = postService.findById(id);
+    public ResponseEntity<PostResponseDto> findById(@LoginUser UserPrincipal userPrincipal,@PathVariable Long id) {
+        PostResponseDto responseDto = postService.findById(userPrincipal,id);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //POST 제목으로 포스트 목록 조회
     @GetMapping("/posts/all/title")
-    public ResponseEntity<List<PostResponseDto>> findByPostTitle(@RequestParam("postTitle") String postTitle) {
-        List<PostResponseDto> responseDto = postService.findByPostTitle(postTitle);
+    public ResponseEntity<List<PostResponseDto>> findByPostTitle(@LoginUser UserPrincipal userPrincipal,@RequestParam("postTitle") String postTitle) {
+        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,postTitle);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //전체 POST 조회
     @GetMapping("/posts/all")
-    public ResponseEntity<List<PostResponseDto>> findAll() {
-        List<PostResponseDto> responseDtoList = postService.findAll();
+    public ResponseEntity<List<PostResponseDto>> findAll(@LoginUser UserPrincipal userPrincipal) {
+        List<PostResponseDto> responseDtoList = postService.findAll(userPrincipal);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
+    //자신이 판매중인 POST 조회
+    @GetMapping("/posts/me")
+    public ResponseEntity<List<PostResponseDto>> findByAllPostAboutMyself(@LoginUser UserPrincipal userPrincipal) {
+        List<PostResponseDto> responseDtoList = postService.findByAllPostAboutMyself(userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 

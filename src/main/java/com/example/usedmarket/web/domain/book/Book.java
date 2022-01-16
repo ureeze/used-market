@@ -4,13 +4,14 @@ package com.example.usedmarket.web.domain.book;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
+import com.example.usedmarket.web.exception.BookIsNotExistException;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@ToString
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -76,6 +77,17 @@ public class Book extends BaseTimeEntity implements Serializable {
     // 주문취소로 인한 책 재고 증가
     public void stockUp(int count) {
         this.stock += count;
+    }
+
+    // 판매로 인한 BOOK 재고 조정
+    public int stockDown(int purchaseAmount) {
+        int updatedStock = this.stock - purchaseAmount;
+        if (updatedStock < 0) {
+            throw new BookIsNotExistException("구매수량이 재고보다 많습니다.");
+        } else {
+            this.stock = updatedStock;
+            return this.stock;
+        }
     }
 
     // 책 삭제
