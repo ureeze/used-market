@@ -118,7 +118,7 @@ class BookServiceTest {
         List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
 
         //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
+        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
+        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book0.getTitle());
     }
 }

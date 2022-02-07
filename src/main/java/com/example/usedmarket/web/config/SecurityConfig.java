@@ -59,9 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/auth/**", "/oauth2/**").permitAll()
+                .antMatchers("/auth/**", "/oauth2/**","/ws/**","/hello/**").permitAll()
 //                .antMatchers("/posts/**","/books/**","/orders/**").hasRole(Role.USER.name())
-                .antMatchers("/posts/**","/books/**","/orders/**").hasAuthority(Role.USER.name())
+                .antMatchers("/posts/chat/**","/posts/**","/books/**","/orders/**").hasAuthority(Role.USER.name())
                 .anyRequest().authenticated()
                 .and()
                 .logout()
