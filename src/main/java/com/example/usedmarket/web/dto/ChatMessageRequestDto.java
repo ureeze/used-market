@@ -1,11 +1,8 @@
 package com.example.usedmarket.web.dto;
 
-import com.example.usedmarket.web.domain.chat.ChatMessage;
+import com.example.usedmarket.web.domain.chatMessage.ChatMessage;
 import com.example.usedmarket.web.domain.user.UserEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -13,13 +10,12 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessageRequestDto implements Serializable {
 
     private Long chatRoomId;
 
     private Long userId;
-
-    private String userName;
 
     private String message;
 

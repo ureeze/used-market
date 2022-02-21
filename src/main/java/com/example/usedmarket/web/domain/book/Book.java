@@ -5,6 +5,7 @@ import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.exception.BookIsNotExistException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -56,6 +57,7 @@ public class Book extends BaseTimeEntity implements Serializable {
     private String imgUrl;
 
     //책과 연결되 있는 POST
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_ID")
     private Post post;

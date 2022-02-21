@@ -1,7 +1,7 @@
-package com.example.usedmarket.web.domain.chat;
-
+package com.example.usedmarket.web.domain.chatMessage;
 
 import com.example.usedmarket.web.domain.BaseTimeEntity;
+import com.example.usedmarket.web.domain.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,30 +11,26 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 
 @Builder
+@Getter
+@Entity
+@Table(name = "CHATMESSAGE")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Table(name = "CHATROOM")
-@Entity
 @EntityListeners(AuditingEntityListener.class)
-public class ChatRoom extends BaseTimeEntity {
+public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
-    private Long postId;
+    private Long chatRoomId;
 
     @Column
-    private Long sellerId;
+    private String message;
 
-    @Column
-    private String sellerName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private UserEntity userEntity;
 
-    @Column
-    private Long userId;
-
-    @Column
-    private String userName;
 }

@@ -4,6 +4,8 @@ import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import org.json.simple.parser.ParseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,10 +18,10 @@ public interface PostService {
     PostResponseDto findById(UserPrincipal userPrincipal, Long postId);
 
     //POST 제목으로 POST 조회
-    List<PostResponseDto> findByPostTitle(UserPrincipal userPrincipal, String postTitle);
+    Page<PostResponseDto> findByPostTitle(UserPrincipal userPrincipal, String postTitle, Pageable pageable);
 
     //전체 POST 조회
-    List<PostResponseDto> findAll(UserPrincipal userPrincipal);
+    Page<PostResponseDto> findAll(UserPrincipal userPrincipal, Pageable pageable);
 
     //자신의 전체 POST 조회
     List<PostResponseDto> findByAllPostAboutMyself(UserPrincipal userPrincipal);

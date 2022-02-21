@@ -1,6 +1,7 @@
 package com.example.usedmarket.web.dto;
 
-import com.example.usedmarket.web.domain.chat.ChatRoom;
+import com.example.usedmarket.web.domain.chatRoom.ChatRoom;
+import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import lombok.Builder;
@@ -11,11 +12,10 @@ import lombok.Getter;
 public class ChatRoomCreateRequestDto {
 
     private Long postId;
-    private Long sellerId;
 
-    public ChatRoom toChatRoom(UserPrincipal userPrincipal, UserEntity seller) {
+    public ChatRoom toChatRoom(UserPrincipal userPrincipal, UserEntity seller, Post post) {
         return ChatRoom.builder()
-                .postId(this.postId)
+                .post(post)
                 .userId(userPrincipal.getId())
                 .userName(userPrincipal.getName())
                 .sellerId(seller.getId())

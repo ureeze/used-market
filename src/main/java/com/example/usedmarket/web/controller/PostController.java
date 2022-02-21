@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.controller;
 
-import com.example.usedmarket.web.dto.PostDetailsResponseDto;
 import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.example.usedmarket.web.security.dto.LoginUser;
@@ -9,7 +8,8 @@ import com.example.usedmarket.web.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,22 +33,22 @@ public class PostController {
 
     //POST ID로 포스트 조회
     @GetMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> findById(@LoginUser UserPrincipal userPrincipal,@PathVariable Long id) {
-        PostResponseDto responseDto = postService.findById(userPrincipal,id);
+    public ResponseEntity<PostResponseDto> findById(@LoginUser UserPrincipal userPrincipal, @PathVariable Long id) {
+        PostResponseDto responseDto = postService.findById(userPrincipal, id);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //POST 제목으로 포스트 목록 조회
     @GetMapping("/posts/all/title")
-    public ResponseEntity<List<PostResponseDto>> findByPostTitle(@LoginUser UserPrincipal userPrincipal,@RequestParam("postTitle") String postTitle) {
-        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,postTitle);
+    public ResponseEntity<Page<PostResponseDto>> findByPostTitle(@LoginUser UserPrincipal userPrincipal, @RequestParam("title") String postTitle, Pageable pageable) {
+        Page<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal, postTitle, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     //전체 POST 조회
     @GetMapping("/posts/all")
-    public ResponseEntity<List<PostResponseDto>> findAll(@LoginUser UserPrincipal userPrincipal) {
-        List<PostResponseDto> responseDtoList = postService.findAll(userPrincipal);
+    public ResponseEntity<Page<PostResponseDto>> findAll(@LoginUser UserPrincipal userPrincipal, Pageable pageable) {
+        Page<PostResponseDto> responseDtoList = postService.findAll(userPrincipal, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 

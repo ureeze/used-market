@@ -19,6 +19,8 @@ import org.json.simple.parser.ParseException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +68,7 @@ public class PostServiceImpl implements PostService {
         postsRepository.save(post);
 
         // POST 를 PostResponseDto 로 반환
-        return PostResponseDto.toResponseDto(userPrincipal.getId(),post);
+        return PostResponseDto.toResponseDto(userPrincipal.getId(), post);
     }
 
     /*
@@ -94,9 +96,8 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<PostResponseDto> findByPostTitle(@LoginUser UserPrincipal userPrincipal, String postTitle) {
-        List<Post> postList = postsRepository.findByPostTitle(postTitle);
-        return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
+    public Page<PostResponseDto> findByPostTitle(@LoginUser UserPrincipal userPrincipal, String postTitle, Pageable pageable) {
+        return postsRepository.findByPostTitle(userPrincipal.getId(), postTitle, pageable);
     }
 
     /*
@@ -106,9 +107,8 @@ public class PostServiceImpl implements PostService {
     @Cacheable(key = "'postAll'", value = "postAll")
     @Transactional(readOnly = true)
     @Override
-    public List<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
-        List<Post> postList = postsRepository.findByPostIsNotDeleted();
-        return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
+    public Page<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal, Pageable pageable) {
+        return postsRepository.findByPostIsNotDeleted(userPrincipal.getId(), pageable);
     }
 
 
@@ -151,9 +151,9 @@ public class PostServiceImpl implements PostService {
         post.updateBook(requestDTO);
 
         // 책 재고수량에 따른 POST 판매상태 변경
-        if(post.getBookList().get(0).existStock()){
+        if (post.getBookList().get(0).existStock()) {
             post.changeToStatusIsSell();
-        }else{
+        } else {
             post.changeToSoldOut();
         }
 

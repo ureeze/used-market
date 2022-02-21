@@ -1,6 +1,7 @@
 package com.example.usedmarket.web.dto;
 
 import com.example.usedmarket.web.domain.book.Book;
+import com.example.usedmarket.web.domain.post.PostStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -42,6 +43,9 @@ public class BookDetailsResponseDto implements Serializable {
     //POST ID
     private Long postId;
 
+    //POST 상태 (SELL, SOLD_OUT, DELETED)
+    private String postStatus;
+
     public static BookDetailsResponseDto toDto(Book retrieveBook) {
         return BookDetailsResponseDto.builder()
                 .bookId(retrieveBook.getId())
@@ -53,6 +57,7 @@ public class BookDetailsResponseDto implements Serializable {
                 .bookImgUrl(retrieveBook.getImgUrl())
                 .createdAt(retrieveBook.getCreatedAt())
                 .postId(retrieveBook.getPost().getId())
+                .postStatus(retrieveBook.getPost().getStatus().name())
                 .build();
     }
 }

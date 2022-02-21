@@ -113,19 +113,18 @@ public class PostServiceTest {
         assertThat(responseDto.getBook().getBookTitle()).isEqualTo(requestDto.getBookTitle());
     }
 
-    @Test
-    @DisplayName("POST TITLE 로 포스트 조회")
-    void findByPostTitle() {
-        //given
-
-        //when
-        entityManager.clear();
-        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,"스프링부트");
-
-        //then
-        assertThat(responseDto.get(0).getPostTitle()).contains("스프링부트");
-//        assertThat(responseDto.get(1).getPostTitle()).contains("스프링부트");
-    }
+//    @Test
+//    @DisplayName("POST TITLE 로 포스트 조회")
+//    void findByPostTitle() {
+//        //given
+//
+//        //when
+//        entityManager.clear();
+//        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,"스프링부트");
+//
+//        //then
+//        assertThat(responseDto.get(0).getPostTitle()).contains("스프링부트");
+//    }
 
 
     @Test

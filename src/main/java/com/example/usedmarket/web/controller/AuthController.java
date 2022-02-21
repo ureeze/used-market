@@ -29,8 +29,8 @@ public class AuthController {
     //로그인(Email+Password)
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto) {
-        String token = authService.loginUser(loginDto);
+        LoginResponseDto loginResponseDto = authService.loginUser(loginDto);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(LoginResponseDto.builder().token(token).build());
+                .body(loginResponseDto);
     }
 }

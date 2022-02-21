@@ -3,6 +3,7 @@ package com.example.usedmarket.web.service.auth;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.LoginRequestDto;
+import com.example.usedmarket.web.dto.LoginResponseDto;
 import com.example.usedmarket.web.dto.SignUpRequestDto;
 import com.example.usedmarket.web.exception.UserExistException;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
@@ -54,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     //로그인
     @Override
-    public String loginUser(LoginRequestDto loginDto) {
+    public LoginResponseDto loginUser(LoginRequestDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -62,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         String token = tokenProvider.create(userPrincipal.getEmail());
         response.addHeader("Authorization", token);
         log.info("token : " + token);
-        return token;
+
+        return LoginResponseDto.toDto(token, userPrincipal);
     }
 }

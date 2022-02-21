@@ -1,6 +1,6 @@
 package com.example.usedmarket.web.dto;
 
-import com.example.usedmarket.web.domain.chat.ChatMessage;
+import com.example.usedmarket.web.domain.chatMessage.ChatMessage;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

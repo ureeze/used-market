@@ -1,9 +1,12 @@
 package com.example.usedmarket.web.service.book;
 
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
 import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.dto.NaverBookInfo;
 import org.json.simple.parser.ParseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ public interface BookService {
     List<BookDetailsResponseDto> findAll();
 
     //BOOK 제목 검색
-    List<BookDetailsResponseDto> findByBookTitle(String bookTitle);
+    Page<BookDetailsResponseDto> findByBookTitle(String bookTitle, Pageable pageable);
 
     //네이버 BOOK 정보 가져오기
     NaverBookInfo retrieveBookInfo(String bookTitle) throws ParseException;

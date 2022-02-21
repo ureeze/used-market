@@ -1,9 +1,12 @@
 package com.example.usedmarket.web.controller;
 
+import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.dto.BookDetailsResponseDto;
 import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.service.book.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +42,8 @@ public class BookController {
 
     //도서 제목 검색
     @GetMapping("/books/all/title")
-    ResponseEntity<List<BookDetailsResponseDto>> findByBookTitle(@RequestParam String bookTitle) {
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.findByBookTitle(bookTitle));
+    ResponseEntity<Page<BookDetailsResponseDto>> findByBookTitle(@RequestParam("title") String bookTitle, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.findByBookTitle(bookTitle, pageable));
     }
+
 }

@@ -108,17 +108,17 @@ class BookServiceTest {
         assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
     }
 
-    @DisplayName("도서 제목 검색")
-    @Test
-    void findByBookTitle() {
-        //given
-
-        //when
-        entityManager.clear();
-        List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
-
-        //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book0.getTitle());
-    }
+//    @DisplayName("도서 제목 검색")
+//    @Test
+//    void findByBookTitle() {
+//        //given
+//
+//        //when
+//        entityManager.clear();
+//        List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
+//
+//        //then
+//        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
+//        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book0.getTitle());
+//    }
 }

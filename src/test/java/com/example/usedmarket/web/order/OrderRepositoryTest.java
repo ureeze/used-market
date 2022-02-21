@@ -1,5 +1,6 @@
 package com.example.usedmarket.web.order;
 
+import com.example.usedmarket.config.TestConfig;
 import com.example.usedmarket.web.Setup;
 import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.book.Book;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.PersistenceContext;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Import(TestConfig.class)
 public class OrderRepositoryTest {
 
     @Autowired

@@ -15,6 +15,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -79,11 +81,9 @@ public class BookServiceImpl implements BookService {
     도서 제목 검색
      */
     @Override
-    public List<BookDetailsResponseDto> findByBookTitle(String bookTitle) {
-        List<Book> bookList = bookRepository.findByBookTitle(bookTitle);
-        return bookList.stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList());
+    public Page<BookDetailsResponseDto> findByBookTitle(String bookTitle, Pageable pageable) {
+        return bookRepository.findByBookTitle(bookTitle, pageable);
     }
-
 
     @Override
     public NaverBookInfo retrieveBookInfo(String bookTitle) throws ParseException {
