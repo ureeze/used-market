@@ -61,11 +61,9 @@ class BookControllerTest {
     @Autowired
     WebApplicationContext context;
 
-    private Setup setup = new Setup();
+    private final Setup setup = new Setup();
     private MockMvc mvc;
-    private UserEntity userEntity;
     private UserPrincipal userPrincipal;
-    private Post post;
     private Book book;
 
     @BeforeEach
@@ -76,22 +74,17 @@ class BookControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        userEntity = setup.createUserEntity();
+        UserEntity userEntity = setup.createUserEntity();
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
-        post = setup.createPost(userEntity);
+        Post post = setup.createPost(userEntity);
         book = setup.createBook();
         post.addBook(book);
         book.addPost(post);
         postRepository.save(post);
     }
 
-//    @AfterEach
-//    void clean() {
-//        postRepository.deleteAll();
-//        userRepository.deleteAll();
-//    }
 
     @Test
     @DisplayName("책 상세 조회")
@@ -181,11 +174,11 @@ class BookControllerTest {
         entityManager.clear();
 
         //then
-        mvc.perform(get(uri).with(user(userPrincipal)).queryParam("bookTitle", book.getTitle())
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .queryParam("title", book.getTitle())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].bookTitle").value(book.getTitle()))
-                .andExpect(jsonPath("$.[0].bookStatus").value(BookStatus.S.name()))
+                .andExpect(jsonPath("$.content.[0].bookTitle").value(book.getTitle()))
                 .andDo(print());
     }
 }

@@ -1,6 +1,5 @@
 package com.example.usedmarket.web.service.chatRoom;
 
-import com.example.usedmarket.web.dto.ChatRoomCreateRequestDto;
 import com.example.usedmarket.web.dto.ChatRoomListResponseDto;
 import com.example.usedmarket.web.dto.ChatRoomResponseDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
@@ -14,9 +13,6 @@ public interface ChatRoomService {
     // sellerId 에 대한 채팅방리스트 조회
     List<ChatRoomResponseDto> retrieveChatRoomListOfSeller(Long sellerId);
 
-//    // userId 와 sellerId 에 대한 ChatRoom 리스트 조회
-//    List<ChatRoomResponseDto> retrieveChatRoomList(UserPrincipal userPrincipal);
-
-    // userId 와 sellerId 에 대한 ChatRoom 리스트 조회
+    // 구매하는 경우와 판매하려는 경우에 대한 ChatRoom 리스트 조회
     ChatRoomListResponseDto retrieveChatRoomList(UserPrincipal userPrincipal);
 }

@@ -180,11 +180,11 @@ public class PostControllerTest {
         //when
         entityManager.clear();
         mvc.perform(get(uri).with(user(userPrincipal))
-                        .queryParam("postTitle", post.getTitle())
+                        .queryParam("title", post.getTitle())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()))
-                .andExpect(jsonPath("$.[0].postStatus").value(PostStatus.SELL.name()))
+                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()))
+                .andExpect(jsonPath("$.content.[0].postStatus").value(PostStatus.SELL.name()))
                 .andDo(print());
 
         //then
@@ -210,7 +210,7 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.[0].postTitle").value(post.getTitle()));
+                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()));
 
         //then
         assertThat(bookRepository.findAll().get(0).getTitle()).isEqualTo(book.getTitle());

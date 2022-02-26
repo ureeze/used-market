@@ -22,6 +22,7 @@ public class ChatMessageController {
     @MessageMapping("/chat")
     public void chatting(ChatMessageRequestDto requestDto) {
         log.info("CHAT SEND");
+        System.out.println(requestDto);
         chatMessageService.pubMessage(requestDto);
     }
 

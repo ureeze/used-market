@@ -8,6 +8,7 @@ import com.example.usedmarket.web.domain.post.PostRepository;
 import com.example.usedmarket.web.domain.user.UserEntity;
 import com.example.usedmarket.web.domain.user.UserRepository;
 import com.example.usedmarket.web.dto.ChatRoomCreateRequestDto;
+import com.example.usedmarket.web.dto.ChatRoomListResponseDto;
 import com.example.usedmarket.web.dto.ChatRoomResponseDto;
 import com.example.usedmarket.web.security.dto.UserPrincipal;
 import com.example.usedmarket.web.service.chatRoom.ChatRoomService;
@@ -71,7 +72,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("sellerId 의 특정 Post 에 대한 ChatRoomList 조회")
+    @DisplayName("sellerId 에 대한 채팅방리스트 조회")
     void retrieveChatRoomListOfSeller() {
         // given
         // UserEntity, UserPrincipal
@@ -100,7 +101,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("userId 와 sellerId 에 대한 ChatRoom 리스트 조회")
+    @DisplayName("구매하는 경우와 판매하려는 경우에 대한 ChatRoom 리스트 조회")
     void retrieveChatRoomList() {
         // given
         // UserEntity, UserPrincipal
@@ -127,11 +128,10 @@ class ChatRoomServiceTest {
         chatRoomRepository.saveAll(Arrays.asList(chatRoom0, chatRoom1));
 
         // when
-        List<ChatRoomResponseDto> responseDtoList = chatRoomService.retrieveChatRoomList(userPrincipal);
+         ChatRoomListResponseDto chatRoomListResponseDto = chatRoomService.retrieveChatRoomList(userPrincipal);
 
         // then
-        assertThat(responseDtoList.get(0).getSellerId()).isEqualTo(user.getId());
-        assertThat(responseDtoList.get(0).getPostId()).isEqualTo(post.getId());
-        assertThat(responseDtoList.get(1).getUserId()).isEqualTo(user.getId());
+        assertThat(chatRoomListResponseDto.getChatRoomListBySeller().get(0).getChatRoomId()).isEqualTo(chatRoom0.getId());
+        assertThat(chatRoomListResponseDto.getChatRoomListByBuyer().get(0).getChatRoomId()).isEqualTo(chatRoom1.getId());
     }
 }

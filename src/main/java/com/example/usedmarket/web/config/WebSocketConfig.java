@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     //*어플리케이션 내부에서 사용할 path를 지정할 수 있음*/
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-//      config.enableSimpleBroker("/topic","/queue","/exchange");
+//        config.enableSimpleBroker("/topic", "/queue", "/exchange");
 
         config.enableStompBrokerRelay("/topic", "queue", "exchange")
                 .setRelayHost(host)

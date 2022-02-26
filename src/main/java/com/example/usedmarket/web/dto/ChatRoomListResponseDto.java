@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ChatRoomListResponseDto implements Serializable {
-    private List<ChatRoomResponseDto> chatRoomByBuyer;
-    private List<ChatRoomResponseDto> chatRoomBySeller;
+    private List<ChatRoomResponseDto> chatRoomListByBuyer;
+    private List<ChatRoomResponseDto> chatRoomListBySeller;
 
 }

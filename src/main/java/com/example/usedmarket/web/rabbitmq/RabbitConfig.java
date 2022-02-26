@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitConfig {
 
-    static final String topicExchangeName = "chatexchange";
+    static final String topicExchangeName = "amq.topic";
     static final String queueName = "chatqueue";
     static final String routingKey = "room.#";
 

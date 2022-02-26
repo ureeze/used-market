@@ -89,7 +89,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
 
-    // userId 와 sellerId 에 대한 ChatRoom 리스트 조회
+    // 구매하는 경우와 판매하려는 경우에 대한 ChatRoom 리스트 조회
     @Override
     public ChatRoomListResponseDto retrieveChatRoomList(@LoginUser UserPrincipal userPrincipal) {
         // USER 가 SELLER 인 경우 ChatRoom 조회
@@ -103,8 +103,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .collect(Collectors.toList());
 
         return ChatRoomListResponseDto.builder()
-                .chatRoomBySeller(chatRoomListBySeller)
-                .chatRoomByBuyer(chatRoomListByBuyer)
+                .chatRoomListBySeller(chatRoomListBySeller)
+                .chatRoomListByBuyer(chatRoomListByBuyer)
                 .build();
     }
 }

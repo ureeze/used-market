@@ -19,6 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,7 +109,7 @@ public class PostServiceTest {
 
         //when
         entityManager.clear();
-        PostResponseDto responseDto = postService.findById(userPrincipal,post0.getId());
+        PostResponseDto responseDto = postService.findById(userPrincipal, post0.getId());
 
         //then
         assertThat(responseDto.getPostTitle()).isEqualTo(requestDto.getPostTitle());
@@ -113,18 +117,19 @@ public class PostServiceTest {
         assertThat(responseDto.getBook().getBookTitle()).isEqualTo(requestDto.getBookTitle());
     }
 
-//    @Test
-//    @DisplayName("POST TITLE 로 포스트 조회")
-//    void findByPostTitle() {
-//        //given
-//
-//        //when
-//        entityManager.clear();
-//        List<PostResponseDto> responseDto = postService.findByPostTitle(userPrincipal,"스프링부트");
-//
-//        //then
-//        assertThat(responseDto.get(0).getPostTitle()).contains("스프링부트");
-//    }
+    @Test
+    @DisplayName("POST TITLE 로 포스트 조회")
+    void findByPostTitle() {
+        //given
+
+        //when
+        entityManager.clear();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<PostResponseDto> page = postService.findByPostTitle(userPrincipal, post0.getTitle(), pageable);
+
+        //then
+        assertThat(page.getContent().get(0).getPostTitle()).contains(post0.getTitle());
+    }
 
 
     @Test
@@ -134,12 +139,11 @@ public class PostServiceTest {
 
         //when
         entityManager.clear();
-        List<PostResponseDto> findAll = postService.findAll(userPrincipal);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<PostResponseDto> page = postService.findAll(userPrincipal, pageable);
 
         //then
-        assertThat(findAll.get(0).getPostTitle()).isEqualTo(post0.getTitle());
-        assertThat(findAll.get(0).getBook().getBookTitle()).isEqualTo(requestDto.getBookTitle());
-        findAll.stream().forEach(System.out::println);
+        assertThat(page.getContent().get(0).getPostTitle()).isEqualTo(post0.getTitle());
     }
 
     @Test
