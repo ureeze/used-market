@@ -17,7 +17,7 @@ public class OrderedBookRepositoryCustomImpl implements OrderedBookRepositoryCus
     @Override
     public List<OrderedBook> findByCurrentUser(Long userId) {
         return queryFactory.selectFrom(orderedBook)
-//                .leftJoin(orderedBook.user, userEntity)
+                .leftJoin(orderedBook.user, userEntity)
 //                .fetchJoin()
                 .where(orderedBook.user.id.eq(userId))
                 .orderBy(orderedBook.id.asc())

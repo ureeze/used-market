@@ -3,15 +3,19 @@ package com.example.usedmarket.web.domain.post;
 import com.example.usedmarket.web.domain.BaseTimeEntity;
 import com.example.usedmarket.web.domain.book.Book;
 import com.example.usedmarket.web.domain.user.UserEntity;
+import com.example.usedmarket.web.dto.PostResponseDto;
 import com.example.usedmarket.web.dto.PostSaveRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "POST")

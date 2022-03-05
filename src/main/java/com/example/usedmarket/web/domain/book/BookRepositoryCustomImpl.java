@@ -26,7 +26,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
                 .orderBy(book.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch().stream().map(book1 -> BookDetailsResponseDto.toDto(book1)).collect(Collectors.toList());
+                .fetch()
+                .stream()
+                .map(book1 -> BookDetailsResponseDto.toDto(book1))
+                .collect(Collectors.toList());
         List<Book> bookList = queryFactory.selectFrom(book)
                 .where(book.title.like("%" + bookTitle + "%"), book.deleted.eq(false))
                 .fetch();

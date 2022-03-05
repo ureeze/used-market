@@ -1,4 +1,4 @@
-package com.example.usedmarket.web.rabbitmq;
+package com.example.usedmarket.web.config;
 
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

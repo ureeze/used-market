@@ -48,9 +48,9 @@ public class OrderServiceImpl implements OrderService {
      */
     @Caching(evict = {
             //해당 사용자에 대한 주문 전체 조회
-            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user"),
+            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "OrderAll-user"),
             //현재 사용자가 주문한 책 목록 조회
-            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
+            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "OrderedBookAll")
     })
     @Transactional
     @Override
@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderId - 주문 ID 값
      * @return
      */
-    @Cacheable(key = "'order-'+#orderId", value = "orderDetails")
+    @Cacheable(key = "'order-'+#orderId", value = "OrderDetails")
     @Transactional(readOnly = true)
     @Override
     public OrderConfirmResponseDto findById(@LoginUser UserPrincipal userPrincipal, Long orderId) {
@@ -116,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
      * @param userPrincipal - 현재 사용자
      * @return 해당 userPrincipal 이 주문한 모든 Order 들을 반환
      */
-    @Cacheable(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user")
+    @Cacheable(key = "'order-user-'+#userPrincipal.id", value = "OrderAll-user")
     @Transactional(readOnly = true)
     @Override
     public List<OrderConfirmResponseDto> findAll(@LoginUser UserPrincipal userPrincipal) {
@@ -140,11 +140,11 @@ public class OrderServiceImpl implements OrderService {
      */
     @Caching(evict = {
             //해당 사용자에 대한 주문 전체 조회
-            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "orderAll-user"),
+            @CacheEvict(key = "'order-user-'+#userPrincipal.id", value = "OrderAll-user"),
             //주문 ID 값에 의한 주문 조회
-            @CacheEvict(key = "'order-'+#orderId", value = "orderDetails"),
+            @CacheEvict(key = "'order-'+#orderId", value = "OrderDetails"),
             //현재 사용자가 주문한 책 목록 조회
-            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
+            @CacheEvict(key = "'orderedBook-user-'+#userPrincipal.id", value = "OrderedBookAll")
     })
     @Transactional
     @Override

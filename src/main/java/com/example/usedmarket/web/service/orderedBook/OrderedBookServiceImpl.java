@@ -39,7 +39,7 @@ public class OrderedBookServiceImpl implements OrderedBookService {
     /*
     현재 사용자가 주문한 책 목록 조회
      */
-    @Cacheable(key = "'orderedBook-user-'+#userPrincipal.id", value = "orderedBookAll")
+    @Cacheable(key = "'orderedBook-user-'+#userPrincipal.id", value = "OrderedBookAll")
     @Override
     public List<OrderedBookDetailsResponseDto> findByCurrentUser(@LoginUser UserPrincipal userPrincipal) {
         List<OrderedBook> orderedBookList = orderedBookRepository.findByCurrentUser(userPrincipal.getId());

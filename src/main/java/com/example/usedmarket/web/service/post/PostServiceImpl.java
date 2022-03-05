@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
      * @param requestDto - 포스트등록 내용
      * @return POST 를 PostResponseDto 로 변환 후 반환
      */
-    @CacheEvict(key = "'postAll'", value = "postAll")
+    @CacheEvict(key = "'postAll'", value = "PostAll")
     @Transactional
     @Override
     public PostResponseDto save(@LoginUser UserPrincipal userPrincipal, PostSaveRequestDto requestDTO) throws ParseException {
@@ -104,7 +104,7 @@ public class PostServiceImpl implements PostService {
      * 전체 POST 조회
      * @return findPOST 를 stream 을 이용해 PostResponseDto 로 변환 후 리스트로 반환
      */
-    @Cacheable(key = "'postAll'", value = "postAll")
+    @Cacheable(key = "'postAll'", value = "PostAll")
     @Transactional(readOnly = true)
     @Override
     public Page<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal, Pageable pageable) {
@@ -129,7 +129,7 @@ public class PostServiceImpl implements PostService {
      */
     @Caching(evict = {
             //전체 POST 리스트
-            @CacheEvict(key = "'postAll'", value = "postAll"),
+            @CacheEvict(key = "'postAll'", value = "PostAll"),
             //POST ID로 조회
             @CacheEvict(key = "'post-'+ #postId", value = "PostDetails")
     })
@@ -168,7 +168,7 @@ public class PostServiceImpl implements PostService {
      */
     @Caching(evict = {
             //전체 POST 리스트
-            @CacheEvict(key = "'postAll'", value = "postAll"),
+            @CacheEvict(key = "'postAll'", value = "PostAll"),
             //POST ID로 조회
             @CacheEvict(key = "'post-'+ #postId", value = "PostDetails")
     })
