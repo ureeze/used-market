@@ -45,15 +45,9 @@ public class Setup {
     private final int ORDERED_BOOK_PRICE = 10000;
 
 
-    //난수
-    public int getRandomNum() {
-        int num = (int) (Math.random() * 10000) + 1;
-        return num;
-    }
-
-    public UserEntity createUserEntity() {
+    public UserEntity createUserEntity(int num) {
         return UserEntity.builder()
-                .name(USER_NAME)
+                .name(USER_NAME + num)
                 .password(ENCRYPTION_PASSWORD)
                 .email(EMAIL)
                 .picture(PICTURE)
@@ -62,8 +56,7 @@ public class Setup {
                 .build();
     }
 
-    public Post createPost(UserEntity userEntity) {
-        int num = getRandomNum();
+    public Post createPost(UserEntity userEntity, int num) {
         return Post.builder()
                 .title(POST_TITLE + num)
                 .content(POST_CONTENT + num)
@@ -72,8 +65,7 @@ public class Setup {
                 .build();
     }
 
-    public Book createBook() {
-        int num = getRandomNum();
+    public Book createBook(int num) {
         return Book.builder()
                 .title(BOOK_TITLE + num)
                 .category(BOOK_CATEGORY + num)
@@ -84,8 +76,7 @@ public class Setup {
                 .build();
     }
 
-    public Order createOrder(UserEntity userEntity, Post post) {
-        int num = getRandomNum();
+    public Order createOrder(UserEntity userEntity, Post post, int num) {
         return Order.builder()
                 .recipient(ORDER_RECIPIENT + num)
                 .address(ORDER_ADDRESS + num)
@@ -126,8 +117,7 @@ public class Setup {
                 .build();
     }
 
-    public PostSaveRequestDto createPostSaveRequestDto() {
-        int num = getRandomNum();
+    public PostSaveRequestDto createPostSaveRequestDto(int num) {
         return PostSaveRequestDto.builder()
                 .postTitle(POST_TITLE + num)
                 .postContent(POST_CONTENT + num)
@@ -139,8 +129,7 @@ public class Setup {
                 .build();
     }
 
-    public OrderRequestDto createOrderRequestDto(Post post, Book book) {
-        int num = getRandomNum();
+    public OrderRequestDto createOrderRequestDto(Post post, Book book, int num) {
         return OrderRequestDto.builder()
                 .recipient(ORDER_RECIPIENT + num)
                 .address(ORDER_ADDRESS + num)

@@ -52,12 +52,12 @@ class BookServiceTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
 
-        post = setup.createPost(userEntity);
-        book0 = setup.createBook();
-        book1 = setup.createBook();
+        post = setup.createPost(userEntity,0);
+        book0 = setup.createBook(0);
+        book1 = setup.createBook(1);
         post.addBook(book0);
         post.addBook(book1);
         book0.addPost(post);

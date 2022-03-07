@@ -26,13 +26,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 //        config.enableSimpleBroker("/topic", "/queue", "/exchange");
-//        config.enableStompBrokerRelay("/topic", "queue", "exchange")
-//                .setRelayHost(host)
-//                .setRelayPort(61613)
-//                .setSystemLogin(username)
-//                .setSystemPasscode(password)
-//                .setClientLogin(username)
-//                .setClientPasscode(password);
+        config.enableStompBrokerRelay("/topic", "queue", "exchange")
+                .setRelayHost(host)
+                .setRelayPort(61613)
+                .setSystemLogin(username)
+                .setSystemPasscode(password)
+                .setClientLogin(username)
+                .setClientPasscode(password);
         config.setApplicationDestinationPrefixes("/pub");
 
 

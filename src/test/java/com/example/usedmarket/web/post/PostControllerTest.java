@@ -88,10 +88,10 @@ public class PostControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        requestDto = setup.createPostSaveRequestDto();
+        requestDto = setup.createPostSaveRequestDto(0);
 
         book = requestDto.toBook();
         post = requestDto.toPost(userEntity);
@@ -215,7 +215,7 @@ public class PostControllerTest {
     @DisplayName("POST 수정 테스트")
     void update() throws Exception {
         //given
-        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto();
+        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto(0);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")

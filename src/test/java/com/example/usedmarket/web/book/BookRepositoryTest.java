@@ -33,14 +33,14 @@ class BookRepositoryTest {
     @Autowired
     BookRepository bookRepository;
 
-    private Setup setup = new Setup();
+    private final Setup setup = new Setup();
     private Book createBook0;
     private Book createBook1;
 
     @BeforeEach
     void setup() {
-        createBook0 = setup.createBook();
-        createBook1 = setup.createBook();
+        createBook0 = setup.createBook(0);
+        createBook1 = setup.createBook(1);
         bookRepository.saveAll(Arrays.asList(createBook0, createBook1));
     }
 
@@ -69,7 +69,7 @@ class BookRepositoryTest {
     @Test
     void bookUpdate() {
         //given
-        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto();
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto(0);
 
         //when
         createBook0.update(requestDto);

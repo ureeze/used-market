@@ -44,9 +44,9 @@ public class PostRepositoryTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
-        book = setup.createBook();
-        post = setup.createPost(userEntity);
+        userEntity = setup.createUserEntity(0);
+        book = setup.createBook(0);
+        post = setup.createPost(userEntity,0);
         book.addPost(post);
         post.addBook(book);
     }

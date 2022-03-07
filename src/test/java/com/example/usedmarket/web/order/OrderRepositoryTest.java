@@ -63,15 +63,15 @@ public class OrderRepositoryTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        book = setup.createBook();
-        post = setup.createPost(userEntity);
+        book = setup.createBook(0);
+        post = setup.createPost(userEntity,0);
         post.addBook(book);
         book.addPost(post);
         postRepository.save(post);
-        order = setup.createOrder(userEntity, post);
+        order = setup.createOrder(userEntity, post,0);
     }
 
 //    @AfterEach

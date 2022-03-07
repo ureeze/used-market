@@ -91,20 +91,20 @@ public class OrderControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
-        book0 = setup.createBook();
-        book1 = setup.createBook();
-        post = setup.createPost(userEntity);
+        book0 = setup.createBook(0);
+        book1 = setup.createBook(1);
+        post = setup.createPost(userEntity,0);
         book0.addPost(post);
         book1.addPost(post);
         post.addBook(book0);
         post.addBook(book1);
         postRepository.save(post);
 
-        order = setup.createOrder(userEntity, post);
+        order = setup.createOrder(userEntity, post,0);
         orderedBook0 = setup.createOrderedBook(userEntity, book0);
         orderedBook1 = setup.createOrderedBook(userEntity, book1);
         orderedBook0.addOrder(order);
@@ -118,7 +118,7 @@ public class OrderControllerTest {
     @DisplayName("주문 요청")
     void save() throws Exception {
         //given
-        OrderRequestDto requestDto = setup.createOrderRequestDto(post, book0);
+        OrderRequestDto requestDto = setup.createOrderRequestDto(post, book0,0);
 
         URI uri = UriComponentsBuilder.newInstance().scheme("http")
                 .host("localhost")

@@ -72,10 +72,10 @@ public class PostServiceTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-        requestDto = setup.createPostSaveRequestDto();
+        requestDto = setup.createPostSaveRequestDto(0);
 
         book = requestDto.toBook();
         post0 = requestDto.toPost(userEntity);
@@ -151,7 +151,7 @@ public class PostServiceTest {
     void updatePost() {
         //given
 
-        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto();
+        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto(0);
 
         //when
         entityManager.clear();

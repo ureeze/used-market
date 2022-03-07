@@ -73,19 +73,19 @@ public class OrderServiceTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
-        book = setup.createBook();
-        post = setup.createPost(userEntity);
+        book = setup.createBook(0);
+        post = setup.createPost(userEntity,0);
         post.addBook(book);
         book.addPost(post);
         postRepository.save(post);
 
-        requestDto = setup.createOrderRequestDto(post, book);
-        order0 = setup.createOrder(userEntity, post);
-        order1 = setup.createOrder(userEntity, post);
+        requestDto = setup.createOrderRequestDto(post, book,0);
+        order0 = setup.createOrder(userEntity, post,0);
+        order1 = setup.createOrder(userEntity, post,1);
         orderedBook = setup.createOrderedBook(userEntity, book);
         order0.addOrderedBook(orderedBook);
         order1.addOrderedBook(orderedBook);

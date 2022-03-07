@@ -42,7 +42,7 @@ public class ChatMessageServiceTest {
     @DisplayName("메시지 발급")
     void pubMessage() {
         // given
-        UserEntity userEntity = setup.createUserEntity();
+        UserEntity userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
 
         String message = "message 전송";
@@ -58,7 +58,7 @@ public class ChatMessageServiceTest {
     @DisplayName("해당 ChatRoom 에 대한 ChatMessage 리스트 조회")
     void retrieveChatMessageByChatRoom() {
         // given
-        UserEntity userEntity = setup.createUserEntity();
+        UserEntity userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
 
         Long chatRoomId = 1L;

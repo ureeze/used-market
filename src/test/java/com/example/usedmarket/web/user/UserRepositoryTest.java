@@ -32,7 +32,7 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         testEntityManager.persist(userEntity);
     }
 

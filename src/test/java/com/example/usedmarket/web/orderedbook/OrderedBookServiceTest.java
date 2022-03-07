@@ -66,15 +66,15 @@ class OrderedBookServiceTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
-        book0 = setup.createBook();
-        book1 = setup.createBook();
+        book0 = setup.createBook(0);
+        book1 = setup.createBook(1);
         bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
 
-        order = setup.createOrder(userEntity, null);
+        order = setup.createOrder(userEntity, null,0);
         orderedBook0 = setup.createOrderedBook(userEntity, book0);
         orderedBook1 = setup.createOrderedBook(userEntity, book1);
 

@@ -63,16 +63,16 @@ public class OrderedBookRepositoryTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         testEntityManager.persist(userEntity);
 
-        book = setup.createBook();
-        post = setup.createPost(userEntity);
+        book = setup.createBook(0);
+        post = setup.createPost(userEntity,0);
         book.addPost(post);
         post.addBook(book);
         testEntityManager.persist(post);
 
-        order = setup.createOrder(userEntity, null);
+        order = setup.createOrder(userEntity, null,0);
         orderedBook = setup.createOrderedBook(userEntity, book);
         testEntityManager.persist(order);
     }

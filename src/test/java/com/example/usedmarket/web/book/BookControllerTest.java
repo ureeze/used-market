@@ -74,12 +74,12 @@ class BookControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        UserEntity userEntity = setup.createUserEntity();
+        UserEntity userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 
-        Post post = setup.createPost(userEntity);
-        book = setup.createBook();
+        Post post = setup.createPost(userEntity,0);
+        book = setup.createBook(0);
         post.addBook(book);
         book.addPost(post);
         postRepository.save(post);

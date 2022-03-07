@@ -49,7 +49,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setup() {
-        userEntity = setup.createUserEntity();
+        userEntity = setup.createUserEntity(0);
         userRepository.save(userEntity);
         userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
     }
@@ -86,7 +86,7 @@ public class UserServiceTest {
     @DisplayName("전체 USER 목록 조회 (ADMIN)")
     void findAllUserEntityTest() {
         //given
-        UserEntity userEntity1 = setup.createUserEntity();
+        UserEntity userEntity1 = setup.createUserEntity(0);
 
         userRepository.save(userEntity1);
 
