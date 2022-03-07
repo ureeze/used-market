@@ -8,12 +8,10 @@ import com.example.usedmarket.web.dto.BookDetailsResponseDto;
 import com.example.usedmarket.web.dto.BookSearchListResponseDto;
 import com.example.usedmarket.web.dto.NaverBookInfo;
 import com.example.usedmarket.web.exception.BookNotFoundException;
-import com.example.usedmarket.web.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -22,6 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -60,9 +59,7 @@ public class BookServiceImpl implements BookService {
         List<BookDetailsResponseDto> responseDtoList = new ArrayList<>();
 
         // LIST 에 담기
-        postList.stream().forEach(post -> {
-            responseDtoList.addAll(post.getBookList().stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList()));
-        });
+        postList.forEach(post -> responseDtoList.addAll(post.getBookList().stream().map(BookDetailsResponseDto::toDto).collect(Collectors.toList())));
 
         // 반환
         return responseDtoList;
@@ -92,14 +89,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public NaverBookInfo retrieveBookInfo(String bookTitle) throws ParseException {
+    public NaverBookInfo retrieveBookInfo(String bookTitle) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
             headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
             String url = "https://openapi.naver.com/v1/search/book.json?query=" + bookTitle + "&display=10&start=1";
-            HttpEntity httpEntity = new HttpEntity(headers);
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(headers);
             ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
 
             JSONParser jsonParser = new JSONParser();

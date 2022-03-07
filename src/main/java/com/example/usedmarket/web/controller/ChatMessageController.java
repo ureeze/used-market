@@ -18,12 +18,12 @@ import java.util.List;
 public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
-    // ChatMessage 전송
-    @MessageMapping("/chat")
-    public void chatting(ChatMessageRequestDto requestDto) {
-        log.info("CHAT SEND : " + requestDto.toString());
-        chatMessageService.pubMessage(requestDto);
-    }
+//    // ChatMessage 전송
+//    @MessageMapping("/chat")
+//    public void chatting(ChatMessageRequestDto requestDto) {
+//        log.info("CHAT SEND : " + requestDto.toString());
+//        chatMessageService.pubMessage(requestDto);
+//    }
 
     // 해당 ChatRoom 에 대한 ChatMessage 리스트 조회
     @GetMapping("/chatroom/{chatRoomId}/messages")

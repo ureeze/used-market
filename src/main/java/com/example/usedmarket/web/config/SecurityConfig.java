@@ -2,7 +2,6 @@ package com.example.usedmarket.web.config;
 
 import com.example.usedmarket.web.domain.user.Role;
 import com.example.usedmarket.web.security.jwt.JwtAuthenticationFilter;
-import com.example.usedmarket.web.security.oauth2.CustomAuthenticationSuccessHandler;
 import com.example.usedmarket.web.security.oauth2.CustomOAuth2UserService;
 import com.example.usedmarket.web.service.user.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
