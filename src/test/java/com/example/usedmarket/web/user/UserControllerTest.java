@@ -17,7 +17,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -52,8 +51,6 @@ public class UserControllerTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    WebTestClient webTestClient;
 
     @Autowired
     UserRepository userRepository;

@@ -37,27 +37,34 @@ public class BookServiceImpl implements BookService {
     private final PostRepository postRepository;
 
     /*
-    BOOK ID로 BOOK 상세 조회
+    BOOK ID 로 BOOK 상세 조회
      */
     @Override
     public BookSearchListResponseDto findById(Long bookId) {
-
+        // ID 값으로 BOOK 조회
         Book retrieveBook = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException("책이 존재하지 않습니다."));
-        Post retrievePost = postRepository.findById(retrieveBook.getPost().getId()).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
-        return BookSearchListResponseDto.toDto(retrieveBook, retrievePost);
+//        Post retrievePost = postRepository.findById(retrieveBook.getPost().getId()).orElseThrow(() -> new PostNotFoundException("POST 가 존재하지 않습니다."));
+        // DTO 로 변환 후 리턴
+        return BookSearchListResponseDto.toDto(retrieveBook);
     }
 
     /*
-    판매중인 도서 조회
+    판매 중인 BOOK LIST 조회
      */
     @Override
     public List<BookDetailsResponseDto> findByStatusIsSell() {
+        // 판매 상태인 POST LIST 조회
         List<Post> postList = postRepository.findByStatusIsSell();
+
+        // 판매 중인 BOOK LIST 를 담기 위한 LIST 생성
         List<BookDetailsResponseDto> responseDtoList = new ArrayList<>();
 
+        // LIST 에 담기
         postList.stream().forEach(post -> {
             responseDtoList.addAll(post.getBookList().stream().map(book -> BookDetailsResponseDto.toDto(book)).collect(Collectors.toList()));
         });
+
+        // 반환
         return responseDtoList;
     }
 

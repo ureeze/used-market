@@ -1,12 +1,11 @@
 package com.example.usedmarket.web.security.jwt;
 
-import com.example.usedmarket.web.config.AppProperties;
-import com.example.usedmarket.web.domain.user.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,13 +14,17 @@ import java.util.Date;
 @Slf4j
 @RequiredArgsConstructor
 public class TokenProvider {
-    private final AppProperties appProperties;
 
+    @Value("${app.auth.tokenSecret}")
+    private String tokenSecret;
+
+    @Value("${app.auth.tokenExpirationMsec}")
+    private long tokenExpirationMsec;
 
     public String create(String email) {
-        Date expiryDate = new Date(new Date().getTime() + appProperties.getAuth().getTokenExpirationMsec());
+        Date expiryDate = new Date(new Date().getTime() + tokenExpirationMsec);
         return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
+                .signWith(SignatureAlgorithm.HS512, tokenSecret)
                 .setSubject(email)
                 .setIssuer("demo app")
                 .setIssuedAt(new Date())
@@ -31,7 +34,7 @@ public class TokenProvider {
 
     public String validateAndGetEmail(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(appProperties.getAuth().getTokenSecret())
+                .setSigningKey(tokenSecret)
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();

@@ -26,7 +26,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 //        config.enableSimpleBroker("/topic", "/queue", "/exchange");
-
         config.enableStompBrokerRelay("/topic", "queue", "exchange")
                 .setRelayHost(host)
                 .setRelayPort(61613)
@@ -34,9 +33,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setSystemPasscode(password)
                 .setClientLogin(username)
                 .setClientPasscode(password);
-
         config.setApplicationDestinationPrefixes("/pub");
-//        config.setPathMatcher(new AntPathMatcher("."));
+
+
     }
 
     // WebSocket 또는 SockJS Client가 웹소켓 핸드셰이크 커넥션을 생성할 경로이다.

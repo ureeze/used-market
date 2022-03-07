@@ -31,11 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -58,8 +54,6 @@ public class PostControllerTest {
     @LocalServerPort
     int port;
 
-
-    WebClient webClient;
 
     @Autowired
     BookRepository bookRepository;

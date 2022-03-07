@@ -22,29 +22,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-//    @Override
-//    public Page<PostResponseDto> findByPostTitle(Long userId, String postTitle, Pageable pageable) {
-//        List<PostResponseDto> content = queryFactory.selectFrom(post)
-//                .leftJoin(post.bookList, book)
-//                .fetchJoin()
-//                .where(post.title.like("%" + postTitle + "%"), book.deleted.eq(false))
-//                .orderBy(post.createdAt.desc())
-//                .offset(pageable.getOffset())
-//                .limit(pageable.getPageSize())
-//                .fetch()
-//                .stream().map(post1 -> PostResponseDto.toResponseDto(userId, post1))
-//                .collect(Collectors.toList());
-//        List<Post> postList = queryFactory.selectFrom(post)
-//                .leftJoin(post.bookList, book)
-//                .fetchJoin()
-//                .where(post.title.like("%" + postTitle + "%"), book.deleted.eq(false))
-//                .fetch();
-//        return new PageImpl<>(content, pageable, postList.size());
-//    }
-
-
+    // POST TITLE 로 PAGING 된 POST 조회
     @Override
     public Page<PostResponseDto> findByPostTitle(Long userId, String postTitle, Pageable pageable) {
+        log.info("FIND POST BY POST TITLE");
         List<PostResponseDto> content = queryFactory.selectFrom(post)
                 .join(post.bookList, book)
                 .where(post.title.like("%" + postTitle + "%"), book.deleted.eq(false))
@@ -55,7 +36,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .stream().map(post1 -> PostResponseDto.toResponseDto(userId, post1))
                 .collect(Collectors.toList());
 
-        log.info("===SIZE===");
+        // SIZE 계산
+        log.info("TOTAL SIZE QUERY");
         List<Post> postList = queryFactory.selectFrom(post)
                 .join(post.bookList, book)
                 .where(post.title.like("%" + postTitle + "%"), book.deleted.eq(false))
@@ -64,8 +46,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return new PageImpl<>(content, pageable, postList.size());
     }
 
+    // POST 상태가 SELL 인 POST LIST 조회
     @Override
     public List<Post> findByStatusIsSell() {
+        log.info("FIND POST BY POST STATUS IS SELL");
         return queryFactory.selectFrom(post)
                 .leftJoin(post.bookList, book)
                 .fetchJoin()
@@ -74,29 +58,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .fetch();
     }
 
-//    @Override
-//    public Page<PostResponseDto> findByPostIsNotDeleted(Long userId, Pageable pageable) {
-//        List<PostResponseDto> content = queryFactory.selectFrom(post)
-//                .leftJoin(post.bookList, book)
-//                .fetchJoin()
-//                .where(post.deleted.eq(false))
-//                .orderBy(post.createdAt.desc())
-//                .offset(pageable.getOffset())
-//                .limit(pageable.getPageSize())
-//                .fetch()
-//                .stream().map(post1 -> PostResponseDto.toResponseDto(userId, post1))
-//                .collect(Collectors.toList());
-//        List<Post> postList = queryFactory.selectFrom(post)
-//                .leftJoin(post.bookList, book)
-//                .fetchJoin()
-//                .where(post.deleted.eq(false))
-//                .fetch();
-//        return new PageImpl<>(content, pageable, postList.size());
-//    }
-
-
+    // 삭제되지 않은 PAGING 된 POST 조회
     @Override
-    public Page<PostResponseDto> findByPostIsNotDeleted(Long userId, Pageable pageable) {
+    public Page<PostResponseDto> findByNotDeletedPost(Long userId, Pageable pageable) {
+        log.info("FIND POST BY NOT DELETED POST");
         List<PostResponseDto> content = queryFactory.selectFrom(post)
                 .join(post.bookList, book)
                 .where(post.deleted.eq(false))
@@ -107,7 +72,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .stream().map(post1 -> PostResponseDto.toResponseDto(userId, post1))
                 .collect(Collectors.toList());
 
-        log.info("===SIZE===");
+        // SIZE 계산
+        log.info("TOTAL SIZE QUERY");
         List<Post> postList = queryFactory.selectFrom(post)
                 .join(post.bookList, book)
                 .where(post.deleted.eq(false))
@@ -115,8 +81,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return new PageImpl<>(content, pageable, postList.size());
     }
 
+    // 현재 사용자의 POST LIST 조회
     @Override
-    public List<Post> findByAllPostAboutMyself(Long userId) {
+    public List<Post> findByCurrentUser(Long userId) {
+        log.info("FIND POST BY CURRENT USER");
         return queryFactory.selectFrom(post)
                 .leftJoin(post.bookList, book)
                 .fetchJoin()
@@ -125,8 +93,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .fetch();
     }
 
+    // POST ID 로 POST 조회
     @Override
     public Optional<Post> findByPostId(Long postId) {
+        log.info("FIND POST BY POST ID");
         return Optional.ofNullable(queryFactory.selectFrom(post)
                 .leftJoin(post.userEntity, userEntity)
                 .fetchJoin()

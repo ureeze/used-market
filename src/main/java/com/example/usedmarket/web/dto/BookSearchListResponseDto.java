@@ -52,20 +52,20 @@ public class BookSearchListResponseDto implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdAt;
 
-    public static BookSearchListResponseDto toDto(Book retrieveBook, Post retrievePost) {
+    public static BookSearchListResponseDto toDto(Book book) {
         return BookSearchListResponseDto.builder()
-                .bookId(retrieveBook.getId())
-                .bookTitle(retrieveBook.getTitle())
-                .stock(retrieveBook.getStock())
-                .unitPrice(retrieveBook.getUnitPrice())
-                .bookCategory(retrieveBook.getCategory())
-                .bookStatus(retrieveBook.getBookStatus().name())
-                .bookImgUrl(retrieveBook.getImgUrl())
-                .postId(retrievePost.getId())
-                .postTitle(retrievePost.getTitle())
-                .postStatus(retrievePost.getStatus().name())
-                .writerId(retrievePost.getUserEntity().getId())
-                .createdAt(retrievePost.getCreatedAt())
+                .bookId(book.getId())
+                .bookTitle(book.getTitle())
+                .stock(book.getStock())
+                .unitPrice(book.getUnitPrice())
+                .bookCategory(book.getCategory())
+                .bookStatus(book.getBookStatus().name())
+                .bookImgUrl(book.getImgUrl())
+                .postId(book.getPost().getId())
+                .postTitle(book.getPost().getTitle())
+                .postStatus(book.getPost().getStatus().name())
+                .writerId(book.getPost().getUserEntity().getId())
+                .createdAt(book.getCreatedAt())
                 .build();
     }
 }

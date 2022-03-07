@@ -20,16 +20,18 @@ public class AuthController {
 
     private final AuthService authService;
 
-    //회원 가입
+    // 회원 가입
     @PostMapping("/auth/signup")
     public ResponseEntity<Long> signup(@RequestBody SignUpRequestDto signUpDto) {
-        Long id = authService.createUser(signUpDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(id);
+        log.info("SIGN UP");
+        Long userId = authService.createUser(signUpDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userId);
     }
 
-    //로그인(Email+Password)
+    // 로그인 (Email + Password)
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto) {
+        log.info("LOG IN");
         LoginResponseDto loginResponseDto = authService.loginUser(loginDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(loginResponseDto);

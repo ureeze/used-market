@@ -69,14 +69,18 @@ class BookServiceTest {
     @Test
     void findById() {
         //given
+//        System.out.println("post Title : " + post.getTitle());
+//        System.out.println("book0 Title : " + book0.getTitle());
+//        System.out.println("book1 Title : " + book1.getTitle());
 
         //when
         entityManager.clear();
-        BookSearchListResponseDto responseDto = bookService.findById(book0.getId());
+        BookSearchListResponseDto findBook = bookService.findById(book0.getId());
 
         //then
-        assertThat(responseDto.getPostTitle()).isEqualTo(post.getTitle());
-        assertThat(responseDto.getBookTitle()).isEqualTo(book0.getTitle());
+//        System.out.println(findBook);
+        assertThat(findBook.getPostTitle()).isEqualTo(post.getTitle());
+        assertThat(findBook.getBookTitle()).isEqualTo(book0.getTitle());
     }
 
 

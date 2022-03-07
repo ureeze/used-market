@@ -1,8 +1,6 @@
 package com.example.usedmarket;
 
-import com.example.usedmarket.web.config.AppProperties;
 import com.example.usedmarket.web.domain.book.Book;
-import com.example.usedmarket.web.domain.book.BookRepository;
 import com.example.usedmarket.web.domain.book.BookStatus;
 import com.example.usedmarket.web.domain.post.Post;
 import com.example.usedmarket.web.domain.post.PostRepository;
@@ -13,18 +11,18 @@ import com.example.usedmarket.web.domain.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @EnableCaching
 @EnableJpaAuditing
 @SpringBootApplication
-@EnableConfigurationProperties(AppProperties.class)
 public class UsedMarketApplication {
 
     public static void main(String[] args) {
@@ -33,7 +31,7 @@ public class UsedMarketApplication {
 
     @Bean
     @Profile("dev")
-    public CommandLineRunner dataLoader(UserRepository userRepository, PostRepository postRepository, BookRepository bookRepository) {
+    public CommandLineRunner dataLoader(UserRepository userRepository, PostRepository postRepository) {
 
         return (args) -> {
             System.out.println("dataLoader 시작");
@@ -44,6 +42,7 @@ public class UsedMarketApplication {
                     .picture("picDefault")
                     .build());
 
+            List<Post> postList = new ArrayList<>();
 
             IntStream.rangeClosed(1, 100).forEach(index -> {
 
@@ -65,11 +64,10 @@ public class UsedMarketApplication {
                                 .build();
                         book.addPost(post);
                         post.addBook(book);
-                        postRepository.save(post);
+                        postList.add(post);
                     }
-
             );
-            postRepository.flush();
+            postRepository.saveAll(postList);
         };
     }
 }

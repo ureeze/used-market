@@ -9,15 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -26,13 +20,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final HttpServletResponse response;
 
     /*
-     * 본인정보 조회
+     * 본인 정보 조회
      */
     @GetMapping("/users/me")
     public ResponseEntity<UserResponseDto> getCurrentUser(@LoginUser UserPrincipal userPrincipal) {
+        log.info("본인 정보 조회");
         UserResponseDto findUser = userService.getCurrentUser(userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(findUser);
     }
@@ -42,6 +36,7 @@ public class UserController {
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {
+        log.info("회원 정보 조회 (ADMIN)");
         UserResponseDto findUser = userService.findByUserId(id);
         return ResponseEntity.status(HttpStatus.OK).body(findUser);
     }
@@ -51,6 +46,7 @@ public class UserController {
      * */
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> findAll() {
+        log.info("회원 전체 조회 (ADMIN)");
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
     }
 
@@ -59,6 +55,7 @@ public class UserController {
      * */
     @PutMapping("/users/me")
     public ResponseEntity<UserResponseDto> updateOne(@LoginUser UserPrincipal userPrincipal, @RequestBody UserUpdateRequestDto requestDto) {
+        log.info("본인 정보 수정");
         return ResponseEntity.status(HttpStatus.OK).body(userService.updatePersonalInfo(userPrincipal, requestDto));
     }
 
@@ -67,8 +64,8 @@ public class UserController {
      * */
     @DeleteMapping("/users/me")
     public HttpStatus delete(@LoginUser UserPrincipal userPrincipal) throws IOException {
+        log.info("회원 탈퇴");
         userService.delete(userPrincipal);
-
         return HttpStatus.OK;
     }
 }

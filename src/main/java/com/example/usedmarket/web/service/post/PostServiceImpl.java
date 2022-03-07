@@ -108,15 +108,15 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     @Override
     public Page<PostResponseDto> findAll(@LoginUser UserPrincipal userPrincipal, Pageable pageable) {
-        return postsRepository.findByPostIsNotDeleted(userPrincipal.getId(), pageable);
+        return postsRepository.findByNotDeletedPost(userPrincipal.getId(), pageable);
     }
 
 
-    //자신의 전체 POST 조회
+    // 자신의 전체 POST 조회
     @Transactional(readOnly = true)
     @Override
     public List<PostResponseDto> findByAllPostAboutMyself(@LoginUser UserPrincipal userPrincipal) {
-        List<Post> postList = postsRepository.findByAllPostAboutMyself(userPrincipal.getId());
+        List<Post> postList = postsRepository.findByCurrentUser(userPrincipal.getId());
         return postList.stream().map(post -> PostResponseDto.toResponseDto(userPrincipal.getId(), post)).collect(Collectors.toList());
     }
 
