@@ -33,87 +33,85 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 class OrderedBookServiceTest {
-    @Autowired
-    OrderedBookRepository orderedBookRepository;
-
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Autowired
-    OrderRepository orderRepository;
-
-    @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    BookRepository bookRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    OrderedBookService orderedBookService;
-
-    private Setup setup = new Setup();
-    private UserEntity userEntity;
-    private UserPrincipal userPrincipal;
-    private Book book0;
-    private Book book1;
-    private Order order;
-    private OrderedBook orderedBook0;
-    private OrderedBook orderedBook1;
-
-
-    @BeforeEach
-    void setup() {
-        userEntity = setup.createUserEntity(0);
-        userRepository.save(userEntity);
-        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-
-        book0 = setup.createBook(0);
-        book1 = setup.createBook(1);
-        bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
-
-        order = setup.createOrder(userEntity, null,0);
-        orderedBook0 = setup.createOrderedBook(userEntity, book0);
-        orderedBook1 = setup.createOrderedBook(userEntity, book1);
-
-        orderedBook0.addOrder(order);
-        orderedBook1.addOrder(order);
-        order.addOrderedBook(orderedBook0);
-        order.addOrderedBook(orderedBook1);
-
-        orderRepository.save(order);
-    }
-
-
-    @Test
-    @DisplayName("주문한 책 조회")
-    void findOne() {
-        //given
-
-        //when
-        entityManager.clear();
-        OrderedBookDetailsResponseDto orderedBookDetailsResponseDto = orderedBookService.findOrderedBook(userPrincipal, orderedBook0.getId());
-
-        //then
-        assertThat(orderedBookDetailsResponseDto.getBookTitle()).isEqualTo(book0.getTitle());
-        assertThat(orderedBookDetailsResponseDto.getId()).isEqualTo(orderedBook0.getId());
-    }
-
-    @Test
-    @DisplayName("주문한 책 목록 조회")
-    void findAll() {
-        //given
-
-        //when
-        entityManager.clear();
-        List<OrderedBookDetailsResponseDto> responseDtoList = orderedBookService.findByCurrentUser(userPrincipal);
-
-        //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
-        assertThat(responseDtoList.get(0).getOrderPrice()).isEqualTo(orderedBook0.getOrderPrice());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
-        assertThat(responseDtoList.get(1).getOrderPrice()).isEqualTo(orderedBook1.getOrderPrice());
-    }
+//    @Autowired
+//    OrderedBookRepository orderedBookRepository;
+//
+//    @PersistenceContext
+//    EntityManager entityManager;
+//
+//    @Autowired
+//    OrderRepository orderRepository;
+//
+//    @Autowired
+//    PostRepository postRepository;
+//
+//    @Autowired
+//    BookRepository bookRepository;
+//
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    OrderedBookService orderedBookService;
+//
+//    private final Setup setup = new Setup();
+//    private UserPrincipal userPrincipal;
+//    private Book book0;
+//    private Book book1;
+//    private OrderedBook orderedBook0;
+//    private OrderedBook orderedBook1;
+//
+//
+//    @BeforeEach
+//    void setup() {
+//        UserEntity userEntity = setup.createUserEntity(0);
+//        userRepository.save(userEntity);
+//        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+//
+//        book0 = setup.createBook(0);
+//        book1 = setup.createBook(1);
+//        bookRepository.saveAll(new ArrayList<>(Arrays.asList(book0, book1)));
+//
+//        Order order = setup.createOrder(userEntity, null, 0);
+//        orderedBook0 = setup.createOrderedBook(userEntity, book0);
+//        orderedBook1 = setup.createOrderedBook(userEntity, book1);
+//
+//        orderedBook0.addOrder(order);
+//        orderedBook1.addOrder(order);
+//        order.addOrderedBook(orderedBook0);
+//        order.addOrderedBook(orderedBook1);
+//
+//        orderRepository.save(order);
+//    }
+//
+//
+//    @Test
+//    @DisplayName("주문한 책 조회")
+//    void findOne() {
+//        //given
+//
+//        //when
+//        entityManager.clear();
+//        OrderedBookDetailsResponseDto orderedBookDetailsResponseDto = orderedBookService.findOrderedBook(userPrincipal, orderedBook0.getId());
+//
+//        //then
+//        assertThat(orderedBookDetailsResponseDto.getBookTitle()).isEqualTo(book0.getTitle());
+//        assertThat(orderedBookDetailsResponseDto.getId()).isEqualTo(orderedBook0.getId());
+//    }
+//
+//    @Test
+//    @DisplayName("주문한 책 목록 조회")
+//    void findAll() {
+//        //given
+//
+//        //when
+//        entityManager.clear();
+//        List<OrderedBookDetailsResponseDto> responseDtoList = orderedBookService.findByCurrentUser(userPrincipal);
+//
+//        //then
+//        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
+//        assertThat(responseDtoList.get(0).getOrderPrice()).isEqualTo(orderedBook0.getOrderPrice());
+//        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
+//        assertThat(responseDtoList.get(1).getOrderPrice()).isEqualTo(orderedBook1.getOrderPrice());
+//    }
 }

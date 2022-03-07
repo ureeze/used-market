@@ -41,88 +41,54 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class UserControllerTest {
-
-    @LocalServerPort
-    int port;
-
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    WebApplicationContext context;
-
-    private Setup setup = new Setup();
-
-    private MockMvc mvc;
-
-    private SignUpRequestDto requestDto;
-    private UserEntity userEntity;
-    private UserPrincipal userPrincipal;
-
-    @BeforeEach
-    void setup() {
-        mvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
-
-        requestDto = setup.createSignUpDto();
-        userEntity = UserEntity.create(requestDto, passwordEncoder);
-        userRepository.save(userEntity);
-        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-    }
 //
-//    @AfterEach
-//    void clean() {
-//        userRepository.deleteAll();
+//    @LocalServerPort
+//    int port;
+//
+//    @PersistenceContext
+//    EntityManager entityManager;
+//
+//    @Autowired
+//    PasswordEncoder passwordEncoder;
+//
+//
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    WebApplicationContext context;
+//
+//    private final Setup setup = new Setup();
+//
+//    private MockMvc mvc;
+//
+//    private UserEntity userEntity;
+//    private UserPrincipal userPrincipal;
+//
+//    @BeforeEach
+//    void setup() {
+//        mvc = MockMvcBuilders
+//                .webAppContextSetup(context)
+//                .apply(springSecurity())
+//                .build();
+//
+//        SignUpRequestDto requestDto = setup.createSignUpDto();
+//        userEntity = UserEntity.create(requestDto, passwordEncoder);
+//        userRepository.save(userEntity);
+//        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
 //    }
-
-
-    @Test
-    @DisplayName("본인 정보 조회")
-    void getCurrentUser() throws Exception {
-        //given
-
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("/users/me")
-                .build()
-                .encode()
-                .toUri();
-
-        //when
-        entityManager.clear();
-
-        //then
-        mvc.perform(get(uri).with(user(userPrincipal))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userEntity.getId()))
-                .andExpect(jsonPath("$.userName").value(userEntity.getName()))
-                .andExpect(jsonPath("$.email").value(userEntity.getEmail()))
-                .andDo(print());
-
-    }
-
-
+//
+//
 //    @Test
-//    @DisplayName("USER ID 를 이용한 사용자 조회 (ADMIN)")
-//    void findByUserId() throws Exception {
+//    @DisplayName("본인 정보 조회")
+//    void getCurrentUser() throws Exception {
 //        //given
 //
 //        URI uri = UriComponentsBuilder.newInstance().scheme("http")
 //                .host("localhost")
 //                .port(port)
-//                .path("/users/{id}")
-//                .build().expand(userEntity.getId())
+//                .path("/users/me")
+//                .build()
 //                .encode()
 //                .toUri();
 //
@@ -131,7 +97,7 @@ public class UserControllerTest {
 //
 //        //then
 //        mvc.perform(get(uri).with(user(userPrincipal))
-//         .contentType(MediaType.APPLICATION_JSON))
+//                        .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.userId").value(userEntity.getId()))
 //                .andExpect(jsonPath("$.userName").value(userEntity.getName()))
@@ -141,16 +107,74 @@ public class UserControllerTest {
 //    }
 //
 //
+////    @Test
+////    @DisplayName("USER ID 를 이용한 사용자 조회 (ADMIN)")
+////    void findByUserId() throws Exception {
+////        //given
+////
+////        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+////                .host("localhost")
+////                .port(port)
+////                .path("/users/{id}")
+////                .build().expand(userEntity.getId())
+////                .encode()
+////                .toUri();
+////
+////        //when
+////        entityManager.clear();
+////
+////        //then
+////        mvc.perform(get(uri).with(user(userPrincipal))
+////         .contentType(MediaType.APPLICATION_JSON))
+////                .andExpect(status().isOk())
+////                .andExpect(jsonPath("$.userId").value(userEntity.getId()))
+////                .andExpect(jsonPath("$.userName").value(userEntity.getName()))
+////                .andExpect(jsonPath("$.email").value(userEntity.getEmail()))
+////                .andDo(print());
+////
+////    }
+////
+////
+////    @Test
+////    @DisplayName("전체 USER 목록 조회 (ADMIN)")
+////    void findAll() throws Exception {
+////        //given
+////
+////        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+////                .host("localhost")
+////                .port(port)
+////                .path("/users/all")
+////                .build().expand(userEntity.getId())
+////                .encode()
+////                .toUri();
+////
+////        //when
+////        entityManager.clear();
+////
+////        //then
+////        mvc.perform(get(uri).with(user(userPrincipal))
+////                       .contentType(MediaType.APPLICATION_JSON))
+////                .andExpect(status().isOk())
+////                .andExpect(jsonPath("$.[0].userId").value(userEntity.getId()))
+////                .andExpect(jsonPath("$.[0].userName").value(userEntity.getName()))
+////                .andExpect(jsonPath("$.[0].email").value(userEntity.getEmail()))
+////                .andDo(print());
+////    }
+//
+//
 //    @Test
-//    @DisplayName("전체 USER 목록 조회 (ADMIN)")
-//    void findAll() throws Exception {
+//    @DisplayName("사용자 정보 수정")
+//    void updatePersonalInfo() throws Exception {
 //        //given
+//        UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
+//                .userName("park")
+//                .build();
 //
 //        URI uri = UriComponentsBuilder.newInstance().scheme("http")
 //                .host("localhost")
 //                .port(port)
-//                .path("/users/all")
-//                .build().expand(userEntity.getId())
+//                .path("/users/me")
+//                .build()
 //                .encode()
 //                .toUri();
 //
@@ -158,69 +182,39 @@ public class UserControllerTest {
 //        entityManager.clear();
 //
 //        //then
-//        mvc.perform(get(uri).with(user(userPrincipal))
-//                       .contentType(MediaType.APPLICATION_JSON))
+//        mvc.perform(put(uri).with(user(userPrincipal))
+//                        .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
+//                        .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.[0].userId").value(userEntity.getId()))
-//                .andExpect(jsonPath("$.[0].userName").value(userEntity.getName()))
-//                .andExpect(jsonPath("$.[0].email").value(userEntity.getEmail()))
+//                .andExpect(jsonPath("$.userName").value(userUpdateRequestDto.getUserName()))
 //                .andDo(print());
 //    }
-
-
-    @Test
-    @DisplayName("사용자 정보 수정")
-    void updatePersonalInfo() throws Exception {
-        //given
-        UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
-                .userName("park")
-                .build();
-
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("/users/me")
-                .build()
-                .encode()
-                .toUri();
-
-        //when
-        entityManager.clear();
-
-        //then
-        mvc.perform(put(uri).with(user(userPrincipal))
-                        .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName").value(userUpdateRequestDto.getUserName()))
-                .andDo(print());
-    }
-
-
-    @Test
-    @DisplayName("회원 탈퇴")
-    void delete() throws Exception {
-        //given
-        UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
-                .userName("park")
-                .build();
-
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("/users/me")
-                .build()
-                .encode()
-                .toUri();
-
-        //when
-        entityManager.clear();
-
-        //then
-        mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
-                        .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
+//
+//
+//    @Test
+//    @DisplayName("회원 탈퇴")
+//    void delete() throws Exception {
+//        //given
+//        UserUpdateRequestDto userUpdateRequestDto = UserUpdateRequestDto.builder()
+//                .userName("park")
+//                .build();
+//
+//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+//                .host("localhost")
+//                .port(port)
+//                .path("/users/me")
+//                .build()
+//                .encode()
+//                .toUri();
+//
+//        //when
+//        entityManager.clear();
+//
+//        //then
+//        mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
+//                        .content(new ObjectMapper().writeValueAsString(userUpdateRequestDto))
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andDo(print());
+//    }
 }

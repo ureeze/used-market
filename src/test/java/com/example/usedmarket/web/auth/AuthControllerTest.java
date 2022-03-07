@@ -30,7 +30,6 @@ import java.net.URI;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -39,90 +38,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class AuthControllerTest {
 
-    @LocalServerPort
-    int port;
-
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    WebApplicationContext context;
-
-    MockMvc mvc;
-    private Setup setup = new Setup();
-
-    @BeforeEach
-    void setup() {
-        mvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
-
-    }
-
-//    @AfterEach
-//    void clean() {
-//        userRepository.deleteAll();
+//    @LocalServerPort
+//    int port;
+//
+//    @PersistenceContext
+//    EntityManager entityManager;
+//
+//    @Autowired
+//    PasswordEncoder passwordEncoder;
+//
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    WebApplicationContext context;
+//
+//    MockMvc mvc;
+//    private final Setup setup = new Setup();
+//
+//    @BeforeEach
+//    void setup() {
+//        mvc = MockMvcBuilders
+//                .webAppContextSetup(context)
+//                .apply(springSecurity())
+//                .build();
+//
 //    }
-
-    @Test
-    @WithMockUser(roles = "USER")
-    @DisplayName("USER 등록 테스트")
-    void signUp() throws Exception {
-        //given
-        SignUpRequestDto signUpDto = setup.createSignUpDto();
-
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("/auth/signup")
-                .build()
-                .encode()
-                .toUri();
-
-        //when
-        mvc.perform(post(uri)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(signUpDto)))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
-    }
-
-    @Test
-    @WithMockUser(roles = "USER")
-    @DisplayName("USER 조회 테스트")
-    void login() throws Exception {
-        //given
-        SignUpRequestDto signUpDto = setup.createSignUpDto();
-
-        UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
-        userRepository.save(userEntity);
-
-        LoginRequestDto loginDto = setup.createLoginRequestDto();
-
-        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("/auth/login")
-                .build()
-                .encode()
-                .toUri();
-
-        //when
-        entityManager.clear();
-
-        //then
-        mvc.perform(post(uri)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(loginDto)))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
+//
+//
+//    @Test
+//    @WithMockUser(roles = "USER")
+//    @DisplayName("USER 등록 테스트")
+//    void signUp() throws Exception {
+//        //given
+//        SignUpRequestDto signUpDto = setup.createSignUpDto();
+//
+//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+//                .host("localhost")
+//                .port(port)
+//                .path("/auth/signup")
+//                .build()
+//                .encode()
+//                .toUri();
+//
+//        //when
+//        mvc.perform(post(uri)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(new ObjectMapper().writeValueAsString(signUpDto)))
+//                .andExpect(status().isCreated())
+//                .andDo(print());
+//
+//    }
+//
+//    @Test
+//    @WithMockUser(roles = "USER")
+//    @DisplayName("USER 조회 테스트")
+//    void login() throws Exception {
+//        //given
+//        SignUpRequestDto signUpDto = setup.createSignUpDto();
+//
+//        UserEntity userEntity = UserEntity.create(signUpDto, passwordEncoder);
+//        userRepository.save(userEntity);
+//
+//        LoginRequestDto loginDto = setup.createLoginRequestDto();
+//
+//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+//                .host("localhost")
+//                .port(port)
+//                .path("/auth/login")
+//                .build()
+//                .encode()
+//                .toUri();
+//
+//        //when
+//        entityManager.clear();
+//
+//        //then
+//        mvc.perform(post(uri)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(new ObjectMapper().writeValueAsString(loginDto)))
+//                .andExpect(status().isOk())
+//                .andDo(print());
+//    }
 }

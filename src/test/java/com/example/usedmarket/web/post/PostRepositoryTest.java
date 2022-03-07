@@ -18,6 +18,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -25,42 +27,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Import(TestConfig.class)
 public class PostRepositoryTest {
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PostRepository postsRepository;
-
-    @Autowired
-    BookRepository booksRepository;
-
-    @Autowired
-    TestEntityManager testEntityManager;
-
-    private Setup setup = new Setup();
-    private UserEntity userEntity;
-    private Book book;
-    private Post post;
-
-    @BeforeEach
-    void setup() {
-        userEntity = setup.createUserEntity(0);
-        book = setup.createBook(0);
-        post = setup.createPost(userEntity,0);
-        book.addPost(post);
-        post.addBook(book);
-    }
-
-    @Test
-    @DisplayName("포스트 저장")
-    void CreatePostAndBook() {
-        //given
-
-        //when
-        testEntityManager.persist(post);
-        testEntityManager.clear();
-
-        //then
-        assertThat(postsRepository.findById(post.getId()).get()).isEqualTo(post);
-    }
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    PostRepository postRepository;
+//
+//    @Autowired
+//    BookRepository bookRepository;
+//
+//    @Autowired
+//    TestEntityManager testEntityManager;
+//
+//    private final Setup setup = new Setup();
+//    private Post post;
+//
+//    @BeforeEach
+//    void setup() {
+//        UserEntity userEntity = setup.createUserEntity(0);
+//        Book book = setup.createBook(0);
+//        post = setup.createPost(userEntity, 0);
+//        book.addPost(post);
+//        post.addBook(book);
+//    }
+//
+//    @Test
+//    @DisplayName("포스트 저장")
+//    void CreatePostAndBook() {
+//        //given
+//
+//        //when
+//        testEntityManager.persist(post);
+//        testEntityManager.clear();
+//
+//        //then
+//        Optional<Post> findPost = postRepository.findById(post.getId());
+//        findPost.ifPresent(value -> assertThat(value).isEqualTo(post));
+//    }
 }

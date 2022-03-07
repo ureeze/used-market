@@ -14,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -21,32 +23,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Import(TestConfig.class)
 class UserRepositoryTest {
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    TestEntityManager testEntityManager;
-
-    private Setup setup = new Setup();
-    private UserEntity userEntity;
-
-    @BeforeEach
-    void setup() {
-        userEntity = setup.createUserEntity(0);
-        testEntityManager.persist(userEntity);
-    }
-
-    @Test
-    @DisplayName("저장 및 조회 테스트")
-    void saveUserTest() {
-        //given
-
-        //when
-        testEntityManager.clear();
-
-        //then
-        assertThat(userRepository.findById(userEntity.getId()).get()).isEqualTo(userEntity);
-    }
-
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    TestEntityManager testEntityManager;
+//
+//    private final Setup setup = new Setup();
+//    private UserEntity userEntity;
+//
+//    @BeforeEach
+//    void setup() {
+//        userEntity = setup.createUserEntity(0);
+//        testEntityManager.persist(userEntity);
+//    }
+//
+//    @Test
+//    @DisplayName("저장 및 조회 테스트")
+//    void saveUserTest() {
+//        //given
+//
+//        //when
+//        testEntityManager.clear();
+//
+//        //then
+//        Optional<UserEntity> findUserEntity = userRepository.findById(userEntity.getId());
+//        findUserEntity.ifPresent(entity -> assertThat(entity).isEqualTo(userEntity));
+//    }
+//
 
 }

@@ -28,101 +28,100 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 class BookServiceTest {
-    @PersistenceContext
-    EntityManager entityManager;
-
-    @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    BookRepository bookRepository;
-
-    @Autowired
-    BookService bookService;
-
-    private Setup setup = new Setup();
-    private UserEntity userEntity;
-
-    private Post post;
-    private Book book0;
-    private Book book1;
-
-    @BeforeEach
-    void setup() {
-        userEntity = setup.createUserEntity(0);
-        userRepository.save(userEntity);
-
-        post = setup.createPost(userEntity,0);
-        book0 = setup.createBook(0);
-        book1 = setup.createBook(1);
-        post.addBook(book0);
-        post.addBook(book1);
-        book0.addPost(post);
-        book1.addPost(post);
-        postRepository.save(post);
-    }
-
-    @DisplayName("책 상세 조회")
-    @Test
-    void findById() {
-        //given
-//        System.out.println("post Title : " + post.getTitle());
-//        System.out.println("book0 Title : " + book0.getTitle());
-//        System.out.println("book1 Title : " + book1.getTitle());
-
-        //when
-        entityManager.clear();
-        BookSearchListResponseDto findBook = bookService.findById(book0.getId());
-
-        //then
-//        System.out.println(findBook);
-        assertThat(findBook.getPostTitle()).isEqualTo(post.getTitle());
-        assertThat(findBook.getBookTitle()).isEqualTo(book0.getTitle());
-    }
-
-
-    @DisplayName("판매중인 도서 조회")
-    @Test
-    void findByStatusIsSell() {
-        //given
-
-        //when
-        entityManager.clear();
-        List<BookDetailsResponseDto> responseDtoList = bookService.findByStatusIsSell();
-
-        //then
-        assertThat(responseDtoList.get(0).getBookStatus()).isEqualTo(book0.getBookStatus().name());
-        assertThat(responseDtoList.get(1).getBookStatus()).isEqualTo(book1.getBookStatus().name());
-    }
-
-    @DisplayName("등록된 도서 전체 조회")
-    @Test
-    void findAll() {
-        //given
-
-        //when
-        entityManager.clear();
-        List<BookDetailsResponseDto> responseDtoList = bookService.findAll();
-
-        //then
-        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
-        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
-    }
-
-//    @DisplayName("도서 제목 검색")
+//    @PersistenceContext
+//    EntityManager entityManager;
+//
+//    @Autowired
+//    PostRepository postRepository;
+//
+//    @Autowired
+//    UserRepository userRepository;
+//
+//    @Autowired
+//    BookRepository bookRepository;
+//
+//    @Autowired
+//    BookService bookService;
+//
+//    private final Setup setup = new Setup();
+//
+//    private Post post;
+//    private Book book0;
+//    private Book book1;
+//
+//    @BeforeEach
+//    void setup() {
+//        UserEntity userEntity = setup.createUserEntity(0);
+//        userRepository.save(userEntity);
+//
+//        post = setup.createPost(userEntity,0);
+//        book0 = setup.createBook(0);
+//        book1 = setup.createBook(1);
+//        post.addBook(book0);
+//        post.addBook(book1);
+//        book0.addPost(post);
+//        book1.addPost(post);
+//        postRepository.save(post);
+//    }
+//
+//    @DisplayName("책 상세 조회")
 //    @Test
-//    void findByBookTitle() {
+//    void findById() {
+//        //given
+////        System.out.println("post Title : " + post.getTitle());
+////        System.out.println("book0 Title : " + book0.getTitle());
+////        System.out.println("book1 Title : " + book1.getTitle());
+//
+//        //when
+//        entityManager.clear();
+//        BookSearchListResponseDto findBook = bookService.findById(book0.getId());
+//
+//        //then
+////        System.out.println(findBook);
+//        assertThat(findBook.getPostTitle()).isEqualTo(post.getTitle());
+//        assertThat(findBook.getBookTitle()).isEqualTo(book0.getTitle());
+//    }
+//
+//
+//    @DisplayName("판매중인 도서 조회")
+//    @Test
+//    void findByStatusIsSell() {
 //        //given
 //
 //        //when
 //        entityManager.clear();
-//        List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
+//        List<BookDetailsResponseDto> responseDtoList = bookService.findByStatusIsSell();
 //
 //        //then
-//        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
-//        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book0.getTitle());
+//        assertThat(responseDtoList.get(0).getBookStatus()).isEqualTo(book0.getBookStatus().name());
+//        assertThat(responseDtoList.get(1).getBookStatus()).isEqualTo(book1.getBookStatus().name());
 //    }
+//
+//    @DisplayName("등록된 도서 전체 조회")
+//    @Test
+//    void findAll() {
+//        //given
+//
+//        //when
+//        entityManager.clear();
+//        List<BookDetailsResponseDto> responseDtoList = bookService.findAll();
+//
+//        //then
+//        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book0.getTitle());
+//        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book1.getTitle());
+//    }
+//
+////    @DisplayName("도서 제목 검색")
+////    @Test
+////    void findByBookTitle() {
+////        //given
+////
+////        //when
+////        entityManager.clear();
+////        List<BookDetailsResponseDto> responseDtoList = bookService.findByBookTitle("스프링부트");
+////
+////        //then
+////        assertThat(responseDtoList.get(0).getBookTitle()).isEqualTo(book1.getTitle());
+////        assertThat(responseDtoList.get(1).getBookTitle()).isEqualTo(book0.getTitle());
+////    }
 }
