@@ -121,7 +121,7 @@
 • JPA : 객체 중심 domain 설계 및 반복적인 CRUD 작업을 대체합니다.
 
 • QueryDSL : 컴파일 단계에서 작성한 Query에 오류가 없는 지 확인할 수 있으며 재 사용성이 용이하여 적용하였습니다.
-- 연관관계의 ENTITY에서 QUERY 조회할 경우 1+N 문제해결방법 : https://blog.naver.com/alchemy21/222596437670
+- 연관관계의 ENTITY에서 QUERY 조회할 경우 N + 1 문제해결방법 : https://blog.naver.com/alchemy21/222596437670
 - fetchjoin & pageable 사용 시 문제해결방법 : https://blog.naver.com/alchemy21/222660250498
 
 - Post (Domain Class)	
