@@ -67,6 +67,9 @@ public class UsedMarketApplication {
                         postList.add(post);
                     }
             );
+
+
+
             postRepository.saveAll(postList);
         };
     }
