@@ -31,74 +31,74 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Import(TestConfig.class)
 public class OrderRepositoryTest {
-//
-//    @Autowired
-//    OrderRepository orderRepository;
-//
-//    @Autowired
-//    UserRepository userRepository;
-//
-//    @Autowired
-//    PostRepository postRepository;
-//
-//    @Autowired
-//    BookRepository bookRepository;
-//
-//    @Autowired
-//    TestEntityManager testEntityManager;
-//
-//    private final Setup setup = new Setup();
-//    private UserPrincipal userPrincipal;
-//    private Order order;
-//
-//    @BeforeEach
-//    void setup() {
-//        UserEntity userEntity = setup.createUserEntity(0);
-//        userRepository.save(userEntity);
-//        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-//        Book book = setup.createBook(0);
-//        Post post = setup.createPost(userEntity, 0);
-//        post.addBook(book);
-//        book.addPost(post);
-//        postRepository.save(post);
-//        order = setup.createOrder(userEntity, post, 0);
+
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    BookRepository bookRepository;
+
+    @Autowired
+    TestEntityManager testEntityManager;
+
+    private final Setup setup = new Setup();
+    private UserPrincipal userPrincipal;
+    private Order order;
+
+    @BeforeEach
+    void setup() {
+        UserEntity userEntity = setup.createUserEntity(0);
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        Book book = setup.createBook(0);
+        Post post = setup.createPost(userEntity, 0);
+        post.addBook(book);
+        book.addPost(post);
+        postRepository.save(post);
+        order = setup.createOrder(userEntity, post, 0);
+    }
+
+//    @AfterEach
+//    void clean() {
+//        userRepository.deleteAll();
+//        postRepository.deleteAll();
+//        orderRepository.deleteAll();
 //    }
-//
-////    @AfterEach
-////    void clean() {
-////        userRepository.deleteAll();
-////        postRepository.deleteAll();
-////        orderRepository.deleteAll();
-////    }
-//
-//    @Test
-//    @DisplayName("주문 저장 및 조회")
-//    void save() {
-//        //given
-//
-//        //when
-//        testEntityManager.persist(order);
-//        testEntityManager.clear();
-//
-//        //then
-//        Optional<Order> findOrder = orderRepository.findById(order.getId());
-//        findOrder.ifPresent(value -> assertThat(value.getAddress()).isEqualTo(order.getAddress()));
-//    }
-//
-//    @Test
-//    @DisplayName("USER ID 로 Order 정보 조회")
-//    void findByUserId() {
-//        //given
-//
-//        //when
-//        testEntityManager.persist(order);
-//        testEntityManager.clear();
-//
-//        //then
-//        List<Order> retrieveOrder = orderRepository.findByUserId(userPrincipal.getId());
-//        assertThat(retrieveOrder.get(0).getUser().getName()).isEqualTo(userPrincipal.getName());
-//
-//        Optional<Order> findOrder = orderRepository.findById(order.getId());
-//        findOrder.ifPresent(value -> assertThat(value.getAddress()).isEqualTo(order.getAddress()));
-//    }
+
+    @Test
+    @DisplayName("주문 저장 및 조회")
+    void save() {
+        //given
+
+        //when
+        testEntityManager.persist(order);
+        testEntityManager.clear();
+
+        //then
+        Optional<Order> findOrder = orderRepository.findById(order.getId());
+        findOrder.ifPresent(value -> assertThat(value.getAddress()).isEqualTo(order.getAddress()));
+    }
+
+    @Test
+    @DisplayName("USER ID 로 Order 정보 조회")
+    void findByUserId() {
+        //given
+
+        //when
+        testEntityManager.persist(order);
+        testEntityManager.clear();
+
+        //then
+        List<Order> retrieveOrder = orderRepository.findByUserId(userPrincipal.getId());
+        assertThat(retrieveOrder.get(0).getUser().getName()).isEqualTo(userPrincipal.getName());
+
+        Optional<Order> findOrder = orderRepository.findById(order.getId());
+        findOrder.ifPresent(value -> assertThat(value.getAddress()).isEqualTo(order.getAddress()));
+    }
 }

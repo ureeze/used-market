@@ -47,225 +47,225 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class PostControllerTest {
 
-//    @LocalServerPort
-//    int port;
-//
-//
-//    @Autowired
-//    BookRepository bookRepository;
-//
-//    @Autowired
-//    UserRepository userRepository;
-//
-//    @Autowired
-//    PostRepository postRepository;
-//
-//    @Autowired
-//    WebApplicationContext context;
-//
-//    @PersistenceContext
-//    EntityManager entityManager;
-//
-//    MockMvc mvc;
-//
-//    private final Setup setup = new Setup();
-//
-//    private UserPrincipal userPrincipal;
-//    private PostSaveRequestDto requestDto;
-//    private Book book;
-//    private Post post;
-//
-//    @BeforeEach
-//    void setup() {
-//        mvc = MockMvcBuilders
-//                .webAppContextSetup(context)
-//                .addFilters(new CharacterEncodingFilter("UTF-8", true))
-//                .apply(springSecurity())
-//                .build();
-//
-//        UserEntity userEntity = setup.createUserEntity(0);
-//        userRepository.save(userEntity);
-//        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
-//        requestDto = setup.createPostSaveRequestDto(0);
-//
-//        book = requestDto.toBook();
-//        post = requestDto.toPost(userEntity);
-//        book.addPost(post);
-//        post.addBook(book);
-//
-//        postRepository.save(post);
-//    }
-//
-//
+    @LocalServerPort
+    int port;
+
+
+    @Autowired
+    BookRepository bookRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    WebApplicationContext context;
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    MockMvc mvc;
+
+    private final Setup setup = new Setup();
+
+    private UserPrincipal userPrincipal;
+    private PostSaveRequestDto requestDto;
+    private Book book;
+    private Post post;
+
+    @BeforeEach
+    void setup() {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                .apply(springSecurity())
+                .build();
+
+        UserEntity userEntity = setup.createUserEntity(0);
+        userRepository.save(userEntity);
+        userPrincipal = UserPrincipal.createUserPrincipal(userEntity);
+        requestDto = setup.createPostSaveRequestDto(0);
+
+        book = requestDto.toBook();
+        post = requestDto.toPost(userEntity);
+        book.addPost(post);
+        post.addBook(book);
+
+        postRepository.save(post);
+    }
+
+
+    @Test
+    @DisplayName("POST 등록 테스트")
+    void save() throws Exception {
+        //given
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts")
+                .build()
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(post(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.postTitle").value(requestDto.getPostTitle()))
+                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
+                .andDo(print());
+
+        //then
+        assertThat(postRepository.findAll().get(0).getTitle()).isEqualTo(requestDto.getPostTitle());
+    }
+
+    @Test
+    @DisplayName("POST ID로 포스트 조회 테스트")
+    void findById() throws Exception {
+        //given
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/{id}")
+                .build().expand(post.getId())
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.postTitle").value(post.getTitle()))
+                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
+                .andDo(print());
+
+        //then
+        Optional<Post> findPost = postRepository.findById(post.getId());
+        findPost.ifPresent(value -> assertThat(value.getTitle()).isEqualTo(requestDto.getPostTitle()));
+
+    }
+
+    @Test
+    @DisplayName("POST 제목으로 포스트 목록 조회 테스트")
+    void findByPostTitle() throws Exception {
+        //given
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/all/title")
+                .build()
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .queryParam("title", post.getTitle())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()))
+                .andExpect(jsonPath("$.content.[0].postStatus").value(PostStatus.SELL.name()))
+                .andDo(print());
+
+        //then
+        Optional<Post> findPost = postRepository.findById(post.getId());
+        findPost.ifPresent(value -> assertThat(value.getTitle()).isEqualTo(requestDto.getPostTitle()));
+    }
+
+
+    @Test
+    @DisplayName("전체 POST 조회 테스트")
+    void findAll() throws Exception {
+        //given
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/all")
+                .build()
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(get(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()));
+
+        //then
+        assertThat(bookRepository.findAll().get(0).getTitle()).isEqualTo(book.getTitle());
+    }
+
+
+    @Test
+    @DisplayName("POST 수정 테스트")
+    void update() throws Exception {
+        //given
+        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto(0);
+
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/{id}")
+                .build().expand(post.getId())
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(put(uri).with(user(userPrincipal))
+                        .content(new ObjectMapper().writeValueAsString(updateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.postTitle").value(updateRequestDto.getPostTitle()));
+    }
+
+
+    @Test
+    @DisplayName("POST 의 ID 을 이용해 POST 삭제 테스트")
+    void delete() throws Exception {
+        //given
+        URI uri = UriComponentsBuilder.newInstance().scheme("http")
+                .host("localhost")
+                .port(port)
+                .path("/posts/{id}")
+                .build().expand(post.getId())
+                .encode()
+                .toUri();
+
+        //when
+        entityManager.clear();
+        mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$").value(post.getId()));
+    }
+
+
 //    @Test
-//    @DisplayName("POST 등록 테스트")
-//    void save() throws Exception {
-//        //given
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts")
-//                .build()
-//                .encode()
-//                .toUri();
+//    @DisplayName("Book 이미지 가져오기")
+//    void retrieveBookImg() throws ParseException {
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
+//        headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
+//        String url = "https://openapi.naver.com/v1/search/book.json?query=스프링 부트와 AWS로 혼자 구현하는 웹 서비스 &display=10&start=1";
+//        HttpEntity httpEntity = new HttpEntity(headers);
+//        ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
 //
-//        //when
-//        entityManager.clear();
-//        mvc.perform(post(uri).with(user(userPrincipal))
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(new ObjectMapper().writeValueAsString(requestDto)))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.postTitle").value(requestDto.getPostTitle()))
-//                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
-//                .andDo(print());
-//
-//        //then
-//        assertThat(postRepository.findAll().get(0).getTitle()).isEqualTo(requestDto.getPostTitle());
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
+//        JSONArray items = (JSONArray) body.get("items");
+//        JSONObject book = (JSONObject) items.get(0);
+//        String imgUrl = (String) book.get("image");
+//        System.out.println(imgUrl);
 //    }
-//
-//    @Test
-//    @DisplayName("POST ID로 포스트 조회 테스트")
-//    void findById() throws Exception {
-//        //given
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts/{id}")
-//                .build().expand(post.getId())
-//                .encode()
-//                .toUri();
-//
-//        //when
-//        entityManager.clear();
-//        mvc.perform(get(uri).with(user(userPrincipal))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.postTitle").value(post.getTitle()))
-//                .andExpect(jsonPath("$.postStatus").value(PostStatus.SELL.name()))
-//                .andDo(print());
-//
-//        //then
-//        Optional<Post> findPost = postRepository.findById(post.getId());
-//        findPost.ifPresent(value -> assertThat(value.getTitle()).isEqualTo(requestDto.getPostTitle()));
-//
-//    }
-//
-//    @Test
-//    @DisplayName("POST 제목으로 포스트 목록 조회 테스트")
-//    void findByPostTitle() throws Exception {
-//        //given
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts/all/title")
-//                .build()
-//                .encode()
-//                .toUri();
-//
-//        //when
-//        entityManager.clear();
-//        mvc.perform(get(uri).with(user(userPrincipal))
-//                        .queryParam("title", post.getTitle())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()))
-//                .andExpect(jsonPath("$.content.[0].postStatus").value(PostStatus.SELL.name()))
-//                .andDo(print());
-//
-//        //then
-//        Optional<Post> findPost = postRepository.findById(post.getId());
-//        findPost.ifPresent(value -> assertThat(value.getTitle()).isEqualTo(requestDto.getPostTitle()));
-//    }
-//
-//
-//    @Test
-//    @DisplayName("전체 POST 조회 테스트")
-//    void findAll() throws Exception {
-//        //given
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts/all")
-//                .build()
-//                .encode()
-//                .toUri();
-//
-//        //when
-//        entityManager.clear();
-//        mvc.perform(get(uri).with(user(userPrincipal))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andExpect(jsonPath("$.content.[0].postTitle").value(post.getTitle()));
-//
-//        //then
-//        assertThat(bookRepository.findAll().get(0).getTitle()).isEqualTo(book.getTitle());
-//    }
-//
-//
-//    @Test
-//    @DisplayName("POST 수정 테스트")
-//    void update() throws Exception {
-//        //given
-//        PostSaveRequestDto updateRequestDto = setup.createPostSaveRequestDto(0);
-//
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts/{id}")
-//                .build().expand(post.getId())
-//                .encode()
-//                .toUri();
-//
-//        //when
-//        entityManager.clear();
-//        mvc.perform(put(uri).with(user(userPrincipal))
-//                        .content(new ObjectMapper().writeValueAsString(updateRequestDto))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andExpect(jsonPath("$.postTitle").value(updateRequestDto.getPostTitle()));
-//    }
-//
-//
-//    @Test
-//    @DisplayName("POST 의 ID 을 이용해 POST 삭제 테스트")
-//    void delete() throws Exception {
-//        //given
-//        URI uri = UriComponentsBuilder.newInstance().scheme("http")
-//                .host("localhost")
-//                .port(port)
-//                .path("/posts/{id}")
-//                .build().expand(post.getId())
-//                .encode()
-//                .toUri();
-//
-//        //when
-//        entityManager.clear();
-//        mvc.perform(MockMvcRequestBuilders.delete(uri).with(user(userPrincipal))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andExpect(jsonPath("$").value(post.getId()));
-//    }
-//
-//
-////    @Test
-////    @DisplayName("Book 이미지 가져오기")
-////    void retrieveBookImg() throws ParseException {
-////        RestTemplate restTemplate = new RestTemplate();
-////        HttpHeaders headers = new HttpHeaders();
-////        headers.add("X-Naver-Client-Id", "qYS6H9SHymBxVVUqIq5h");
-////        headers.add("X-Naver-Client-Secret", "VMyHdP2hXi");
-////        String url = "https://openapi.naver.com/v1/search/book.json?query=스프링 부트와 AWS로 혼자 구현하는 웹 서비스 &display=10&start=1";
-////        HttpEntity httpEntity = new HttpEntity(headers);
-////        ResponseEntity<String> s = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
-////
-////        JSONParser jsonParser = new JSONParser();
-////        JSONObject body = (JSONObject) jsonParser.parse(s.getBody());
-////        JSONArray items = (JSONArray) body.get("items");
-////        JSONObject book = (JSONObject) items.get(0);
-////        String imgUrl = (String) book.get("image");
-////        System.out.println(imgUrl);
-////    }
 }

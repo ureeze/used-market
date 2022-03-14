@@ -26,56 +26,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 class BookRepositoryTest {
-//
-//    @PersistenceContext
-//    EntityManager entityManager;
-//
-//    @Autowired
-//    BookRepository bookRepository;
-//
-//    private final Setup setup = new Setup();
-//    private Book createBook0;
-//
-//    @BeforeEach
-//    void setup() {
-//        createBook0 = setup.createBook(0);
-//        Book createBook1 = setup.createBook(1);
-//        bookRepository.saveAll(Arrays.asList(createBook0, createBook1));
-//    }
-//
-//    @DisplayName("BOOK 저장 및 조회 - queryDsl(JPAQueryFactory)")
-//    @Test
-//    void queryDslTest1() {
-//        //given
-//        entityManager.clear();
-//
-//        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-//        QBook qBook = QBook.book;
-//        JPAQuery<Book> query = queryFactory.selectFrom(qBook)
-//                .where(qBook.stock.eq(1));
-//
-//        //when
-//        List<Book> bookList = query.fetch();
-//
-//        //then
-//        for (Book book : bookList) {
-//            System.out.println(book.toString());
-//        }
-//    }
-//
-//
-//    @DisplayName("BOOK 수정")
-//    @Test
-//    void bookUpdate() {
-//        //given
-//        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto(0);
-//
-//        //when
-//        createBook0.update(requestDto);
-//        bookRepository.flush();
-//        entityManager.clear();
-//
-//        //then
-//        assertThat(createBook0.getTitle()).isEqualTo(requestDto.getBookTitle());
-//    }
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    @Autowired
+    BookRepository bookRepository;
+
+    private final Setup setup = new Setup();
+    private Book createBook0;
+
+    @BeforeEach
+    void setup() {
+        createBook0 = setup.createBook(0);
+        Book createBook1 = setup.createBook(1);
+        bookRepository.saveAll(Arrays.asList(createBook0, createBook1));
+    }
+
+    @DisplayName("BOOK 저장 및 조회 - queryDsl(JPAQueryFactory)")
+    @Test
+    void queryDslTest1() {
+        //given
+        entityManager.clear();
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        QBook qBook = QBook.book;
+        JPAQuery<Book> query = queryFactory.selectFrom(qBook)
+                .where(qBook.stock.eq(1));
+
+        //when
+        List<Book> bookList = query.fetch();
+
+        //then
+        for (Book book : bookList) {
+            System.out.println(book.toString());
+        }
+    }
+
+
+    @DisplayName("BOOK 수정")
+    @Test
+    void bookUpdate() {
+        //given
+        PostSaveRequestDto requestDto = setup.createPostSaveRequestDto(0);
+
+        //when
+        createBook0.update(requestDto);
+        bookRepository.flush();
+        entityManager.clear();
+
+        //then
+        assertThat(createBook0.getTitle()).isEqualTo(requestDto.getBookTitle());
+    }
 }

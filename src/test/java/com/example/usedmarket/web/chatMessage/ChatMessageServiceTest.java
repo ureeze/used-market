@@ -24,56 +24,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class ChatMessageServiceTest {
 
-//    @Autowired
-//    private ChatMessageService chatMessageService;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    @Autowired
-//    private ChatMessageRepository chatMessageRepository;
-//
-//    private final Setup setup = new Setup();
-//
-//    @Test
-//    @DisplayName("메시지 발급")
-//    void pubMessage() {
-//        // given
-//        UserEntity userEntity = setup.createUserEntity(0);
-//        userRepository.save(userEntity);
-//
-//        String message = "message 전송";
-//        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(1L, userEntity.getId(), message);
-//
-//        // when
-//        chatMessageService.pubMessage(requestDto);
-//
-//        // then
-//    }
-//
-//    @Test
-//    @DisplayName("해당 ChatRoom 에 대한 ChatMessage 리스트 조회")
-//    void retrieveChatMessageByChatRoom() {
-//        // given
-//        UserEntity userEntity = setup.createUserEntity(0);
-//        userRepository.save(userEntity);
-//
-//        Long chatRoomId = 1L;
-//        String message = "message 전송";
-//        ChatMessage chatMessage = ChatMessage.builder()
-//                .message(message)
-//                .chatRoomId(chatRoomId)
-//                .userEntity(userEntity)
-//                .build();
-//        chatMessageRepository.save(chatMessage);
-//
-//        // when
-//        List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageService.retrieveChatMessageByChatRoom(chatRoomId);
-//
-//        // then
-//        assertThat(chatMessageResponseDtoList.get(0).getChatRoomId()).isEqualTo(chatRoomId);
-//        assertThat(chatMessageResponseDtoList.get(0).getUserId()).isEqualTo(userEntity.getId());
-//        assertThat(chatMessageResponseDtoList.get(0).getMessage()).isEqualTo(message);
-//
-//    }
+    @Autowired
+    private ChatMessageService chatMessageService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
+    private final Setup setup = new Setup();
+
+    @Test
+    @DisplayName("메시지 발급")
+    void pubMessage() {
+        // given
+        UserEntity userEntity = setup.createUserEntity(0);
+        userRepository.save(userEntity);
+
+        String message = "message 전송";
+        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(1L, userEntity.getId(), message);
+
+        // when
+        chatMessageService.pubMessage(requestDto);
+
+        // then
+    }
+
+    @Test
+    @DisplayName("해당 ChatRoom 에 대한 ChatMessage 리스트 조회")
+    void retrieveChatMessageByChatRoom() {
+        // given
+        UserEntity userEntity = setup.createUserEntity(0);
+        userRepository.save(userEntity);
+
+        Long chatRoomId = 1L;
+        String message = "message 전송";
+        ChatMessage chatMessage = ChatMessage.builder()
+                .message(message)
+                .chatRoomId(chatRoomId)
+                .userEntity(userEntity)
+                .build();
+        chatMessageRepository.save(chatMessage);
+
+        // when
+        List<ChatMessageResponseDto> chatMessageResponseDtoList = chatMessageService.retrieveChatMessageByChatRoom(chatRoomId);
+
+        // then
+        assertThat(chatMessageResponseDtoList.get(0).getChatRoomId()).isEqualTo(chatRoomId);
+        assertThat(chatMessageResponseDtoList.get(0).getUserId()).isEqualTo(userEntity.getId());
+        assertThat(chatMessageResponseDtoList.get(0).getMessage()).isEqualTo(message);
+
+    }
 }

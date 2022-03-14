@@ -31,59 +31,59 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Import(TestConfig.class)
 public class OrderedBookRepositoryTest {
-//    @Autowired
-//    OrderRepository orderRepository;
-//
-//    @Autowired
-//    UserRepository userRepository;
-//
-//    @Autowired
-//    PostRepository postRepository;
-//
-//    @Autowired
-//    BookRepository bookRepository;
-//
-//    @Autowired
-//    OrderedBookRepository orderedBookRepository;
-//
-//    @Autowired
-//    TestEntityManager testEntityManager;
-//
-//    private final Setup setup = new Setup();
-//    private Book book;
-//    private OrderedBook orderedBook;
-//
-//
-//    @BeforeEach
-//    void setup() {
-//        UserEntity userEntity = setup.createUserEntity(0);
-//        testEntityManager.persist(userEntity);
-//
-//        book = setup.createBook(0);
-//        Post post = setup.createPost(userEntity, 0);
-//        book.addPost(post);
-//        post.addBook(book);
-//        testEntityManager.persist(post);
-//
-//        Order order = setup.createOrder(userEntity, null, 0);
-//        orderedBook = setup.createOrderedBook(userEntity, book);
-//        testEntityManager.persist(order);
-//    }
-//
-//    @Test
-//    @DisplayName("OrderedBook 저장")
-//    void saveOrderedBook() {
-//        //given
-//
-//        //when
-//        testEntityManager.persist(orderedBook);
-//        testEntityManager.clear();
-//
-//        //then
-//        Optional<OrderedBook> findOrder = orderedBookRepository.findById(orderedBook.getId());
-//        if (findOrder.isPresent()) {
-//            assertThat(findOrder.get().getOrderPrice()).isEqualTo(orderedBook.getOrderPrice());
-//            assertThat(findOrder.get().getBook().getId()).isEqualTo(book.getId());
-//        }
-//    }
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    BookRepository bookRepository;
+
+    @Autowired
+    OrderedBookRepository orderedBookRepository;
+
+    @Autowired
+    TestEntityManager testEntityManager;
+
+    private final Setup setup = new Setup();
+    private Book book;
+    private OrderedBook orderedBook;
+
+
+    @BeforeEach
+    void setup() {
+        UserEntity userEntity = setup.createUserEntity(0);
+        testEntityManager.persist(userEntity);
+
+        book = setup.createBook(0);
+        Post post = setup.createPost(userEntity, 0);
+        book.addPost(post);
+        post.addBook(book);
+        testEntityManager.persist(post);
+
+        Order order = setup.createOrder(userEntity, null, 0);
+        orderedBook = setup.createOrderedBook(userEntity, book);
+        testEntityManager.persist(order);
+    }
+
+    @Test
+    @DisplayName("OrderedBook 저장")
+    void saveOrderedBook() {
+        //given
+
+        //when
+        testEntityManager.persist(orderedBook);
+        testEntityManager.clear();
+
+        //then
+        Optional<OrderedBook> findOrder = orderedBookRepository.findById(orderedBook.getId());
+        if (findOrder.isPresent()) {
+            assertThat(findOrder.get().getOrderPrice()).isEqualTo(orderedBook.getOrderPrice());
+            assertThat(findOrder.get().getBook().getId()).isEqualTo(book.getId());
+        }
+    }
 }
