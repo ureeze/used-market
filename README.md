@@ -204,7 +204,6 @@ public class MissionControllerTest {
 
 # AWS (Infra) 	
 > 전체 프로젝트 인프라 구성 및 계정 별 권한을 관리합니다.	
-구조는 다음과 같습니다.	
 
 
 - EC2의 ssh 접근권한은 반드시 본인의 IP 만 허용하였습니다. 	
@@ -215,10 +214,15 @@ public class MissionControllerTest {
 > 채팅 서비스를 구축하기 위해 AWS EC2에 DOCKER를 설치하여 Rabbit MQ 컨테이너를 구동하였습니다.  
 > WEB Client에서 전송된 Message는 Spring Boot 서버의 StompBrokerRelay를 통해 외부 Message Broker인 RabbitMQ로 전송됩니다.  
 > Message는 RabbitMQ에서 RoutingKey에 의해 Exchange에서 Queue로 binding되며 WebClient는 Subscribe한 Queue를 통해 Message를 전달받습니다.  
-![20220313_215639](https://user-images.githubusercontent.com/37195463/158060393-9dc4c646-fde9-4364-95e1-35ce6fe61dd4.png)
+
+![20220317_013218](https://user-images.githubusercontent.com/37195463/158640148-ab224291-2997-4342-a544-66b259cfcc9a.png)
+![20220317_011153](https://user-images.githubusercontent.com/37195463/158635945-5287f5ab-1d84-486c-bef4-eeeb25ed2c74.png)
 
  
 
-# Jenkins & Codedeploy (CI/CD) 	
-> Jenkins와 AWS의 CodeDeploy를 사용해 CI/CD를 구현하였습니다.  	 
- 
+# Jenkins & CodeDeploy (CI/CD) 	
+> EC2의 Docker에 Jenkins 컨테이너를 구동하고 AWS S3, CodeDeploy를 사용하였습니다.  
+> 실제 서비스 시에 새로운 코드의 변경사항이 적용된 프로젝트가 정기적으로 빌드 및 테스트, 배포되어야 하므로 CI/CD 환경을 구축하였습니다.  
+
+![20220317_004118](https://user-images.githubusercontent.com/37195463/158629641-267897fc-d5e7-4f0e-af9b-29ef9d8b4355.png)
+
