@@ -72,10 +72,9 @@
 
 > 사용한 기술스택은 다음과 같습니다.  
 • Spring Boot (API Server)  
-• Spring Security (Security)  
+• Spring Security + JWT (Security & Login)  
 • MySQL (RDB)  
 • JPA & QueryDSL (ORM)  
-• OAuth2.0 + JWT (Login)  
 • Redis (Cache)  
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
@@ -104,7 +103,7 @@
  	
  
 
-# Spring Security (Security) 	
+# Spring Security (Security) + JWT (Login)  
 > Security 설정을 추가해 인가된 사용자만 특정 API에 접근할 수 있도록 제한하였습니다. 또한, CORS 설정을 통해 허용된 도메인에서만 API 를 호출할 수 있습니다.  
 
 - Allowed Origins : frontend(react) domain
@@ -115,14 +114,20 @@
 
 > 전체 User가 접근할 수 있어야 하는 API(회원가입, 로그인)는 permitAll()을 선언하였습니다. 반대로 그 외에 인가된 사용자만 접근할 수 있어야 하는 서비스 API에는 hasAuthority() 를 이용하여 접근을 제한하였습니다.	
 
- 
+> Security + JWT Token을 사용하여 Authorizaton Header 기반 인증 시스템을 구현하였습니다.  
+
+![20220317_164815](https://user-images.githubusercontent.com/37195463/158761535-ce0417b5-20f4-4250-8915-81a2f37852c6.png)
+![20220317_164824](https://user-images.githubusercontent.com/37195463/158761549-3de3aa5b-dcab-4a0f-a87f-9d2f889aacf3.png)
+
 
 # JPA & QueryDSL (ORM)	 
 • JPA : 객체 중심 domain 설계 및 반복적인 CRUD 작업을 대체합니다.
 
 • QueryDSL : 컴파일 단계에서 작성한 Query에 오류가 없는 지 확인할 수 있으며 재 사용성이 용이하여 적용하였습니다.
-- 연관관계의 ENTITY에서 QUERY 조회할 경우 N + 1 문제해결방법 : https://blog.naver.com/alchemy21/222596437670
-- fetchjoin & pageable 사용 시 문제해결방법 : https://blog.naver.com/alchemy21/222660250498
+- 연관관계의 ENTITY에서 QUERY 조회할 경우 N + 1 문제 해결방법 : https://blog.naver.com/alchemy21/222596437670
+- fetchjoin & pageable 를 동시에 사용 시 QUERY에 Limit가 적용되지 않는 문제 해결방법 : https://blog.naver.com/alchemy21/222660250498  
+
+![img](https://user-images.githubusercontent.com/37195463/158750861-5207b753-50b2-4f7d-9648-3270e59d4cce.png)
 
 - Post (Domain Class)	
 - PostRepository (JPA Interface)	
@@ -148,14 +153,12 @@ Hibernate:
             on post0_.id=commentlis1_.post_id  
 ```	
 
-# Security + JWT (Login)	
-> JWT Token을 사용하여 Authorizaton Header 기반 인증 시스템을 구현하였습니다.	
-
- 
 
 # Redis (Cache)	
 > Global Cache Server를 사용해 반복적인 메서드의 호출을 차단, API 응답 성능을 높였습니다.  
-![20220313_223817](https://user-images.githubusercontent.com/37195463/158062165-31bd6dfe-9590-4a83-81a4-b1a983d06e8c.png)
+
+![20220317_153052](https://user-images.githubusercontent.com/37195463/158750378-cb121aec-e585-4bca-859b-d8f0b5e903a9.png)
+
 - @CachePut : key 값의 Cache를 갱신합니다.	
 - @Cacheable : key가 존재할 경우 Cache 된 결과값을 Return 합니다. 존재하지 않을 경우 메서드를 실행 후 결과값을 Cache 합니다.	
 - @CacheEvict : key 값의 Cache를 제거합니다.	
@@ -205,6 +208,7 @@ public class MissionControllerTest {
 # AWS (Infra) 	
 > 전체 프로젝트 인프라 구성 및 계정 별 권한을 관리합니다.	
 
+![20220317_180251](https://user-images.githubusercontent.com/37195463/158774590-5f8b5949-873f-4c72-ab17-93cea8abd893.png)
 
 - EC2의 ssh 접근권한은 반드시 본인의 IP 만 허용하였습니다. 	
 
@@ -215,7 +219,7 @@ public class MissionControllerTest {
 > WEB Client에서 전송된 Message는 Spring Boot 서버의 StompBrokerRelay를 통해 외부 Message Broker인 RabbitMQ로 전송됩니다.  
 > Message는 RabbitMQ에서 RoutingKey에 의해 Exchange에서 Queue로 binding되며 WebClient는 Subscribe한 Queue를 통해 Message를 전달받습니다.  
 
-![20220317_013218](https://user-images.githubusercontent.com/37195463/158640148-ab224291-2997-4342-a544-66b259cfcc9a.png)
+![20220317_191642](https://user-images.githubusercontent.com/37195463/158787966-725c45eb-772d-4f7e-9694-6cd19bc32d3b.png)
 ![20220317_011153](https://user-images.githubusercontent.com/37195463/158635945-5287f5ab-1d84-486c-bef4-eeeb25ed2c74.png)
 
  
