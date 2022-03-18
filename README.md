@@ -186,7 +186,7 @@ public class OrderedBookRepositoryTest {
 @ActiveProfiles("test")  
 @Transactional  
 @SpringBootTest  
-public class MissionServiceTest {	
+public class OrderServiceTest {	
 ...	
 }	
 ```	
@@ -198,7 +198,7 @@ public class MissionServiceTest {
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class MissionControllerTest {	
+public class OrderControllerTest {	
 ...	
 }	
 ```	
