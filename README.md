@@ -110,7 +110,7 @@
 - Session Creation Policy : STATELESS	
 - CSRF : disable	
 - Form Login : disable	
-- Token Authentication Filter : UsernamePasswordAuthenticationFilter.class	
+- Token Authentication Filter : JwtAuthenticationFilter.class	
 
 > 전체 User가 접근할 수 있어야 하는 API(회원가입, 로그인)는 permitAll()을 선언하였습니다. 반대로 그 외에 인가된 사용자만 접근할 수 있어야 하는 서비스 API에는 hasAuthority() 를 이용하여 접근을 제한하였습니다.	
 
