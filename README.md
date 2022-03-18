@@ -116,7 +116,7 @@
 
 > Security + JWT Token을 사용하여 Authorizaton Header 기반 인증 시스템을 구현하였습니다.  
 
-![20220317_164815](https://user-images.githubusercontent.com/37195463/158761535-ce0417b5-20f4-4250-8915-81a2f37852c6.png)
+![20220317_164815](https://user-images.githubusercontent.com/37195463/159002681-4bd72e1c-5317-4f7b-a0f6-3e22d1ec17d5.png)
 ![20220317_164824](https://user-images.githubusercontent.com/37195463/158761549-3de3aa5b-dcab-4a0f-a87f-9d2f889aacf3.png)
 
 
