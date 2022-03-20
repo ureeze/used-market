@@ -41,7 +41,8 @@
 ![20220313_204933](https://user-images.githubusercontent.com/37195463/158058322-b18b6ef9-0fda-4aef-b56c-252ed2a10001.png)
 
 ## 7. 채팅 목록 확인
-- 자신이 참여 중인 채팅방을 확인 및 관리 할 수 있습니다. 채팅방은 자신이 구매자인 경우와 판매자인 경우로 나눠집니다.
+- 자신이 참여 중인 채팅방을 확인 및 관리 할 수 있습니다. 채팅방은 자신이 구매자인 경우와 판매자인 경우로 나눠집니다.  
+
 ![20220313_205744](https://user-images.githubusercontent.com/37195463/158059977-7740e3b4-ed76-4b27-abc2-283eee09a802.png)
 
 ![20220313_214429](https://user-images.githubusercontent.com/37195463/158059932-6a9853dd-138c-4ee9-92ae-b6cc9d0e2939.png)
