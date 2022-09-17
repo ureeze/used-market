@@ -1,5 +1,5 @@
 # USED-MARKET  
-![20220917_145922](https://user-images.githubusercontent.com/37195463/190842889-0fc5bcd0-c497-4580-bd94-5eb99739bdae.png)
+![20220917_184834](https://user-images.githubusercontent.com/37195463/190850848-cf0d84f4-a459-4e67-90af-da00a2f9d39b.png)
 
 - 도서 중고 거래 플랫폼  
 
@@ -73,6 +73,7 @@
 • JUnit (Test)  
 • AWS EC2  
 • AWS RDS (MySQL)  
+• Docker  
 • Jenkins & Codedeploy (CI/CD)  
 
 > ERD  
@@ -151,7 +152,7 @@ Hibernate:
 # Redis (Cache)	
 > Global Cache Server를 사용해 반복적인 메서드의 호출을 차단, API 응답 성능을 높였습니다.  
 
-![20220317_153052](https://user-images.githubusercontent.com/37195463/158750378-cb121aec-e585-4bca-859b-d8f0b5e903a9.png)
+![20220917_184459](https://user-images.githubusercontent.com/37195463/190850731-4b3d50e4-9e0b-49eb-bfdc-e7cb66fe5b72.png)
 
 - @CachePut : key 값의 Cache를 갱신합니다.	
 - @Cacheable : key가 존재할 경우 Cache 된 결과값을 Return 합니다. 존재하지 않을 경우 메서드를 실행 후 결과값을 Cache 합니다.	
@@ -213,8 +214,8 @@ public class OrderControllerTest {
 > WEB Client에서 전송된 Message는 Spring Boot 서버의 StompBrokerRelay를 통해 외부 Message Broker인 RabbitMQ로 전송됩니다.  
 > Message는 RabbitMQ에서 RoutingKey에 의해 Exchange에서 Queue로 binding되며 WebClient는 Subscribe한 Queue를 통해 Message를 전달받습니다.  
 
-![20220317_191642](https://user-images.githubusercontent.com/37195463/158787966-725c45eb-772d-4f7e-9694-6cd19bc32d3b.png)
-![20220317_011153](https://user-images.githubusercontent.com/37195463/158635945-5287f5ab-1d84-486c-bef4-eeeb25ed2c74.png)
+ 
+![20220917_184645](https://user-images.githubusercontent.com/37195463/190850804-a7ce1af3-2039-4a94-a00a-d2681156eeda.png)
 
  
 
