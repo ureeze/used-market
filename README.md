@@ -1,4 +1,6 @@
 # USED-MARKET  
+![20220917_145922](https://user-images.githubusercontent.com/37195463/190842889-0fc5bcd0-c497-4580-bd94-5eb99739bdae.png)
+
 - 도서 중고 거래 플랫폼  
 
 - 더 이상 읽지 않는 중고 도서를 판매 목록에 등록합니다.
@@ -14,55 +16,46 @@
 - 메인 페이지  
 ![20220313_182559](https://user-images.githubusercontent.com/37195463/158058101-844a6420-cefe-4e6f-b666-0a90289b1e01.png)
 
-- 회원 가입 페이지  
-![20220313_182614](https://user-images.githubusercontent.com/37195463/158058149-f55003ac-d392-4e9e-bc1b-23258173859a.png)
-
-- 로그인 페이지  
-![20220313_182620](https://user-images.githubusercontent.com/37195463/158058151-1304a61d-ace9-46ad-93b4-196b428cf6f6.png)
+- 회원 가입 및 로그인 페이지    
+![20220313_182644](https://user-images.githubusercontent.com/37195463/190844051-25578f3f-4302-43cd-a195-7504b20e506f.png)
 
 ## 2. 전체 도서 목록	
 - 새로 등록된 중고 도서를 확인할 수 있습니다.  
 ![20220313_204435](https://user-images.githubusercontent.com/37195463/158058166-05c4f6f5-7ec3-408a-84d6-798ea7c62898.png)
  
-## 3. POST 작성하기	
+## 3. 판매할 도서 등록하기 (POST 등록)
 - 판매하고자 할 도서의 상세정보를 입력 후 POST를 등록합니다.  
 ![20220313_204443](https://user-images.githubusercontent.com/37195463/158058184-2b025c23-b7f6-4bbc-a3ed-bc77f2e46abc.png)
 
-## 4. POST 작성 / 도서 판매 목록 확인
+## 4. 중고 도서 판매 목록 확인하기
 - 자신이 판매중인 도서 목록을 확인 할 수 있습니다.  
 ![20220313_205003](https://user-images.githubusercontent.com/37195463/158058259-4342a320-fa4e-495c-8f51-fe0b9eea2aeb.png)
 
-## 5. POST 상세 정보
+## 5. 중고 도서 상세 조회
 - 관심있는 도서의 POST를 확인하여 상세 정보를 확인할 수 있습니다.
 ![20220313_204555](https://user-images.githubusercontent.com/37195463/158058277-8c2917e1-581d-44c3-8e0f-35e246de7c7d.png)
  
-## 6. 채팅 참여	
-- 구매하기 전 도서 구매와 관련하여 판매자와 이야기를 나눌 수 있습니다.
-![20220313_204933](https://user-images.githubusercontent.com/37195463/158058322-b18b6ef9-0fda-4aef-b56c-252ed2a10001.png)
+## 6. 주문하기
+- 이름, 전화번호, 배송지를 작성하고 도서 상세내역을 확인하고 주문합니다.
+![20220313_204700](https://user-images.githubusercontent.com/37195463/190847186-da866254-fd36-4dd8-bc96-29b107380b2f.png)
 
-## 7. 채팅 목록 확인
+
+
+## 7. 채팅 목록 및 채팅 참여	
 - 자신이 참여 중인 채팅방을 확인 및 관리 할 수 있습니다. 채팅방은 자신이 구매자인 경우와 판매자인 경우로 나눠집니다.  
-
-![20220313_205744](https://user-images.githubusercontent.com/37195463/158059977-7740e3b4-ed76-4b27-abc2-283eee09a802.png)
-
-![20220313_214429](https://user-images.githubusercontent.com/37195463/158059932-6a9853dd-138c-4ee9-92ae-b6cc9d0e2939.png)
+- 구매하기 전 도서 구매와 관련하여 판매자와 이야기를 나눌 수 있습니다.
+![20220313_214439](https://user-images.githubusercontent.com/37195463/190847655-7d203b00-a0f1-41f6-96c2-45b20dc8dd22.png)
 
  
-## 8. 주문 정보 작성	
-- 이름, 전화번호, 배송지를 작성하고 도서 상세내역을 확인합니다.
-![20220313_204654](https://user-images.githubusercontent.com/37195463/158058382-7110069a-5156-42d1-9310-6da46fd65a68.png)
 
-
-## 9. 주문 도서 목록
-- 내가 주문한 도서 목록을 확인 할 수 있습니다.
-![20220313_204742](https://user-images.githubusercontent.com/37195463/158058394-09868e14-33d3-4249-a3d2-9b56dde74af9.png)
- 
-## 8. 주문 취소	
-- 배송 상태가 결제완료인 경우에 한하여 주문 취소가 가능합니다.
-
+## 8. 주문 도서 목록 및 상세 정보
+- 내가 주문한 도서 목록을 확인 할 수 있습니다.  
+- 배송 상태가 결제완료인 경우에 한하여 주문 취소가 가능합니다.  
 - 배송 상태가 배송 중, 배송 완료인 경우에는 주문 취소가 불가능 합니다.
-![20220313_210101](https://user-images.githubusercontent.com/37195463/158058444-7f88fd21-d2eb-4521-916d-871da5a5b6f9.png)
 
+
+![20220313_210112](https://user-images.githubusercontent.com/37195463/190848114-c1270433-ca72-4b5d-9dd8-5c4bfd4e747e.png)
+ 
 ## 9. 도서 및 POST 검색
 - 도서 제목 혹은 POST 제목을 찾고자 하는 도서/POST를 검색할 수 있습니다.
 ![20220313_204811](https://user-images.githubusercontent.com/37195463/158058456-043837e9-67ac-4690-b208-df47d325085f.png)
@@ -74,12 +67,12 @@
 > 사용한 기술스택은 다음과 같습니다.  
 • Spring Boot (API Server)  
 • Spring Security + JWT (Security & Login)  
-• MySQL (RDB)  
 • JPA & QueryDSL (ORM)  
 • Redis (Cache)  
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
-• AWS (Infra)  
+• AWS EC2  
+• AWS RDS (MySQL)  
 • Jenkins & Codedeploy (CI/CD)  
 
 > ERD  
@@ -96,7 +89,7 @@
 
 - config  : 프로젝트 configuration을 관리합니다.	
 - exception : custom exception message를 관리합니다.  	
-- security : security, oauth, jwt 관련 기능들을 관리합니다.		
+- security : security, jwt 관련 기능들을 관리합니다.		
 - controller : API를 관리합니다.	
 - dto : request/response dto를 관리합니다.	
 - domain : domain + JPA/QueryDSL를 관리합니다. (비즈니스 로직은 service가 아닌 domain에 작성하였습니다.)  
@@ -104,7 +97,7 @@
  	
  
 
-# Spring Security (Security) + JWT (Login)  
+# Spring Security + JWT (Login)  
 > Security 설정을 추가해 인가된 사용자만 특정 API에 접근할 수 있도록 제한하였습니다. 또한, CORS 설정을 통해 허용된 도메인에서만 API 를 호출할 수 있습니다.  
 
 - Allowed Origins : frontend(react) domain
@@ -206,7 +199,7 @@ public class OrderControllerTest {
 
 > 총 52개의 Test Case를 작성했습니다.  
 
-# AWS (Infra) 	
+# AWS  	
 > 전체 프로젝트 인프라 구성 및 계정 별 권한을 관리합니다.	
 
 ![20220317_180251](https://user-images.githubusercontent.com/37195463/158774590-5f8b5949-873f-4c72-ab17-93cea8abd893.png)
