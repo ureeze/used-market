@@ -111,8 +111,9 @@
 
 > Security + JWT Token을 사용하여 Authorizaton Header 기반 인증 시스템을 구현하였습니다.  
 
-![20220317_164815](https://user-images.githubusercontent.com/37195463/159002681-4bd72e1c-5317-4f7b-a0f6-3e22d1ec17d5.png)
-![20220317_164824](https://user-images.githubusercontent.com/37195463/158761549-3de3aa5b-dcab-4a0f-a87f-9d2f889aacf3.png)
+![20220917_190727](https://user-images.githubusercontent.com/37195463/190851520-9176cf48-1596-4779-b3e0-da432877de8d.png)  
+#  
+![20220917_190735](https://user-images.githubusercontent.com/37195463/190851522-24a08d8c-a915-4962-a649-c2df8ea4e1e4.png)
 
 
 # JPA & QueryDSL (ORM)	 
