@@ -60,7 +60,7 @@
  
  
 # Project Structure	
-> React(SPA) + Spring Boot(API Server) 구조로 개발하였습니다. 프로젝트에 필요한 기술들은 공식문서/책 등을 참조하여 적용하였습니다.  	
+> React(SPA) + Spring Boot(API Server) 구조로 개발하였습니다. 프로젝트에 필요한 기술들은 공식문서/책 등을 참조하여 적용하였습니다.   	
 • Spring Boot (API Server)  
 • Spring Security + JWT Token (Login)  
 • MySQL (RDS)  
