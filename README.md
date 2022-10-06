@@ -68,8 +68,7 @@
 • Redis (Cache)  
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
-• AWS   
-• MySQL (RDS)  
+• AWS    
 • Docker  
 • Jenkins & Codedeploy (CI/CD)  
 
