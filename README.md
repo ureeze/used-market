@@ -68,9 +68,9 @@
 • Redis (Cache)  
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
-• AWS    
+• AWS EC2    
 • Docker  
-• Jenkins & Codedeploy (CI/CD)  
+• Jenkins & AWS S3, Codedeploy (CI/CD)  
 
 > ERD  
 • ErdCloud :  
