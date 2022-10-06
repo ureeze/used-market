@@ -69,7 +69,7 @@
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
 • AWS   
-• MySQL (RDS) 
+• MySQL (RDS)  
 • Docker  
 • Jenkins & Codedeploy (CI/CD)  
 
