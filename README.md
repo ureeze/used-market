@@ -3,9 +3,7 @@
 
 - 도서 중고 거래 플랫폼  
 
-- 더 이상 읽지 않는 중고 도서를 판매 목록에 등록합니다.
-
-- 원하는 도서가 존재하면 구매할 수 있습니다.  
+- 이용자 간에 중고 도서 구매/판매를 할 수 있습니다.  
 
 - 채팅 서비스를 이용하여 거래 전 사전 조율을 합니다.
 
@@ -63,16 +61,15 @@
  
 # Project Structure	
 > React(SPA) + Spring Boot(API Server) 구조로 개발하였습니다. 프로젝트에 필요한 기술들은 공식문서/책 등을 참조하여 적용하였습니다.	
-
-> 사용한 기술스택은 다음과 같습니다.  
 • Spring Boot (API Server)  
-• Spring Security + JWT (Security & Login)  
+• Spring Security + JWT Token (Login)  
+• MySQL (RDS)  
 • JPA & QueryDSL (ORM)  
 • Redis (Cache)  
 • Rabbit MQ (Message Broker)  
 • JUnit (Test)  
-• AWS EC2  
-• AWS RDS (MySQL)  
+• AWS   
+• MySQL (RDS) 
 • Docker  
 • Jenkins & Codedeploy (CI/CD)  
 
